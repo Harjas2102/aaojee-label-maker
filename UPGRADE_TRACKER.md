@@ -43,6 +43,7 @@ here.
 | U-018 | 2026-09-17 | Git version control + GitHub sync         | **Live** — private repo github.com/Harjas2102/aaojee-label-maker | — |
 | U-019 | 2026-09-17 | Automated tests on every change           | **Live** (hook on; GitHub runs tests + builds the .exe on every push) | `git config --unset core.hooksPath` turns the hook off |
 | U-020 | 2026-09-17 | U-006 / U-013 re-run on the store's database | Done: `september_store_copy/READY_FOR_STORE/products.db`, not yet installed | Put back the store's original file (see U-020) |
+| U-021 | 2026-09-17 | Make Aaojee labels scan in Square         | In progress: step 1 (one-item test at the store) | Nothing changed in Square yet |
 
 "Not yet built" means the source is changed but `AaojeeLabels.exe` hasn't been rebuilt with it.
 Update the status to **Live** once the new build is in use at the store.
@@ -938,6 +939,40 @@ as `store_original_products.db`.
 **Undo.** Close the program and put `products_before_update.db` back as `products.db`. The May
 `.exe` also works with the new file (schema v2 is compatible; see Schema v2), so going back to the
 old `.exe` alone doesn't require this.
+
+### U-021 — Make Aaojee labels scan in Square
+
+**Problem.** Scanning an Aaojee label at the Square register says *"Item not found - Item with
+GTIN '03122006' was not found"* (Hakka Noodles).
+
+**Root cause.** The labels are correct. The Square catalog was built in June from Sellorama's
+`Products.accdb` (see `POS Upgrade Files for Context/`, kept out of Git). The import rule put
+every barcode into **SKU** and only put 8/12/13/14-digit barcodes into **GTIN**. Sellorama stored
+in-house codes as the 6 data digits, so Square has HAKKA NOODLES as SKU `312200`, GTIN blank. The
+scanner sends the whole UPC-E, `03122006`, and Square only finds exact matches. Sellorama
+cut the scan down to the middle 6 digits itself.
+
+Findings from the Square export of 2026-09-17 (a snapshot of the June import; Square is not in use yet):
+- 807 items have a 6-digit SKU and no GTIN. 424 of the label program's 441 barcoded products
+  are among them. The rest include manufactured cans and candy stored the same way (DIET COKE
+  `496580`, PEPSI `121290`, SNICKERS `401020`), which probably fail too.
+- None of the 807 eight-digit codes clashes with any SKU or GTIN in Square, or with each other.
+- Only 195 of the 807 also pass the GTIN-8 check digit, so Square might reject most of them in
+  the GTIN field. Step 1 tests this.
+- 24 codes name a different product in Square than in the label program (e.g. `565400` CROWN
+  CHILLI POWDER vs ALOO PANEER), 107 prices differ, and 17 label products are not in Square.
+
+**Plan.**
+1. One-item test (`data_changes/2026-09-17_U-021_square_scan_codes/make_test_files.py`):
+   `TEST_A_gtin.xlsx` gives ALOO MATTER GTIN `03143009` (it fails the GTIN-8 check, so it is a
+   real test); `TEST_B_sku.xlsx` puts it in SKU instead. Same Token, all other cells unchanged.
+2. Owner reviews the name/price/missing-item list against a fresh copy of Sellorama's database.
+3. Update import for the 807 items, changing only the field chosen in step 1; compare a
+   re-export with the baseline `square_export_before_U-021.xlsx`.
+4. Optional (needs approval, cashiers would see it): show the Square scan code in Edit Products.
+
+**Undo.** Nothing changed in Square yet. After the import, re-importing the baseline export
+puts the old SKU/GTIN values back.
 
 ---
 

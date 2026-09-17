@@ -12,6 +12,11 @@ data_changes/*/store_original_settings.json
 *.db-wal
 *.db-shm
 
+# Old POS (Sellorama) backup + Square migration files: sales and customer databases (U-021)
+POS Upgrade Files for Context/
+# Square library exports and import files (store data)
+data_changes/*/*.xlsx
+
 # ── Build output (rebuilt by build.bat) ──────────────────────────────────────
 AaojeeLabels.exe
 source/build/
