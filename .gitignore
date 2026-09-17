@@ -6,6 +6,11 @@
 /settings.json
 /print_queue.json
 backups/
+# Copies of the store PC's files, brought over on a flash drive (U-020)
+september_store_copy/
+data_changes/*/store_original_settings.json
+*.db-wal
+*.db-shm
 
 # ── Build output (rebuilt by build.bat) ──────────────────────────────────────
 AaojeeLabels.exe

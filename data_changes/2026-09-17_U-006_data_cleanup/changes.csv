@@ -66,7 +66,7 @@ update,107,GREEN CHANNA,size,2LBS,2 LB,1 size spelling
 update,112,YELLOW PEAS,size,2LBS,2 LB,1 size spelling
 update,113,YELLOW PEAS,size,4LB,4 LB,1 size spelling
 update,121,BHINDI ALOO,ingredients,"Okra, Potato, Tomato, Carrom seed, tumeric,onions,spieces,salt &oil","Okra, Potato, Tomato, Carrom seed, tumeric, onions, spieces, salt & oil",2 ingredient spacing/punctuation
-update,124,AAOJEE BLACK TEA,size,800G,800 GM,1 size spelling
+update,124,AAOJEE BLEND TEA,size,800G,800 GM,1 size spelling
 update,134,MANGO MOOSE,name,MANGO MOOSE,MANGO MOUSSE,3 name spelling
 update,135,MANGO MOOSE,name,MANGO MOOSE,MANGO MOUSSE,3 name spelling
 update,137,WHOLE WHEAT ATTA,size,4LB,4 LB,1 size spelling
@@ -87,7 +87,6 @@ update,166,JUMBO CASHEW,size,2LB,2 LB,1 size spelling
 update,168,ROASTED PISTACHO,size,2LB,2 LB,1 size spelling
 update,169,JUMBO ALMOND,size,2LB,2 LB,1 size spelling
 update,170,JUMBO DATES,size,1.5LB,1.5 LB,1 size spelling
-update,171,JUMBO ALMOND,size,4LB,4 LB,1 size spelling
 update,172,JUMBO CASHEW,size,3LB,3 LB,1 size spelling
 update,176,BASMATI RICE,size,4.0LB,4 LB,1 size spelling
 update,182,FENNEL CANDY,size,14Oz,14 OZ,1 size spelling
@@ -164,21 +163,33 @@ update,401,RASGULLA,size,14OZ,14 OZ,1 size spelling
 update,404,SOYA  WADI,name,SOYA  WADI,SOYA WADI,2 stray spaces
 update,418,WALNUTS,size,1.5lb,1.5 LB,1 size spelling
 update,422,ALU BUKHARA,size,7OZ,7 OZ,1 size spelling
-update,134,MANGO MOOSE,notes,,CHECK (data cleanup 2026-09-17): another product has the same name and size but costs $5.99 (barcode 313900). Probably a different size — add the size to both.,4 flagged: duplicate name+size
-update,135,MANGO MOOSE,notes,,CHECK (data cleanup 2026-09-17): another product has the same name and size but costs $4.99 (barcode 313800). Probably a different size — add the size to both.,4 flagged: duplicate name+size
+update,431,PARAS  COOKIES,name,PARAS  COOKIES,PARAS COOKIES,2 stray spaces
+update,433,GOLGAPPA PANI,ingredients,"MINT,CILENTRO,","MINT, CILENTRO",2 ingredient spacing/punctuation
+update,436,GOLDEN RAISINS,size,28OZ,28 OZ,1 size spelling
+update,438,CHIA SEEDS,size,1.50 LB,1.5 LB,1 size spelling
+update,440,MANGO MOOSE,name,MANGO MOOSE,MANGO MOUSSE,3 name spelling
+update,441,LOBIA RASMISA,name,LOBIA RASMISA,LOBIA RASMISSA,3 name spelling
+update,134,MANGO MOOSE,notes,,CHECK (data cleanup 2026-09-17): another product has the same name and size but costs $5.99 (barcode 313900). Probably a different size — add the size to both. | CHECK (data cleanup 2026-09-17): another product has the same name and size but costs $5.99 (barcode 100006). Probably a different size — add the size to both.,4 flagged: duplicate name+size; 4 flagged: duplicate name+size
+update,135,MANGO MOOSE,notes,,"CHECK (data cleanup 2026-09-17): another product has the same name and size but costs $3.99 (barcode 313800). Probably a different size — add the size to both. | CHECK (data cleanup 2026-09-17): another product has the same name, size and price (barcode 100006). Look both barcodes up in the POS and delete the one the POS does not use.",4 flagged: duplicate name+size; 4 flagged: duplicate name+size
+update,440,MANGO MOOSE,notes,,"CHECK (data cleanup 2026-09-17): another product has the same name and size but costs $3.99 (barcode 313800). Probably a different size — add the size to both. | CHECK (data cleanup 2026-09-17): another product has the same name, size and price (barcode 313900). Look both barcodes up in the POS and delete the one the POS does not use.",4 flagged: duplicate name+size; 4 flagged: duplicate name+size
 update,176,BASMATI RICE,notes,,"CHECK (data cleanup 2026-09-17): another product has the same name, size and price (barcode 502700). Look both barcodes up in the POS and delete the one the POS does not use.",4 flagged: duplicate name+size
 update,241,BASMATI RICE,notes,,"CHECK (data cleanup 2026-09-17): another product has the same name, size and price (barcode 318900). Look both barcodes up in the POS and delete the one the POS does not use.",4 flagged: duplicate name+size
+update,210,DAHI VADA,notes,,"CHECK (data cleanup 2026-09-17): another product has the same name, size and price (barcode 100002). Look both barcodes up in the POS and delete the one the POS does not use.",4 flagged: duplicate name+size
+update,434,DAHI VADA,notes,,"CHECK (data cleanup 2026-09-17): another product has the same name, size and price (barcode 405400). Look both barcodes up in the POS and delete the one the POS does not use.",4 flagged: duplicate name+size
 update,287,DEER BROWN MUSTARD- BIG,notes,,"CHECK (data cleanup 2026-09-17): another product has the same name, size and price (barcode 562100). Look both barcodes up in the POS and delete the one the POS does not use.",4 flagged: duplicate name+size
 update,288,DEER BROWN MUSTARD- BIG,notes,,"CHECK (data cleanup 2026-09-17): another product has the same name, size and price (barcode 562000). Look both barcodes up in the POS and delete the one the POS does not use.",4 flagged: duplicate name+size
 update,315,MANGO CANDY,notes,,CHECK (data cleanup 2026-09-17): another product has the same name and size but costs $2.99 (barcode 565500). Probably a different size — add the size to both.,4 flagged: duplicate name+size
 update,317,MANGO CANDY,notes,,CHECK (data cleanup 2026-09-17): another product has the same name and size but costs $1.99 (barcode 565000). Probably a different size — add the size to both.,4 flagged: duplicate name+size
+update,357,GOLGAPPA PANI,notes,,"CHECK (data cleanup 2026-09-17): another product has the same name, size and price (barcode 100001). Look both barcodes up in the POS and delete the one the POS does not use.",4 flagged: duplicate name+size
+update,433,GOLGAPPA PANI,notes,,"CHECK (data cleanup 2026-09-17): another product has the same name, size and price (barcode 603800). Look both barcodes up in the POS and delete the one the POS does not use.",4 flagged: duplicate name+size
 update,371,RASMALAI,notes,,"CHECK (data cleanup 2026-09-17): another product has the same name, size and price (barcode 605900). Look both barcodes up in the POS and delete the one the POS does not use.",4 flagged: duplicate name+size
 update,379,RASMALAI,notes,,"CHECK (data cleanup 2026-09-17): another product has the same name, size and price (barcode 605100). Look both barcodes up in the POS and delete the one the POS does not use.",4 flagged: duplicate name+size
 update,396,QUINOA SALAD,notes,,"CHECK (data cleanup 2026-09-17): another product has the same name, size and price (barcode 607700). Look both barcodes up in the POS and delete the one the POS does not use.",4 flagged: duplicate name+size
 update,397,QUINOA SALAD,notes,,"CHECK (data cleanup 2026-09-17): another product has the same name, size and price (barcode 607600). Look both barcodes up in the POS and delete the one the POS does not use.",4 flagged: duplicate name+size
-insert,434,ALSI PINNI,(new product),,"Flex Seed, Chickpea Flour, Clarified Butter, Almonds, Raisins, Cashews, Coconut Powder, Fennel Powder, Oil & Sugar",6 added from unmatched .docx
-insert,435,ASSORTED NUTS,(new product),,"Roasted Salted Almonds, Pistachios, Roasted Salted Cashews, Raisins",6 added from unmatched .docx
-insert,436,LOBIA RASMISSA,(new product),,"Black eye beans, ginger, Garlic, onions, spieces, salt tomatoes & oil",6 added from unmatched .docx
-insert,437,MORIYO,(new product),,"Moriyo (Samo), Potatoes, Curry Leaves, Cumin Seeds, Cilantro, Red Whole Chilli, Salt, Sugar, Cashews, Lemon Juice, Ginger, Green Chilli & Oil",6 added from unmatched .docx
-insert,438,STRAWBERRY MOUSSE,(new product),,"Strawberry, Sugar, Yogurt, Gelatin, Heavy Cream",6 added from unmatched .docx
-insert,439,URAD CHANA DAL,(new product),,"Split Matpe Beans, Chickpea Lentils, Ginger, Garlic, Cumin, Tomatoes, Cilantro, Salt, Oil & Spices",6 added from unmatched .docx
+update,441,LOBIA RASMISA,subtitle,,BLACK EYE BEANS,6 copied from LOBIA.docx
+update,441,LOBIA RASMISA,ingredients,,"Black eye beans, ginger, Garlic, onions, spieces, salt tomatoes & oil",6 copied from LOBIA.docx
+insert,442,ALSI PINNI,(new product),,"Flex Seed, Chickpea Flour, Clarified Butter, Almonds, Raisins, Cashews, Coconut Powder, Fennel Powder, Oil & Sugar",6 added from unmatched .docx
+insert,443,ASSORTED NUTS,(new product),,"Roasted Salted Almonds, Pistachios, Roasted Salted Cashews, Raisins",6 added from unmatched .docx
+insert,444,MORIYO,(new product),,"Moriyo (Samo), Potatoes, Curry Leaves, Cumin Seeds, Cilantro, Red Whole Chilli, Salt, Sugar, Cashews, Lemon Juice, Ginger, Green Chilli & Oil",6 added from unmatched .docx
+insert,445,STRAWBERRY MOUSSE,(new product),,"Strawberry, Sugar, Yogurt, Gelatin, Heavy Cream",6 added from unmatched .docx
+insert,446,URAD CHANA DAL,(new product),,"Split Matpe Beans, Chickpea Lentils, Ginger, Garlic, Cumin, Tomatoes, Cilantro, Salt, Oil & Spices",6 added from unmatched .docx

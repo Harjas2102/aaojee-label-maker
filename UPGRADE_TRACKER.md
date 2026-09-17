@@ -27,21 +27,22 @@ here.
 | U-003 | 2026-09-17 | Manager PIN lock                          | Done, not yet built | Settings → Remove Manager PIN |
 | U-004 | 2026-09-17 | Unsaved-changes warning                   | Done, not yet built | Restore snapshot |
 | U-005 | 2026-09-17 | Sharper barcodes (print at printer's DPI) | Done, not yet built | Settings → untick "Print at the printer's own resolution" |
-| U-006 | 2026-09-17 | Product data cleanup (6 parts)            | **Live** (data only, no rebuild needed) | `cleanup.py --undo` (see U-006) |
+| U-006 | 2026-09-17 | Product data cleanup (6 parts)            | Ready: re-run on the store's database (U-020), live once installed | `cleanup.py --undo` (see U-006) |
 | U-007 | 2026-09-17 | Allergens "Contains:" line                | Done, not yet built | Leave the Allergens field blank |
 | U-008 | 2026-09-17 | Net weight line                           | Done, not yet built | Leave the Net Wt field blank |
 | U-009 | 2026-09-17 | Print history                             | Done, not yet built | Restore snapshot (history is only recorded) |
 | U-010 | 2026-09-17 | Duplicate as new size                     | Done, not yet built | Don't use it; or restore snapshot |
 | U-011 | 2026-09-17 | Price tools (change many / export)        | Done, not yet built | "Undo Last Change"; or restore snapshot |
 | U-012 | 2026-09-17 | Trash (undo delete)                       | Done, not yet built | Restore snapshot (see U-012 note) |
-| U-013 | 2026-09-17 | Better product list (price, sort, categories) | Code: not yet built · Categories data: **Live** | `assign_categories.py --undo`; or restore snapshot |
-| —     | 2026-09-17 | Database schema v2 (for U-007–U-013)      | **Live** (applied with U-013 data) | See [Schema v2](#schema-v2-2026-09-17) |
+| U-013 | 2026-09-17 | Better product list (price, sort, categories) | Code: not yet built · Categories data: ready (U-020) | `assign_categories.py --undo`; or restore snapshot |
+| —     | 2026-09-17 | Database schema v2 (for U-007–U-013)      | Ready (applied with U-013 data, U-020) | See [Schema v2](#schema-v2-2026-09-17) |
 | U-014 | 2026-09-17 | Two screens: Print Labels / Edit Products | Done, not yet built | `git revert` the UI commit, or restore snapshot |
 | U-015 | 2026-09-17 | Bigger, resizing preview                  | Done, not yet built | (part of the UI commit) |
 | U-016 | 2026-09-17 | Windows 11 look (sv-ttk theme)            | Done, not yet built | Uninstall `sv-ttk` and rebuild: the program falls back to the old theme |
 | U-017 | 2026-09-17 | Keyboard printing flow                    | Done, not yet built | (part of the UI commit) |
 | U-018 | 2026-09-17 | Git version control + GitHub sync         | **Live** — private repo github.com/Harjas2102/aaojee-label-maker | — |
 | U-019 | 2026-09-17 | Automated tests on every change           | **Live** (hook on; GitHub runs tests + builds the .exe on every push) | `git config --unset core.hooksPath` turns the hook off |
+| U-020 | 2026-09-17 | U-006 / U-013 re-run on the store's database | Done: `september_store_copy/READY_FOR_STORE/products.db`, not yet installed | Put back the store's original file (see U-020) |
 
 "Not yet built" means the source is changed but `AaojeeLabels.exe` hasn't been rebuilt with it.
 Update the status to **Live** once the new build is in use at the store.
@@ -337,9 +338,14 @@ candidate to fix.
 
 ### U-006 — Product data cleanup
 
-**What it is.** A one-time correction of the product data in `products.db`. It was applied
-2026-09-17 with the program closed. It changes data only, not code, so it is already live in the
-current `.exe`.
+**What it is.** A one-time correction of the product data in `products.db`. It changes data
+only, not code.
+
+> **Re-run on the store's database (U-020).** It was first applied to an old copy of the
+> database on the development PC, while the cashiers kept working on the store PC. It was then
+> re-run on the store's own database. The numbers and tables below are from the **first run**,
+> which is kept in `first_run_on_old_copy/`. For the store's run, see U-020. `changes.csv` and
+> `products_before_U-006.db` in this folder are now the store's.
 
 **Where everything is.** `data_changes/2026-09-17_U-006_data_cleanup/`
 | File | Purpose |
@@ -368,9 +374,11 @@ and prices are unchanged, and the database integrity check is `ok`.
 | QUINOA SALAD | 607600 / 607700 | Same as above. |
 | RASMALAI | 605100 / 605900 | Same as above. |
 | MANGO CANDY | 565000 ($1.99) / 565500 ($2.99) | Different prices, probably different sizes. Add the size to both. |
-| MANGO MOUSSE | 313800 ($4.99, has ingredients) / 313900 ($5.99, none) | Add sizes. The $5.99 one probably needs the same ingredients and Best By. |
+| MANGO MOUSSE | 313800 ($3.99 in the store, has ingredients) / 313900 ($5.99, none) / 100006 ($5.99, added by a cashier) | 313900 and 100006 look like the same product; delete the one the POS doesn't use. Then add sizes. The $5.99 one probably needs the same ingredients and Best By. |
 | GOBHI MUTTAR, SABUDANA KHICHDI, WASABI FRIED GREEN PEAS | 314200, 560500, 558900 | Type in ingredients and subtitle. |
-| ALSI PINNI, ASSORTED NUTS, LOBIA RASMISSA, MORIYO, STRAWBERRY MOUSSE, URAD CHANA DAL | none yet | Enter price, and the barcode number from the POS (or create one with Auto and add it to the POS). |
+| DAHI VADA | 405400 / 100002 (added by a cashier) | Same price. Delete the one the POS doesn't use (U-020). |
+| GOLGAPPA PANI | 603800 / 100001 (added by a cashier) | Same price. Delete the one the POS doesn't use (U-020). |
+| ALSI PINNI, ASSORTED NUTS, MORIYO, STRAWBERRY MOUSSE, URAD CHANA DAL | none yet | Enter price, and the barcode number from the POS (or create one with Auto and add it to the POS). LOBIA RASMISSA no longer needs this: in the store's run its details went into the cashier's product (U-020). |
 
 After fixing an item, delete its `CHECK …` / `Added from …` line from Notes.
 
@@ -401,8 +409,9 @@ After fixing an item, delete its `CHECK …` / `Added from …` line from Notes.
 **Undo.**
 1. Close the program.
 2. Run `python data_changes/2026-09-17_U-006_data_cleanup/cleanup.py --undo`. It puts back every
-   old value that hasn't been edited since, and removes the 6 added products if they haven't been
-   edited. Hand edits made afterwards are kept and listed.
+   old value that hasn't been edited since, and removes the added products if they still hold
+   exactly what was added. (Giving them a category doesn't count as an edit; this check was
+   fixed in U-020.) Hand edits made afterwards are kept and listed.
 3. For a full reset instead, restore `products_before_U-006.db` with File → Restore from Backup.
    This loses any edits made after 2026-09-17.
 
@@ -425,8 +434,10 @@ pattern, so it is never deleted automatically.
 - **Upgrade itself** changes no existing values. Tested on the real data: all 439 products
   identical before and after.
 
-**Already applied to the live `products.db`** when the U-013 categories were assigned. The
-backup is `backups/premigration_v2_20260917_020953.db`, from just before the upgrade.
+**Applied when the U-013 categories were assigned.** On the development copy, the backup is
+`backups/premigration_v2_20260917_020953.db`. For the store's database, the copy from before the
+upgrade (and before the U-006 cleanup) is
+`data_changes/2026-09-17_store_update/store_original_products.db` (see U-020).
 
 **Compatibility with the current (older) `.exe`.** It keeps working on the upgraded database;
 this was tested by saving and reading with the previous `database.py`. Two things to know:
@@ -434,8 +445,8 @@ this was tested by saving and reading with the previous `database.py`. Two thing
 - **It shows products that are in the Trash as normal products.** Once the new build is in use,
   don't go back to the old `.exe` without emptying the Trash first.
 
-**Undo.** Restore `backups/premigration_v2_20260917_020953.db` with File → Restore from Backup.
-This loses changes made after 2026-09-17 02:09.
+**Undo.** On the store PC, put back the store's original file (see U-020). The schema upgrade
+itself never needs undoing: the older `.exe` works with it.
 
 ---
 
@@ -604,11 +615,14 @@ intended.
 name, size and date mode (`source/categories.py`, `suggest_category()`):
 - 310 products got a category: 180 Dry Goods, 66 Spices, 64 Sweets.
 - 129 were left without one, mostly cooked dishes, which the "Cooked Food" filter covers.
+- Those numbers are from the first run, on the old copy. On the store's database (U-020), 314 got
+  a category (182 Dry Goods, 66 Spices, 66 Sweets) and 132 didn't.
 
 Records are in `data_changes/2026-09-17_U-013_categories/`:
 - `assign_categories.py`: dry run, `--apply`, `--undo`;
-- `changes.csv`: every assignment;
-- `products_before_U-013.db`: a copy from just before.
+- `changes.csv`: every assignment (the store's run);
+- `products_before_U-013.db`: a copy from just before (the store's run);
+- `first_run_on_old_copy/`: the same two files from the first run.
 
 Wrong guesses are harmless (filtering only); fix them on the product form.
 
@@ -764,9 +778,12 @@ match. It now opens the first match.
 - **`update_and_build.bat`** (store PC) runs `git pull --ff-only`, then `build.bat`.
 - **`DEVELOPING.md`** explains the workflow: Mac or PC → commit → push → store PC update.
 
-**GitHub.** The workflow file is ready, but the private repository isn't created yet. This PC
-has no GitHub login, so that step needs the owner (see the chat instructions). After the first
-push, every push runs the tests and builds the `.exe` on GitHub. **Not yet verified on GitHub.**
+**GitHub.** Private repository `github.com/Harjas2102/aaojee-label-maker` (remote `origin`),
+first pushed 2026-09-17. Every push runs the tests and builds the `.exe` on GitHub. Download the
+build from the run's **Artifacts** (`AaojeeLabels-exe`). The first run failed on one window
+test (`test_preview_grows_with_window`). GitHub's test machines have a 1024×768 screen, so the
+window can't be made larger there, and the test now skips itself on small screens. The run after
+that fix passed.
 
 **Why.** It replaces the zip → flash drive → unzip loop, and gives an exact history of every
 change and a safe undo (`git revert`).
@@ -821,7 +838,106 @@ into this suite. See `DEVELOPING.md` §2 for the full list.
 - **Real build:** built with `build.bat` into a scratch folder; theme files bundled; launched
   maximised on the real data with the new theme.
 - **Screenshots checked:** 1920×989 and 1280×720; both screens fit at 1280×720.
-- **Not tested:** real printers, a real scanner, GitHub Actions.
+- **Not tested:** real printers, a real scanner. (GitHub Actions: passing since the fix in U-018.)
+
+---
+
+### U-020 — Cleanup and categories re-run on the store's database
+
+**Why.** U-006 (cleanup), the schema v2 upgrade and U-013 (categories) were first applied to an
+old copy of `products.db` on the development PC. The store PC kept running the May `.exe`, and
+the cashiers added and edited products there. Copying the development database to the store would
+have lost that work. It would also have mixed up products, because the U-006 additions (ids
+434–439) use the same ids as products the cashiers added. So on 2026-09-17 the store's own
+`products.db` and `settings.json` were copied (program closed) into `september_store_copy/`, and
+the same scripts were re-run on it.
+
+**What the cashiers had changed since the old copy** (all kept):
+- **8 products added:**
+  - DAHI VADA (100002)
+  - ROCK SUGAR 350 GM (100456)
+  - GOLDEN RAISINS 28 OZ (100000)
+  - SWEET FENNEL CANDY 350 GM (100003)
+  - CHIA SEEDS 1.5 LB (100004)
+  - STAR ANISE (100005)
+  - MANGO MOOSE (100006)
+  - LOBIA RASMISA (100009)
+- **Products edited:**
+  - Prices: AAOJEE BLEND TEA, MANGO MOUSSE 313800, SHRIKHAND, SOYA SABJI, PARAS COOKIES,
+    GOLGAPPA PANI.
+  - Renames: AAOJEE BLACK TEA → BLEND TEA, JUMBO ALMOND 4LB → ALMOND 3 LB,
+    SOYA MATTAR → SOYA SABJI, PARAS AJWAIN COOKIES → PARAS COOKIES.
+  - Date modes: 5 products.
+- **Deleted:** nothing.
+- `settings.json` was byte-for-byte the same as the development copy, so it needs no change.
+
+**Result** (`september_store_copy/READY_FOR_STORE/products.db`):
+- 441 → 446 products.
+- U-006: 189 field changes and 5 products added.
+- U-013: 314 categories.
+- The schema was upgraded to v2.
+
+Compared with the first run, the differences all come from the cashiers' work:
+- the new products' sizes (`28OZ` → `28 OZ`, `1.50 LB` → `1.5 LB`), spacing and names were tidied
+  (`MANGO MOOSE` → `MANGO MOUSSE`);
+- 3 new duplicate pairs are flagged in Notes (DAHI VADA, GOLGAPPA PANI and MANGO MOUSSE, each a
+  cashier product with a 1000xx barcode next to an existing product). See the U-006 "Needs a
+  person" table.
+
+**One rule added to `cleanup.py` (approved by the owner).** LOBIA RASMISA had been added by a
+cashier with a price, a barcode and no ingredients. Adding a second LOBIA RASMISSA from
+`LOBIA.docx` would have made two near-identical products. Instead:
+- `NAME_FIXES` corrects RASMISA → RASMISSA;
+- step 6 now copies the document's subtitle and ingredients into an existing product with the
+  same name if that product has no ingredients, instead of adding a new one.
+
+The cashier's barcode 100009 and $4.99 are kept. **Its label now prints the ingredients.**
+Running the updated script on the old copy gives exactly the first run's 177 changes and 6
+additions, so the rule changes nothing there.
+
+**Undo fix in `cleanup.py`.** `--undo` removed an added product only if its `updated_at` still
+equalled `created_at`. But U-013 sets a category, which changes `updated_at`, so undo kept
+STRAWBERRY MOUSSE. Undo now checks that the product still holds exactly what was added.
+Categories are ignored because they are only a filter.
+
+**Files.**
+- `data_changes/2026-09-17_store_update/build_store_db.py`:
+  - builds the file: `python …/build_store_db.py`;
+  - re-checks it: `--check`.
+- `store_original_products.db` (read-only) and `store_original_settings.json`: the store's files,
+  untouched. Both stay out of Git.
+- The U-006 and U-013 folders now hold the **store's** `changes.csv` and `products_before_*.db`,
+  so `--undo` works on the store's database. The first run's files are in each folder's
+  `first_run_on_old_copy/`.
+
+**Tested** (`build_store_db.py --check`, all passing):
+- integrity `ok`; schema v2; a single file (no `-wal`);
+- all 441 store products present, none in Trash;
+- **every barcode number and price unchanged**; `created_at` unchanged;
+- every changed field is in a `changes.csv`;
+- 5 products added, all without a barcode or price; no barcode used twice;
+- the new `database.py` lists 446 products;
+- 2,220 labels rendered at 203 DPI with the store's settings, with no errors (Barcode labels
+  skipped for the 5 products with no barcode).
+
+Also checked:
+- The 425 products nobody touched are identical to the first run's result, apart from the
+  duplicate notes caused by the cashiers' new products.
+- Undo tested on a scratch copy: U-013 `--undo` then U-006 `--undo` restored every field of all
+  441 store products exactly and removed the added products. A product edited on purpose before
+  the undo was kept.
+
+**Install** (store PC, program closed):
+1. Rename the old `products.db` to `products_before_update.db`. Keep it.
+2. Copy `READY_FOR_STORE/products.db` into the program folder, next to the new `AaojeeLabels.exe`.
+
+**No product edits on the store PC between the copy (2026-09-17 11:09) and the install**, or they
+are lost. If some were made anyway, re-copy the store's file and re-run `build_store_db.py` with it
+as `store_original_products.db`.
+
+**Undo.** Close the program and put `products_before_update.db` back as `products.db`. The May
+`.exe` also works with the new file (schema v2 is compatible; see Schema v2), so going back to the
+old `.exe` alone doesn't require this.
 
 ---
 
@@ -888,5 +1004,9 @@ version ignores them.
 - [ ] If a PIN is set: the Edit Products tab asks for it; Spacing / Side Margin are in Settings (U-014).
 - [ ] The window looks like Windows 11 (rounded, light controls). If it looks like the old grey
       theme, `sv-ttk` didn't install; re-run `build.bat` with internet (U-016).
-- [ ] Double-click `run_tests.bat` once on the store PC: all tests pass (U-019).
+- [ ] Double-click `run_tests.bat` once on the store PC: all tests pass (U-019). (This needs
+      Python on the store PC. Skip it if the `.exe` was downloaded from GitHub; GitHub already
+      ran the tests.)
+- [ ] The product list shows **446** products. Search `LOBIA`: one product, barcode 100009, with
+      ingredients. Search `ROCK SUGAR`: it's there (a cashier's product) (U-020).
 - [ ] Update the Index statuses above to **Live**.

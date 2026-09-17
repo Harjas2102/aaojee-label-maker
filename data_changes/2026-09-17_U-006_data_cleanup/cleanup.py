@@ -82,7 +82,9 @@ def tidy_ingredients(text: str) -> str:
 
 
 # ── 3. Spelling of product names ──────────────────────────────────────────────
-NAME_FIXES = {"MANGO MOOSE": "MANGO MOUSSE"}
+NAME_FIXES = {"MANGO MOOSE": "MANGO MOUSSE",
+              # Added for the store's database: a cashier typed RASMISA; LOBIA.docx says RASMISSA.
+              "LOBIA RASMISA": "LOBIA RASMISSA"}
 
 # ── 4. Duplicate name + size (flag only — the POS decides which barcode is live)
 DUPLICATE_NOTE_SAME = ("CHECK (data cleanup {today}): another product has the same name, size "
@@ -194,11 +196,18 @@ def plan(conn) -> tuple[list[dict], list[dict]]:
                                                        other_price=o["price"] or 0)
                 change(r, "notes", add_note(current(r, "notes") or "", note), "4 flagged: duplicate name+size")
 
-    # 6. new products (skip any that already exist by name)
-    existing = {current(r, "name") for r in rows}
+    # 6. new products (skip any that already exist by name).  If a product with that
+    # name already exists but has no ingredients (a cashier added it), the document's
+    # subtitle and ingredients are copied into it instead of adding a second product.
+    existing = {current(r, "name"): r for r in rows}
     inserts = []
     for p in NEW_PRODUCTS:
         if p["name"] in existing:
+            r = existing[p["name"]]
+            if not current(r, "ingredients"):
+                if not current(r, "subtitle"):
+                    change(r, "subtitle", p["subtitle"], f"6 copied from {p['doc']}")
+                change(r, "ingredients", p["ingredients"], f"6 copied from {p['doc']}")
             continue
         inserts.append(dict(name=p["name"], subtitle=p["subtitle"], ingredients=p["ingredients"],
                             size=p["size"], date_mode=p["date_mode"],
@@ -249,19 +258,35 @@ def apply():
     print(f"Backup: {BACKUP_PATH}\nLog:    {CSV_PATH}")
 
 
+def _still_as_added(row, name: str) -> bool:
+    """True if a product this script added still holds exactly what was added.
+    (Its updated_at can't be used: giving it a category (U-013) changes that,
+    and a category is only a list filter.)"""
+    p = next((p for p in NEW_PRODUCTS if p["name"] == name), None)
+    if p is None:
+        return False
+    cols = row.keys()
+    return (row["name"] == p["name"] and row["subtitle"] == p["subtitle"]
+            and row["ingredients"] == p["ingredients"] and row["size"] == p["size"]
+            and row["date_mode"] == p["date_mode"] and row["price"] is None
+            and row["barcode_number"] == ""
+            and row["notes"] == NEW_PRODUCT_NOTE.format(doc=p["doc"], today=TODAY)
+            and all(not row[k] for k in ("allergens", "net_weight") if k in cols))
+
+
 def undo():
     if not os.path.exists(CSV_PATH):
         sys.exit("No changes.csv - nothing to undo.")
     with open(CSV_PATH, newline="", encoding="utf-8-sig") as f:
         log = list(csv.DictReader(f))
     conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
     kept = 0
     with conn:
         for c in reversed(log):
             if c["action"] == "insert":
-                row = conn.execute("SELECT created_at, updated_at FROM products WHERE id = ?",
-                                   (int(c["id"]),)).fetchone()
-                if row and row[0] == row[1]:
+                row = conn.execute("SELECT * FROM products WHERE id = ?", (int(c["id"]),)).fetchone()
+                if row and _still_as_added(row, c["name"]):
                     conn.execute("DELETE FROM products WHERE id = ?", (int(c["id"]),))
                 elif row:
                     kept += 1
