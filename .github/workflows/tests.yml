@@ -1,0 +1,67 @@
+# Runs on GitHub for every push: all tests, the label check, and a Windows build.
+# The finished AaojeeLabels.exe can be downloaded from the run's "Artifacts".
+name: Tests and build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2            # the previous commit is needed for the label check
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install test requirements
+        run: python -m pip install Pillow sv-ttk
+
+      - name: Run all tests
+        run: python tools/run_tests.py
+
+      - name: Labels unchanged since the previous commit
+        # Put [label change] in the commit message when a label change is intended.
+        if: ${{ !contains(github.event.head_commit.message, '[label change]') }}
+        shell: bash
+        run: |
+          if git rev-parse --verify -q HEAD~1 >/dev/null; then
+            python tools/compare_labels.py --ref HEAD~1
+          else
+            echo "First commit - nothing to compare."
+          fi
+
+      - name: Upload label difference pictures
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: label-differences
+          path: tools/label_diffs/
+          if-no-files-found: ignore
+
+  build:
+    needs: test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install build requirements
+        run: python -m pip install Pillow pywin32 pyinstaller pyodbc sv-ttk
+
+      - name: Build AaojeeLabels.exe
+        working-directory: source
+        run: python -m PyInstaller --noconfirm --clean --onefile --windowed --name AaojeeLabels --collect-data sv_ttk main.py
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AaojeeLabels-exe
+          path: source/dist/AaojeeLabels.exe

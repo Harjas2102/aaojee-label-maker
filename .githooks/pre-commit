@@ -1,0 +1,28 @@
+#!/bin/sh
+# Runs automatically before every commit that changes source/ or tests/.
+#   1. the quick tests (everything except the window tests)
+#   2. a check that printed labels are pixel-identical to the last commit
+# Turn on once per copy of the project:   git config core.hooksPath .githooks
+# Intended label change?   ALLOW_LABEL_CHANGES=1 git commit ...
+
+if ! git diff --cached --name-only | grep -qE '^(source|tests|tools)/'; then
+    exit 0
+fi
+
+PY=""
+for candidate in python python3 py; do
+    if "$candidate" -c "import PIL" >/dev/null 2>&1; then
+        PY="$candidate"
+        break
+    fi
+done
+if [ -z "$PY" ]; then
+    echo "pre-commit: Python with Pillow not found. Install it:  python -m pip install Pillow sv-ttk"
+    exit 1
+fi
+
+echo "pre-commit: running quick tests..."
+"$PY" tools/run_tests.py --quick || { echo "pre-commit: tests failed - commit stopped."; exit 1; }
+
+echo "pre-commit: checking labels against the last commit..."
+"$PY" tools/compare_labels.py || { echo "pre-commit: labels changed - commit stopped."; exit 1; }

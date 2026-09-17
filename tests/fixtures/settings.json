@@ -1,0 +1,60 @@
+{
+  "address_line": "Aaojee, Middletown, NY 845-342-0040",
+  "default_printer": "",
+  "default_label_type": "Combined",
+  "default_label_size": "2.25x1.25",
+  "show_combined_button": true,
+  "default_preview": "All",
+  "show_barcode": true,
+  "show_price": true,
+  "show_dollar_sign": true,
+  "show_date": true,
+  "show_address": true,
+  "bestby_offset_days": 10,
+  "auto_capitalize": true,
+  "label_spacing": 1.75,
+  "label_margin_in": 0.05,
+  "barcode_auto_start": 100000,
+  "font_name": {
+    "family": "Arial Narrow",
+    "size": 22,
+    "bold": true,
+    "italic": false
+  },
+  "font_subtitle": {
+    "family": "Arial Narrow",
+    "size": 14,
+    "bold": true,
+    "italic": true
+  },
+  "font_ingredients": {
+    "family": "Arial",
+    "size": 10,
+    "bold": false,
+    "italic": false
+  },
+  "font_price": {
+    "family": "Arial Narrow",
+    "size": 24,
+    "bold": true,
+    "italic": false
+  },
+  "font_barcode_digits": {
+    "family": "Arial",
+    "size": 9,
+    "bold": false,
+    "italic": false
+  },
+  "font_date": {
+    "family": "Arial",
+    "size": 10,
+    "bold": false,
+    "italic": false
+  },
+  "font_address": {
+    "family": "Arial",
+    "size": 9,
+    "bold": false,
+    "italic": false
+  }
+}

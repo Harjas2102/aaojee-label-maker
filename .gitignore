@@ -1,10 +1,10 @@
 # ── Live store data: lives on the store PC, never in git ─────────────────────
-products.db
-products.db-wal
-products.db-shm
+/products.db
+/products.db-wal
+/products.db-shm
 *.db
-settings.json
-print_queue.json
+/settings.json
+/print_queue.json
 backups/
 
 # ── Build output (rebuilt by build.bat) ──────────────────────────────────────
