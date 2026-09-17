@@ -167,8 +167,29 @@ class GuiHarness:
         self.db = make_database(folder)
         self.settings = make_settings(folder, **settings_overrides)
         self.root = tk.Tk()
-        self.root.geometry("1280x800+0+0")
         self.app = app_window.AaojeeApp(self.root, self.db, self.settings, folder)
+        self.root.state("normal")
+        self.root.geometry("1280x800+0+0")
+        # Keyboard tests need the window in front with focus
+        self.root.attributes("-topmost", True)
+        self.root.lift()
+        self.root.focus_force()
+        self.pump(300)
+
+    def key(self, widget, sequence: str, ms: int = 250):
+        """Send a key press (e.g. "<Return>") to *widget* as if typed."""
+        widget.focus_force()
+        self.pump(80)
+        widget.event_generate(sequence, when="tail")
+        self.pump(ms)
+
+    def focused(self):
+        return self.root.focus_get()
+
+    def open_barcode(self, code: str):
+        self.app._search_var.set(code)
+        self.pump()
+        self.app._on_search_enter()
         self.pump()
 
     def _patch(self, obj, attr, value):
@@ -200,6 +221,8 @@ class GuiHarness:
 
     def close(self):
         try:
+            for job in self.root.tk.splitlist(self.root.tk.call("after", "info")):
+                self.root.after_cancel(job)
             self.root.destroy()
         except Exception:
             pass

@@ -35,6 +35,11 @@ from tkinter import ttk, messagebox, filedialog
 
 from PIL import Image, ImageTk, ImageDraw
 
+try:                       # U-016: Windows 11 look (optional; see build.bat)
+    import sv_ttk
+except ImportError:
+    sv_ttk = None
+
 # Our modules (imported at runtime; all live in the same source directory)
 from database import Database
 from barcode_engine import (pad_barcode, validate_barcode_input, run_self_test,
@@ -78,10 +83,10 @@ NO_CATEGORY = "(none)"   # shown in the form's Category dropdown for ""
 
 # U-013: product list columns (key, heading, width, stretch)
 LIST_COLUMNS = [
-    ("name",    "Name",      130, True),
-    ("barcode", "Barcode #",  62, False),
+    ("name",    "Name",      140, True),
+    ("barcode", "Barcode #",  70, False),
     ("size",    "Size",       70, False),
-    ("price",   "Price",      48, False),
+    ("price",   "Price",      54, False),
 ]
 _OUNCES_PER = {"OZ": 1.0, "LB": 16.0, "GM": 1 / 28.3495}
 
@@ -98,11 +103,23 @@ def _size_sort_key(size: str):
     return (1, unit, number, size)
 
 # Compact preview: each tile's canvas is sized exactly to the rendered label
-# (no margins).  PREVIEW_MAX_W applies when a single label is previewed;
-# PREVIEW_STACKED_W applies to each tile when all three previews are stacked.
-PREVIEW_MAX_W     = 285
-PREVIEW_MAX_H     = 340
-PREVIEW_STACKED_W = 200
+# (no margins).  U-015: the preview column takes all the width left over, and
+# a single label is drawn as large as that column allows (up to
+# PREVIEW_LIMIT_W wide); "All three" tiles are PREVIEW_STACKED_RATIO of that.
+PREVIEW_MIN_W         = 300
+PREVIEW_LIMIT_W       = 760
+PREVIEW_STACKED_RATIO = 0.7
+LIST_PANEL_W          = 340     # width of the product list column
+LIST_PANEL_WIDE_W     = 450     # … on screens at least WIDE_SCREEN_W pixels wide
+WIDE_SCREEN_W         = 1600
+CENTER_W              = 540     # width of the Print / Edit column
+CARD_WRAP             = 500
+
+# U-014: the two screens
+MODE_PRINT = "print"
+MODE_EDIT  = "edit"
+MODE_BAR_BG = "#1e293b"
+UI_FONT = "Segoe UI" if sys.platform == "win32" else "TkDefaultFont"
 PREVIEW_DPI       = 150     # render DPI for the on-screen preview
 
 # Printing.  Labels are rendered at the printer's own resolution (e.g. 203 DPI
@@ -192,8 +209,13 @@ class AaojeeApp:
 
     def _setup_window(self):
         self.root.title("Aaojee Label Maker")
-        self.root.geometry("1240x780")
-        self.root.minsize(1120, 710)
+        self.root.geometry("1280x800")
+        self.root.minsize(1200, 700)
+        if sys.platform == "win32":
+            try:
+                self.root.state("zoomed")          # U-016: use the whole screen
+            except tk.TclError:
+                pass
         try:
             icon_path = os.path.join(self.app_dir, "icon.ico")
             if os.path.isfile(icon_path):
@@ -201,30 +223,47 @@ class AaojeeApp:
         except Exception:
             pass
 
+        # U-016: Windows 11 "Sun Valley" look when the sv_ttk package is
+        # available; otherwise the standard Windows theme.
         style = ttk.Style()
-        if sys.platform == "win32":
+        self._modern_theme = False
+        if sv_ttk is not None:
+            try:
+                sv_ttk.set_theme("light")
+                self._modern_theme = True
+            except Exception:
+                pass
+        if not self._modern_theme and sys.platform == "win32":
             try:
                 style.theme_use("vista")
             except Exception:
                 pass
-        style.configure("TLabel",  padding=2)
-        style.configure("TButton", padding=4)
-        style.configure("Accent.TButton", font=("Arial", 10, "bold"))
+        self._bg = style.lookup(".", "background") or "#f0f0f0"
+        style.configure("Accent.TButton", font=(UI_FONT, 10, "bold"))
+        style.configure("Treeview", rowheight=30, font=(UI_FONT, 11))
+        style.configure("Treeview.Heading", font=(UI_FONT, 10, "bold"))
+        style.configure("Card.TFrame", background="white")
+        style.configure("Card.TLabel", background="white")
+        style.configure("Hint.TLabel", foreground="#6b7280")
+        style.configure("Status.TLabel", foreground="#b42318")
 
-        # Named styles for the New / Save / Delete action buttons
+        # Named styles for the coloured buttons
+        def solid(bg, active, size=9, **kw):
+            style = dict(bg=bg, fg="white", activebackground=active, activeforeground="white",
+                         relief=tk.FLAT, bd=0, font=(UI_FONT, size, "bold"), cursor="hand2",
+                         padx=12, pady=5)
+            style.update(kw)
+            return style
+
         self._btn_style = {
-            "new":    dict(bg="#2b6cb0", fg="white", activebackground="#2c5282",
-                           activeforeground="white", relief=tk.RAISED, bd=2,
-                           font=("Arial", 9, "bold"), padx=10, pady=3),
-            "save":   dict(bg="#276749", fg="white", activebackground="#22543d",
-                           activeforeground="white", relief=tk.RAISED, bd=2,
-                           font=("Arial", 9, "bold"), padx=10, pady=3),
-            "delete": dict(bg="#c53030", fg="white", activebackground="#9b2c2c",
-                           activeforeground="white", relief=tk.RAISED, bd=2,
-                           font=("Arial", 9, "bold"), padx=10, pady=3),
-            "duplicate": dict(bg="#4a5568", fg="white", activebackground="#2d3748",
-                              activeforeground="white", relief=tk.RAISED, bd=2,
-                              font=("Arial", 9, "bold"), padx=10, pady=3),
+            "new":       solid("#2b6cb0", "#2c5282"),
+            "save":      solid("#276749", "#22543d"),
+            "delete":    solid("#c53030", "#9b2c2c"),
+            "duplicate": solid("#4a5568", "#2d3748"),
+            "queue":     solid("#2b6cb0", "#2c5282", pady=7),
+            "test":      solid(BTN_GREY, BTN_GREY_ACT, pady=6),
+            "print":     solid(BTN_GREEN, BTN_GREEN_ACT, size=13, pady=10, compound=tk.LEFT,
+                               anchor="w"),
         }
 
     # ──────────────────────────────────────────────────────────────────────────
@@ -235,6 +274,11 @@ class AaojeeApp:
         menubar = tk.Menu(self.root)
 
         file_menu = tk.Menu(menubar, tearoff=0)
+        file_menu.add_command(label="Print Labels", command=lambda: self._set_mode(MODE_PRINT),
+                              accelerator="Ctrl+P")
+        file_menu.add_command(label="Edit Products", command=lambda: self._set_mode(MODE_EDIT),
+                              accelerator="Ctrl+E")
+        file_menu.add_separator()
         file_menu.add_command(label="New Product", command=self._on_new, accelerator="Ctrl+N")
         file_menu.add_command(label="Duplicate as New Size", command=self._on_duplicate)
         file_menu.add_separator()
@@ -265,6 +309,7 @@ class AaojeeApp:
         menubar.add_cascade(label="Tools", menu=tools_menu)
 
         help_menu = tk.Menu(menubar, tearoff=0)
+        help_menu.add_command(label="Keyboard Shortcuts", command=self._show_shortcuts)
         help_menu.add_command(label="Run Barcode Self-Test", command=self._run_barcode_test)
         help_menu.add_command(label="About",                 command=self._show_about)
         menubar.add_cascade(label="Help", menu=help_menu)
@@ -272,71 +317,176 @@ class AaojeeApp:
         self.root.config(menu=menubar)
         # Bind both cases so the shortcuts still work with Caps Lock on
         # (common here, since product names are typed in capitals).
-        for key in ("n", "N"):
-            self.root.bind(f"<Control-{key}>", lambda _: self._on_new())
-        for key in ("s", "S"):
-            self.root.bind(f"<Control-{key}>", lambda _: self._on_save())
-        for key in ("f", "F"):
-            self.root.bind(f"<Control-{key}>", self._focus_search)
+        def bind_ctrl(letter, handler):
+            for key in (letter.lower(), letter.upper()):
+                self.root.bind(f"<Control-{key}>", handler)
+
+        bind_ctrl("n", lambda _e: self._on_new())
+        bind_ctrl("s", lambda _e: self._on_save() if self._mode == MODE_EDIT else None)
+        bind_ctrl("f", self._focus_search)
+        bind_ctrl("e", lambda _e: self._set_mode(MODE_EDIT))
+        bind_ctrl("p", lambda _e: self._set_mode(MODE_PRINT))
+        # U-017: printing from the keyboard (Print mode only)
+        self.root.bind("<F5>", lambda _e: self._print_key("Barcode"))
+        self.root.bind("<F6>", lambda _e: self._print_key("Ingredient"))
+        self.root.bind("<F7>", lambda _e: self._print_key("Combined"))
+        self.root.bind("<F8>", lambda _e: self._on_add_to_queue() if self._mode == MODE_PRINT else None)
 
     # ──────────────────────────────────────────────────────────────────────────
-    # Main UI layout
+    # Main UI layout (U-014 / U-015)
+    #
+    #   ┌ mode bar: [Print Labels] [Edit Products]                 lock status ┐
+    #   ├──────────────┬──────────────────────────────┬────────────────────────┤
+    #   │ search       │ Print page  (product card,   │ label preview          │
+    #   │ filter       │   quantity, date, buttons)   │ (large)                │
+    #   │ product list │   — or —                     │                        │
+    #   │              │ Edit page   (product form)   │                        │
+    #   └──────────────┴──────────────────────────────┴────────────────────────┘
     # ──────────────────────────────────────────────────────────────────────────
 
     def _build_ui(self):
-        pane = ttk.PanedWindow(self.root, orient=tk.HORIZONTAL)
-        pane.pack(fill=tk.BOTH, expand=True, padx=4, pady=4)
+        self._mode = MODE_PRINT
+        self._icons = self._make_icons()
+        self._build_mode_bar()
 
-        # Left panel — product list
-        left_frame = ttk.Frame(pane, width=340)
-        left_frame.pack_propagate(False)
-        pane.add(left_frame, weight=0)
-        self._build_left_panel(left_frame)
+        body = ttk.Frame(self.root, padding=(8, 4, 8, 8))
+        body.pack(fill=tk.BOTH, expand=True)
 
-        # Right panel — form + print controls + print actions/preview
-        right_outer = ttk.Frame(pane)
-        pane.add(right_outer, weight=1)
-        self._build_right_panel(right_outer)
+        left = ttk.Frame(body, width=LIST_PANEL_W)
+        left.pack(side=tk.LEFT, fill=tk.Y)
+        left.pack_propagate(False)
+        self._build_left_panel(left)
+        self._list_panel = left
+        body.bind("<Configure>", self._on_body_resize)
+
+        center = ttk.Frame(body, width=CENTER_W)
+        center.pack(side=tk.LEFT, fill=tk.Y, padx=14)
+        center.pack_propagate(False)
+
+        preview_col = ttk.Frame(body)
+        preview_col.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self._build_preview_column(preview_col)
+
+        self._print_page = ttk.Frame(center)
+        self._edit_page = ttk.Frame(center)
+        self._build_print_page(self._print_page)
+        self._build_product_form(self._edit_page)
+        self._print_page.pack(fill=tk.BOTH, expand=True)
+
+        self._apply_combined_visibility()
+        self._update_mode_bar()
+        self.root.after_idle(self._focus_search)
+
+    # ── Mode bar ──────────────────────────────────────────────────────────────
+
+    def _build_mode_bar(self):
+        bar = tk.Frame(self.root, bg=MODE_BAR_BG, padx=10, pady=6)
+        bar.pack(fill=tk.X)
+        tab = dict(font=(UI_FONT, 11, "bold"), relief=tk.FLAT, bd=0, cursor="hand2",
+                   padx=16, pady=6)
+        self._mode_buttons = {
+            MODE_PRINT: tk.Button(bar, text="🖨  Print Labels", **tab,
+                                  command=lambda: self._set_mode(MODE_PRINT)),
+            MODE_EDIT:  tk.Button(bar, text="✏  Edit Products", **tab,
+                                  command=lambda: self._set_mode(MODE_EDIT)),
+        }
+        self._mode_buttons[MODE_PRINT].pack(side=tk.LEFT)
+        self._mode_buttons[MODE_EDIT].pack(side=tk.LEFT, padx=(6, 0))
+
+        self._lock_btn = tk.Button(bar, text="Lock", font=(UI_FONT, 9, "bold"), relief=tk.FLAT,
+                                   bd=0, cursor="hand2", padx=10, pady=4, bg="#e2e8f0",
+                                   fg=MODE_BAR_BG, activebackground="#cbd5e1",
+                                   command=self._on_lock_now)
+        self._lock_var = tk.StringVar()
+        self._lock_label = tk.Label(bar, textvariable=self._lock_var, bg=MODE_BAR_BG,
+                                    fg="#e2e8f0", font=(UI_FONT, 9))
+        self._lock_label.pack(side=tk.RIGHT, padx=(0, 8))
+        self._mode_hint_var = tk.StringVar()
+        tk.Label(bar, textvariable=self._mode_hint_var, bg=MODE_BAR_BG, fg="#cbd5e1",
+                 font=(UI_FONT, 9)).pack(side=tk.LEFT, padx=16)
+
+    def _update_mode_bar(self):
+        for mode, btn in self._mode_buttons.items():
+            active = mode == self._mode
+            btn.configure(bg="white" if active else MODE_BAR_BG,
+                          fg=MODE_BAR_BG if active else "#e2e8f0",
+                          activebackground="white" if active else "#334155",
+                          activeforeground=MODE_BAR_BG if active else "white")
+        self._mode_hint_var.set(
+            "Type or scan to find a product · Enter = pick · type quantity · Enter = print"
+            if self._mode == MODE_PRINT else
+            "Changes are saved only when you click Save (Ctrl+S)")
+
+    def _set_mode(self, mode: str) -> bool:
+        """Switch between Print Labels and Edit Products.  Editing needs the
+        manager PIN when one is set.  Returns True if now in *mode*."""
+        if mode == self._mode:
+            return True
+        if mode == MODE_EDIT:
+            if not self.lock.require(self.root, "Editing products"):
+                return False
+        else:
+            if not self._confirm_unsaved("going back to printing"):
+                return False
+            if self._is_dirty():                 # changes were thrown away
+                self._revert_form()
+        self._mode = mode
+        if mode == MODE_EDIT:
+            self._print_page.pack_forget()
+            self._edit_page.pack(fill=tk.BOTH, expand=True)
+            self._name_entry.focus_set()
+        else:
+            self._edit_page.pack_forget()
+            self._print_page.pack(fill=tk.BOTH, expand=True)
+            self._focus_search()
+        self._update_mode_bar()
+        self._refresh_lock_ui()
+        return True
+
+    def _revert_form(self):
+        """Put the form back to the saved product (or empty)."""
+        product = self.db.get_product(self._current_id) if self._current_id is not None else None
+        if product:
+            self._load_product(product)
+        else:
+            self._clear_form()
 
     # ── LEFT PANEL ────────────────────────────────────────────────────────────
 
     def _build_left_panel(self, parent: ttk.Frame):
-        # Search
-        search_frame = ttk.Frame(parent)
-        search_frame.pack(fill=tk.X, padx=6, pady=(6, 2))
-        ttk.Label(search_frame, text="Search:").pack(side=tk.LEFT)
+        ttk.Label(parent, text="Find a product", font=(UI_FONT, 10, "bold")).pack(anchor=tk.W)
         self._search_var = tk.StringVar()
         self._search_var.trace_add("write", self._on_search_change)
-        search_entry = ttk.Entry(search_frame, textvariable=self._search_var)
-        search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(4, 0))
+        search_entry = ttk.Entry(parent, textvariable=self._search_var, font=(UI_FONT, 15))
+        search_entry.pack(fill=tk.X, pady=(2, 4), ipady=3)
         # Barcode scanners type the code and press Enter.  Enter opens the
-        # scanned product (or the only match) and selects the text so the
-        # next scan replaces it.  Escape clears the search.
+        # scanned product (or the first match); Up / Down move through the
+        # list; Escape clears the search.
         search_entry.bind("<Return>",   self._on_search_enter)
         search_entry.bind("<KP_Enter>", self._on_search_enter)
         search_entry.bind("<Escape>",   lambda _e: self._search_var.set(""))
+        search_entry.bind("<Down>",     lambda _e: self._move_selection(1))
+        search_entry.bind("<Up>",       lambda _e: self._move_selection(-1))
         self._search_entry = search_entry
 
         # Category filter (works together with Search)
         filter_frame = ttk.Frame(parent)
-        filter_frame.pack(fill=tk.X, padx=6, pady=(0, 2))
+        filter_frame.pack(fill=tk.X, pady=(0, 2))
         ttk.Label(filter_frame, text="Show:").pack(side=tk.LEFT)
         self._category_var = tk.StringVar(value=PRODUCT_CATEGORIES[0][0])
         category_combo = ttk.Combobox(
             filter_frame, textvariable=self._category_var,
             values=[c[0] for c in PRODUCT_CATEGORIES], state="readonly")
-        category_combo.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(4, 0))
+        category_combo.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(6, 0))
         category_combo.bind("<<ComboboxSelected>>", self._on_filter_change)
         _block_mousewheel(category_combo)
 
-        # Product count label
         self._count_var = tk.StringVar(value="")
-        ttk.Label(parent, textvariable=self._count_var, foreground="gray").pack(anchor=tk.W, padx=6)
+        ttk.Label(parent, textvariable=self._count_var, style="Hint.TLabel").pack(anchor=tk.W)
 
-        # Treeview + always-visible vertical scrollbar.  Using grid (not pack)
-        # keeps the scrollbar from being squeezed off-panel at narrow widths.
+        # Treeview + always-visible vertical scrollbar.
         tree_frame = ttk.Frame(parent)
-        tree_frame.pack(fill=tk.BOTH, expand=True, padx=6, pady=(0, 6))
+        tree_frame.pack(fill=tk.BOTH, expand=True, pady=(2, 0))
         tree_frame.rowconfigure(0, weight=1)
         tree_frame.columnconfigure(0, weight=1)
 
@@ -358,34 +508,324 @@ class AaojeeApp:
 
         self._tree.bind("<<TreeviewSelect>>", self._on_tree_select)
         self._tree.bind("<Double-1>", lambda e: self._on_tree_select(e, force=True))
+        self._tree.bind("<Return>", lambda _e: self._focus_quantity())
 
         # Keep product id → tree iid mapping
         self._tree_id_map: dict[str, int] = {}
 
-    # ── RIGHT PANEL ───────────────────────────────────────────────────────────
+    # ── PRINT PAGE (U-014) ────────────────────────────────────────────────────
 
-    def _build_right_panel(self, parent: ttk.Frame):
-        """Two columns: a fixed-width action column on the right (print buttons +
-        preview), and a flexible middle column (form + print settings)."""
-        rightcol = ttk.Frame(parent, width=335)
-        rightcol.pack(side=tk.RIGHT, fill=tk.Y, padx=(6, 2), pady=2)
-        rightcol.pack_propagate(False)
+    def _build_print_page(self, parent: ttk.Frame):
+        # Product card
+        card = ttk.Frame(parent, style="Card.TFrame", padding=(16, 12))
+        card.pack(fill=tk.X, pady=(4, 10))
+        ttk.Label(card, text="SELECTED PRODUCT", style="Card.TLabel",
+                  font=(UI_FONT, 8, "bold"), foreground="#6b7280").pack(anchor=tk.W)
+        self._action_name_var = tk.StringVar(value="(none)")
+        self._card_name = ttk.Label(card, textvariable=self._action_name_var, style="Card.TLabel",
+                                    font=(UI_FONT, 22, "bold"), wraplength=CARD_WRAP)
+        self._card_name.pack(anchor=tk.W)
+        self._card_subtitle_var = tk.StringVar()
+        ttk.Label(card, textvariable=self._card_subtitle_var, style="Card.TLabel",
+                  font=(UI_FONT, 11, "italic"), foreground="#374151",
+                  wraplength=CARD_WRAP).pack(anchor=tk.W)
+        self._card_details_var = tk.StringVar(value="Type a name or scan a label to begin.")
+        ttk.Label(card, textvariable=self._card_details_var, style="Card.TLabel",
+                  font=(UI_FONT, 14)).pack(anchor=tk.W, pady=(6, 0))
+        self._card_date_var = tk.StringVar()
+        ttk.Label(card, textvariable=self._card_date_var, style="Card.TLabel",
+                  font=(UI_FONT, 11), foreground="#374151").pack(anchor=tk.W)
+        self._card_allergens_var = tk.StringVar()
+        ttk.Label(card, textvariable=self._card_allergens_var, style="Card.TLabel",
+                  font=(UI_FONT, 10, "bold"), foreground="#9b2c2c",
+                  wraplength=CARD_WRAP).pack(anchor=tk.W)
 
-        mid = ttk.Frame(parent)
-        mid.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        # Quantity
+        qty_frame = ttk.Frame(parent)
+        qty_frame.pack(fill=tk.X, pady=(0, 8))
+        ttk.Label(qty_frame, text="Quantity", font=(UI_FONT, 13, "bold")).pack(side=tk.LEFT)
+        self._qty_var = tk.StringVar(value="1")
+        step = dict(font=(UI_FONT, 16, "bold"), width=3, relief=tk.FLAT, bd=0, cursor="hand2",
+                    bg="#e2e8f0", activebackground="#cbd5e1")
+        tk.Button(qty_frame, text="−", command=self._qty_minus, **step).pack(side=tk.LEFT, padx=(14, 0))
+        self._qty_entry = tk.Entry(qty_frame, textvariable=self._qty_var, font=(UI_FONT, 20, "bold"),
+                                   width=5, justify=tk.CENTER, relief=tk.SOLID, bd=1)
+        self._qty_entry.pack(side=tk.LEFT, padx=6, ipady=2)
+        tk.Button(qty_frame, text="+", command=self._qty_plus, **step).pack(side=tk.LEFT)
+        # U-017: Enter prints the barcode label, Shift+Enter the ingredients label
+        for seq in ("<Return>", "<KP_Enter>"):
+            self._qty_entry.bind(seq, lambda _e: self._print_key("Barcode"))
+        self._qty_entry.bind("<Shift-Return>", lambda _e: self._print_key("Ingredient"))
+        self._qty_entry.bind("<Escape>", self._focus_search)
+        self._qty_entry.bind("<FocusIn>", lambda _e: self._qty_entry.select_range(0, tk.END))
+        ttk.Label(qty_frame, text="Enter = print", style="Hint.TLabel").pack(side=tk.LEFT, padx=10)
 
-        self._build_product_form(mid)
-        ttk.Separator(mid, orient=tk.HORIZONTAL).pack(fill=tk.X, padx=8, pady=(8, 4))
-        self._build_print_controls(mid)
+        # Print date + show / hide
+        date_row = ttk.Frame(parent)
+        date_row.pack(fill=tk.X, pady=(0, 4))
+        ttk.Label(date_row, text="Print Date", font=(UI_FONT, 10, "bold")).pack(side=tk.LEFT)
+        self._print_date_var = tk.StringVar(value=self._today_str())
+        self._print_date_var.trace_add("write", self._on_date_change)
+        self._date_entry = ttk.Entry(date_row, textvariable=self._print_date_var, width=12)
+        self._date_entry.pack(side=tk.LEFT, padx=(8, 4))
+        ttk.Button(date_row, text="📅", width=3, command=self._open_calendar).pack(side=tk.LEFT)
 
-        self._build_print_actions(rightcol)
+        toggle_frame = ttk.Frame(parent)
+        toggle_frame.pack(fill=tk.X, pady=(0, 10))
+        ttk.Label(toggle_frame, text="Show on label:").pack(side=tk.LEFT, padx=(0, 4))
+        self._show_barcode_var = tk.BooleanVar(value=self.settings.show_barcode)
+        self._show_price_var   = tk.BooleanVar(value=self.settings.show_price)
+        self._show_dollar_var  = tk.BooleanVar(value=self.settings.show_dollar_sign)
+        self._show_date_var    = tk.BooleanVar(value=self.settings.show_date)
+        self._show_address_var = tk.BooleanVar(value=self.settings.show_address)
+        chk = dict(command=self._schedule_preview_update)
+        for text, var in (("Barcode", self._show_barcode_var), ("Price", self._show_price_var),
+                          ("$ Sign", self._show_dollar_var), ("Date", self._show_date_var),
+                          ("Address", self._show_address_var)):
+            ttk.Checkbutton(toggle_frame, text=text, variable=var, **chk).pack(side=tk.LEFT, padx=3)
+
+        # Big print buttons
+        self._barcode_btn = tk.Button(
+            parent, text="  Print Barcode          Enter / F5", image=self._icons["barcode"],
+            command=lambda: self._print_label_type("Barcode"), **self._btn_style["print"])
+        self._barcode_btn.pack(fill=tk.X, pady=3)
+        self._ingredient_btn = tk.Button(
+            parent, text="  Print Ingredients      Shift+Enter / F6",
+            image=self._icons["ingredient"],
+            command=lambda: self._print_label_type("Ingredient"), **self._btn_style["print"])
+        self._ingredient_btn.pack(fill=tk.X, pady=3)
+        # Combined button — built now, shown only when enabled in Settings
+        self._combined_btn = tk.Button(
+            parent, text="  Print Combined Label   F7", image=self._icons["combined"],
+            command=lambda: self._print_label_type("Combined"), **self._btn_style["print"])
+
+        # Print queue — add the current product, or open the batch list
+        self._queue_row = ttk.Frame(parent)
+        self._queue_row.pack(fill=tk.X, pady=(8, 0))
+        self._queue_row.columnconfigure(0, weight=1, uniform="q")
+        self._queue_row.columnconfigure(1, weight=1, uniform="q")
+        tk.Button(self._queue_row, text="+ Add to Print Queue  (F8)", command=self._on_add_to_queue,
+                  **self._btn_style["queue"]).grid(row=0, column=0, sticky="ew", padx=(0, 3))
+        self._queue_btn = tk.Button(self._queue_row, text="Print Queue",
+                                    command=self._open_print_queue, **self._btn_style["queue"])
+        self._queue_btn.grid(row=0, column=1, sticky="ew", padx=(3, 0))
+
+        tk.Button(parent, text="Test Print  (1 barcode label, to check it scans)",
+                  command=self._on_test_print, **self._btn_style["test"]).pack(fill=tk.X, pady=(6, 4))
+
+        self._status_var = tk.StringVar()
+        ttk.Label(parent, textvariable=self._status_var, style="Status.TLabel",
+                  wraplength=CARD_WRAP).pack(anchor=tk.W, pady=(4, 0))
+
+    def _update_card(self, data: dict):
+        """Refresh the Print page's product card from the form data."""
+        if not data["name"]:
+            self._card_subtitle_var.set("")
+            self._card_details_var.set("Type a name or scan a label to begin.")
+            self._card_date_var.set("")
+            self._card_allergens_var.set("")
+            return
+        self._card_subtitle_var.set(f"({data['subtitle']})" if data["subtitle"] else "")
+        parts = []
+        if data["size"]:
+            parts.append(data["size"])
+        parts.append("no price" if data["price"] is None else f"${data['price']:.2f}")
+        parts.append(f"Barcode {data['barcode_number']}" if data["barcode_number"] else "no barcode")
+        self._card_details_var.set("   ·   ".join(parts))
+        date_line = format_date_line(data["date_mode"] or "Packed", self._get_pack_date(),
+                                     self.settings.bestby_offset_days)
+        self._card_date_var.set(date_line or "No date line")
+        self._card_allergens_var.set(f"Contains: {data['allergens']}" if data["allergens"] else "")
+
+    # ── PREVIEW COLUMN (U-015) ────────────────────────────────────────────────
+
+    def _build_preview_column(self, parent: ttk.Frame):
+        hdr = ttk.Frame(parent)
+        hdr.pack(fill=tk.X)
+        ttk.Label(hdr, text="Label Preview", font=(UI_FONT, 10, "bold")).pack(side=tk.LEFT)
+        # Default is read from settings.default_preview; the radios are a
+        # session-level override the user can change at any time.
+        initial_mode = self.settings.get("default_preview", "Barcode")
+        if initial_mode not in PREVIEW_MODES:
+            initial_mode = "Barcode"
+        self._preview_type_var = tk.StringVar(value=initial_mode)
+        radios = ttk.Frame(parent)
+        radios.pack(fill=tk.X, pady=(2, 6))
+        for i, (label, value) in enumerate([("Barcode", "Barcode"), ("Ingredients", "Ingredient"),
+                                            ("Combined", "Combined"), ("All three", "All")]):
+            ttk.Radiobutton(radios, text=label, value=value, variable=self._preview_type_var,
+                            command=self._schedule_preview_update).grid(
+                row=i // 2, column=i % 2, sticky=tk.W, padx=(0, 16))
+
+        # Scrollable preview container — holds the placeholder (when no product
+        # is selected) or 1–3 stacked preview tiles.
+        preview_outer = ttk.Frame(parent)
+        preview_outer.pack(fill=tk.BOTH, expand=True)
+        preview_outer.rowconfigure(0, weight=1)
+        preview_outer.columnconfigure(0, weight=1)
+        self._preview_scrollcanvas = tk.Canvas(preview_outer, highlightthickness=0, bg=self._bg)
+        pv_scrollbar = ttk.Scrollbar(preview_outer, orient=tk.VERTICAL,
+                                     command=self._preview_scrollcanvas.yview)
+        self._preview_scrollcanvas.configure(yscrollcommand=pv_scrollbar.set)
+        self._preview_scrollcanvas.grid(row=0, column=0, sticky="nsew")
+        pv_scrollbar.grid(row=0, column=1, sticky="ns")
+        self._preview_inner = ttk.Frame(self._preview_scrollcanvas)
+        self._preview_scrollcanvas.create_window((0, 0), window=self._preview_inner, anchor="nw")
+        self._preview_inner.bind(
+            "<Configure>",
+            lambda _e: self._preview_scrollcanvas.configure(
+                scrollregion=self._preview_scrollcanvas.bbox("all")))
+        # The label is drawn to fit this box; re-draw when the window is resized.
+        self._preview_box = (PREVIEW_MIN_W + 30, 600)
+        preview_outer.bind("<Configure>", self._on_preview_resize)
+        self._preview_scrollcanvas.bind(
+            "<MouseWheel>",
+            lambda e: self._preview_scrollcanvas.yview_scroll(-1 if e.delta > 0 else 1, "units"))
+
+        # Placeholder shown when no product is selected
+        self._preview_placeholder = tk.Canvas(
+            self._preview_inner, width=PREVIEW_MIN_W, height=200,
+            bg="white", highlightthickness=1, highlightbackground="#cbd5e1")
+        self._preview_placeholder.create_text(
+            PREVIEW_MIN_W // 2, 100, text="(select a product)", fill="grey")
+
+        # Three preview tiles.  Each has a small caption (only shown when
+        # multiple are stacked) plus a bordered canvas sized to its label.
+        self._preview_tiles: dict[str, dict] = {}
+        for value, caption in [("Barcode", "Barcode"),
+                               ("Ingredient", "Ingredients"),
+                               ("Combined", "Combined")]:
+            tile = ttk.Frame(self._preview_inner)
+            cap = ttk.Label(tile, text=caption, font=(UI_FONT, 8, "bold"), style="Hint.TLabel")
+            border = tk.Frame(tile, relief=tk.SOLID, bd=1, bg="white")
+            canvas = tk.Canvas(border, width=PREVIEW_MIN_W, height=80,
+                               bg="white", highlightthickness=0)
+            canvas.pack()
+            border.pack(anchor=tk.W)
+            self._preview_tiles[value] = {
+                "frame": tile, "caption": cap, "border": border,
+                "canvas": canvas, "image": None,
+            }
+
+    # ── Button icons ──────────────────────────────────────────────────────────
+
+    def _make_icons(self) -> dict:
+        """Draw small white icons for the print buttons using Pillow."""
+        icons: dict[str, ImageTk.PhotoImage] = {}
+        size = 24
+
+        # Barcode — a row of vertical bars
+        img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+        d = ImageDraw.Draw(img)
+        for x, w in [(2, 2), (6, 1), (9, 3), (14, 1), (17, 2), (21, 1)]:
+            d.rectangle([x, 4, x + w - 1, 19], fill="white")
+        icons["barcode"] = ImageTk.PhotoImage(img)
+
+        # Ingredients — a bulleted list
+        img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+        d = ImageDraw.Draw(img)
+        for yy in (6, 12, 18):
+            d.ellipse([3, yy - 2, 7, yy + 2], fill="white")
+            d.rectangle([10, yy - 1, 21, yy + 1], fill="white")
+        icons["ingredient"] = ImageTk.PhotoImage(img)
+
+        # Combined — a label tag with text lines and a mini barcode
+        img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+        d = ImageDraw.Draw(img)
+        d.rectangle([3, 2, 20, 21], outline="white", width=2)
+        d.rectangle([6, 6, 17, 7], fill="white")
+        d.rectangle([6, 10, 17, 11], fill="white")
+        for x in range(6, 18, 2):
+            d.rectangle([x, 14, x, 18], fill="white")
+        icons["combined"] = ImageTk.PhotoImage(img)
+
+        return icons
+
+    def _on_body_resize(self, event):
+        """Give the product list more room on wide screens so names and
+        sizes aren't cut off."""
+        wide = event.width >= WIDE_SCREEN_W
+        width = LIST_PANEL_WIDE_W if wide else LIST_PANEL_W
+        if int(self._list_panel.cget("width")) != width:
+            self._list_panel.configure(width=width)
+            self._tree.column("size", width=100 if wide else 70)
+
+    def _on_preview_resize(self, event):
+        old_w, old_h = self._preview_box
+        if abs(event.width - old_w) > 12 or abs(event.height - old_h) > 12:
+            self._preview_box = (event.width, event.height)
+            self._schedule_preview_update()
+
+    def _preview_limits(self) -> tuple[int, int]:
+        """(max width, max height) for a single previewed label."""
+        box_w, box_h = self._preview_box
+        return (max(PREVIEW_MIN_W, min(PREVIEW_LIMIT_W, box_w - 30)),
+                max(200, box_h - 12))
+
+    def _apply_combined_visibility(self):
+        """Show or hide the Combined PRINT button per the Settings toggle.
+        The Combined preview radio is always available regardless."""
+        show = bool(self.settings.get("show_combined_button", False))
+        if show:
+            if not self._combined_btn.winfo_manager():
+                self._combined_btn.pack(fill=tk.X, pady=3, after=self._ingredient_btn)
+        else:
+            self._combined_btn.pack_forget()
+
+    # ── Keyboard flow (U-017) ─────────────────────────────────────────────────
+
+    def _focus_quantity(self):
+        if self._mode != MODE_PRINT:
+            return "break"
+        self._qty_entry.focus_set()
+        self._qty_entry.select_range(0, tk.END)
+        self._qty_entry.icursor(tk.END)
+        return "break"
+
+    def _move_selection(self, delta: int):
+        items = self._tree.get_children()
+        if not items:
+            return "break"
+        sel = self._tree.selection()
+        index = items.index(sel[0]) + delta if sel else (0 if delta > 0 else len(items) - 1)
+        index = max(0, min(len(items) - 1, index))
+        self._tree.selection_set(items[index])
+        self._tree.see(items[index])
+        return "break"
+
+    def _print_key(self, label_type: str):
+        """Print from the keyboard (Print mode only), then go back to Search."""
+        if self._mode != MODE_PRINT:
+            return None
+        if label_type == "Combined" and not self._combined_btn.winfo_manager():
+            return "break"
+        self._print_label_type(label_type)
+        self._focus_search()
+        return "break"
+
+    def _show_shortcuts(self):
+        messagebox.showinfo(
+            "Keyboard Shortcuts",
+            "PRINT LABELS\n"
+            "  Type a name, or scan a label   find the product\n"
+            "  Up / Down                      move through the list\n"
+            "  Enter (in Search)              pick the first product, go to Quantity\n"
+            "  Enter (in Quantity)            print barcode labels\n"
+            "  Shift+Enter (in Quantity)      print ingredient labels\n"
+            "  F5 / F6 / F7                   print barcode / ingredients / combined\n"
+            "  F8                             add to the print queue\n"
+            "  Esc                            back to Search\n\n"
+            "EVERYWHERE\n"
+            "  Ctrl+F   Search          Ctrl+P   Print Labels\n"
+            "  Ctrl+E   Edit Products   Ctrl+N   New product\n"
+            "  Ctrl+S   Save (Edit Products)")
 
     # ── PRODUCT FORM ──────────────────────────────────────────────────────────
 
     def _build_product_form(self, parent: ttk.Frame):
         hdr = ttk.Frame(parent)
-        hdr.pack(fill=tk.X, padx=8, pady=(8, 4))
-        ttk.Label(hdr, text="Product Details", font=("Arial", 10, "bold")).pack(side=tk.LEFT)
+        hdr.pack(fill=tk.X, pady=(4, 8))
+        ttk.Label(hdr, text="Product Details", font=(UI_FONT, 13, "bold")).pack(side=tk.LEFT)
         tk.Button(hdr, text="+ New",   command=self._on_new,
                   **self._btn_style["new"]).pack(   side=tk.RIGHT, padx=2)
         tk.Button(hdr, text="⧉ Duplicate", command=self._on_duplicate,
@@ -395,7 +835,7 @@ class AaojeeApp:
         tk.Button(hdr, text="💾 Save",  command=self._on_save,
                   **self._btn_style["save"]).pack(  side=tk.RIGHT, padx=2)
 
-        form = ttk.Frame(parent, padding=(8, 0, 8, 0))
+        form = ttk.Frame(parent)
         form.pack(fill=tk.X)
         form.columnconfigure(1, weight=1)
         form.columnconfigure(3, weight=1)
@@ -404,8 +844,8 @@ class AaojeeApp:
         ttk.Label(form, text="Name *").grid(row=0, column=0, sticky=tk.W, pady=3, padx=(0, 6))
         self._name_var = tk.StringVar()
         self._name_var.trace_add("write", self._on_form_change)
-        ttk.Entry(form, textvariable=self._name_var).grid(
-            row=0, column=1, columnspan=3, sticky=tk.EW, pady=3)
+        self._name_entry = ttk.Entry(form, textvariable=self._name_var)
+        self._name_entry.grid(row=0, column=1, columnspan=3, sticky=tk.EW, pady=3)
 
         # Row 1 — Subtitle (wide)
         ttk.Label(form, text="Subtitle").grid(row=1, column=0, sticky=tk.W, pady=3, padx=(0, 6))
@@ -416,8 +856,9 @@ class AaojeeApp:
 
         # Row 2 — Ingredients (wide, multi-line so the whole list is visible)
         ttk.Label(form, text="Ingredients").grid(row=2, column=0, sticky=tk.NW, pady=3, padx=(0, 6))
-        self._ingredients_text = tk.Text(form, height=3, wrap=tk.WORD,
-                                         font=("Arial", 9), relief=tk.SOLID, bd=1)
+        self._ingredients_text = tk.Text(form, height=4, wrap=tk.WORD, font=(UI_FONT, 10),
+                                         relief=tk.SOLID, bd=1, highlightthickness=0,
+                                         padx=4, pady=3)
         self._ingredients_text.grid(row=2, column=1, columnspan=3, sticky=tk.EW, pady=3)
         self._ingredients_text.bind("<KeyRelease>", self._on_form_change)
 
@@ -486,255 +927,9 @@ class AaojeeApp:
                         command=self._on_caps_toggle).grid(
             row=8, column=0, columnspan=4, sticky=tk.W, pady=(6, 2))
 
-        # Status label for validation feedback
-        self._status_var = tk.StringVar()
-        ttk.Label(parent, textvariable=self._status_var, foreground="red",
-                  wraplength=520).pack(anchor=tk.W, padx=8, pady=(2, 0))
-
-    # ── PRINT CONTROLS ────────────────────────────────────────────────────────
-
-    def _build_print_controls(self, parent: ttk.Frame):
-        ttk.Label(parent, text="Print Settings", font=("Arial", 10, "bold")).pack(anchor=tk.W, padx=8)
-
-        ctrl = ttk.Frame(parent, padding=(8, 2, 8, 2))
-        ctrl.pack(fill=tk.X)
-
-        # Row 0 — Print Date (+ calendar) | Spacing
-        ttk.Label(ctrl, text="Print Date").grid(row=0, column=0, sticky=tk.W, pady=3, padx=(0, 6))
-        self._print_date_var = tk.StringVar(value=self._today_str())
-        self._print_date_var.trace_add("write", self._on_date_change)
-        date_frame = ttk.Frame(ctrl)
-        date_frame.grid(row=0, column=1, sticky=tk.W, pady=3)
-        self._date_entry = ttk.Entry(date_frame, textvariable=self._print_date_var, width=12)
-        self._date_entry.pack(side=tk.LEFT)
-        ttk.Button(date_frame, text="📅", width=3,
-                   command=self._open_calendar).pack(side=tk.LEFT, padx=(3, 0))
-
-        ttk.Label(ctrl, text="Spacing").grid(row=0, column=2, sticky=tk.W, pady=3, padx=(12, 6))
-        self._spacing_var = tk.StringVar(value=str(self.settings.get("label_spacing", 1.0)))
-        self._spacing_var.trace_add("write", self._on_spacing_change)
-        spacing_spin = ttk.Spinbox(ctrl, textvariable=self._spacing_var,
-                                   from_=0.5, to=3.0, increment=0.25, width=6, format="%.2f")
-        spacing_spin.grid(row=0, column=3, sticky=tk.W, pady=3)
-        _block_mousewheel(spacing_spin)
-        self._spacing_spin = spacing_spin
-
-        # Shown only when a manager PIN is set: unlock / lock the layout knobs
-        self._layout_lock_btn = ttk.Button(ctrl, width=10, command=self._on_layout_lock_btn)
-
-        # Row 1 — Side Margin
-        ttk.Label(ctrl, text="Side Margin").grid(row=1, column=0, sticky=tk.W, pady=3, padx=(0, 6))
-        self._margin_var = tk.StringVar(value=str(self.settings.get("label_margin_in", 0.08)))
-        self._margin_var.trace_add("write", self._on_margin_change)
-        margin_spin = ttk.Spinbox(ctrl, textvariable=self._margin_var,
-                                  from_=0.03, to=0.25, increment=0.01, width=6, format="%.2f")
-        margin_spin.grid(row=1, column=1, sticky=tk.W, pady=3)
-        _block_mousewheel(margin_spin)
-        self._margin_spin = margin_spin
-        ttk.Label(ctrl, text="inches — shifts content left/right", foreground="gray").grid(
-            row=1, column=2, columnspan=2, sticky=tk.W, padx=(12, 0))
-
-        # Show / Hide toggles
-        toggle_frame = ttk.LabelFrame(parent, text="Show / Hide on label", padding=4)
-        toggle_frame.pack(fill=tk.X, padx=8, pady=(6, 2))
-
-        self._show_barcode_var = tk.BooleanVar(value=self.settings.show_barcode)
-        self._show_price_var   = tk.BooleanVar(value=self.settings.show_price)
-        self._show_dollar_var  = tk.BooleanVar(value=self.settings.show_dollar_sign)
-        self._show_date_var    = tk.BooleanVar(value=self.settings.show_date)
-        self._show_address_var = tk.BooleanVar(value=self.settings.show_address)
-
-        chk = dict(command=self._schedule_preview_update)
-        ttk.Checkbutton(toggle_frame, text="Barcode", variable=self._show_barcode_var, **chk).pack(side=tk.LEFT, padx=5)
-        ttk.Checkbutton(toggle_frame, text="Price",   variable=self._show_price_var,   **chk).pack(side=tk.LEFT, padx=5)
-        ttk.Checkbutton(toggle_frame, text="$ Sign",  variable=self._show_dollar_var,  **chk).pack(side=tk.LEFT, padx=5)
-        ttk.Checkbutton(toggle_frame, text="Date",    variable=self._show_date_var,    **chk).pack(side=tk.LEFT, padx=5)
-        ttk.Checkbutton(toggle_frame, text="Address", variable=self._show_address_var, **chk).pack(side=tk.LEFT, padx=5)
-
-    # ── PRINT ACTIONS + PREVIEW (right column) ────────────────────────────────
-
-    def _build_print_actions(self, parent: ttk.Frame):
-        self._icons = self._make_icons()
-
-        # Selected product name
-        name_frame = ttk.Frame(parent)
-        name_frame.pack(fill=tk.X, padx=8, pady=(8, 2))
-        ttk.Label(name_frame, text="SELECTED PRODUCT", font=("Arial", 7),
-                  foreground="gray").pack(anchor=tk.W)
-        self._action_name_var = tk.StringVar(value="(none)")
-        ttk.Label(name_frame, textvariable=self._action_name_var,
-                  font=("Arial", 12, "bold")).pack(anchor=tk.W)
-
-        # Quantity
-        qty_frame = ttk.Frame(parent)
-        qty_frame.pack(fill=tk.X, padx=8, pady=(2, 6))
-        ttk.Label(qty_frame, text="Quantity", font=("Arial", 9, "bold")).pack(side=tk.LEFT)
-        self._qty_var = tk.StringVar(value="1")
-        qty_row = tk.Frame(qty_frame)
-        qty_row.pack(side=tk.RIGHT)
-        tk.Button(qty_row, text="−", font=("Arial", 11, "bold"), width=2,
-                  cursor="hand2", command=self._qty_minus).pack(side=tk.LEFT)
-        tk.Entry(qty_row, textvariable=self._qty_var, font=("Arial", 14, "bold"),
-                 width=4, justify=tk.CENTER, relief=tk.SUNKEN, bd=2).pack(side=tk.LEFT, padx=3)
-        tk.Button(qty_row, text="+", font=("Arial", 11, "bold"), width=2,
-                  cursor="hand2", command=self._qty_plus).pack(side=tk.LEFT)
-
-        # Three large print buttons
-        btn_kw = dict(font=("Arial", 12, "bold"), fg="white", bg=BTN_GREEN,
-                      activebackground=BTN_GREEN_ACT, activeforeground="white",
-                      relief=tk.RAISED, bd=2, cursor="hand2",
-                      compound=tk.LEFT, padx=12, pady=9)
-
-        self._barcode_btn = tk.Button(
-            parent, text="  Print Barcode", image=self._icons["barcode"],
-            command=lambda: self._print_label_type("Barcode"), **btn_kw)
-        self._barcode_btn.pack(fill=tk.X, padx=8, pady=3)
-
-        self._ingredient_btn = tk.Button(
-            parent, text="  Print Ingredients", image=self._icons["ingredient"],
-            command=lambda: self._print_label_type("Ingredient"), **btn_kw)
-        self._ingredient_btn.pack(fill=tk.X, padx=8, pady=3)
-
-        # Combined button — built now, shown only when enabled in Settings
-        self._combined_btn = tk.Button(
-            parent, text="  Print Combined Label", image=self._icons["combined"],
-            command=lambda: self._print_label_type("Combined"), **btn_kw)
-
-        # Print queue — add the current product, or open the batch list
-        queue_row = ttk.Frame(parent)
-        queue_row.pack(fill=tk.X, padx=8, pady=(6, 0))
-        queue_row.columnconfigure(0, weight=1, uniform="q")
-        queue_row.columnconfigure(1, weight=1, uniform="q")
-        q_kw = dict(font=("Arial", 9, "bold"), fg="white", bg="#2b6cb0",
-                    activebackground="#2c5282", activeforeground="white",
-                    relief=tk.RAISED, bd=2, cursor="hand2", pady=4)
-        tk.Button(queue_row, text="+ Add to Print Queue", command=self._on_add_to_queue,
-                  **q_kw).grid(row=0, column=0, sticky="ew", padx=(0, 2))
-        self._queue_btn = tk.Button(queue_row, text="Print Queue", command=self._open_print_queue,
-                                    **q_kw)
-        self._queue_btn.grid(row=0, column=1, sticky="ew", padx=(2, 0))
-
-        # Test print (small, secondary)
-        tk.Button(parent, text="Test Print  (1 barcode label)",
-                  font=("Arial", 9), fg="white", bg=BTN_GREY,
-                  activebackground=BTN_GREY_ACT, activeforeground="white",
-                  relief=tk.FLAT, bd=1, cursor="hand2",
-                  command=self._on_test_print).pack(fill=tk.X, padx=8, pady=(6, 4))
-
-        ttk.Separator(parent, orient=tk.HORIZONTAL).pack(fill=tk.X, padx=8, pady=6)
-
-        # Preview type radios — 2×2: Barcode / Ingredients / Combined / All three.
-        # Default is read from settings.default_preview; the radios are a
-        # session-level override the user can change at any time.
-        pt_frame = ttk.Frame(parent)
-        pt_frame.pack(fill=tk.X, padx=8)
-        ttk.Label(pt_frame, text="Preview:", font=("Arial", 9, "bold")).grid(
-            row=0, column=0, rowspan=2, sticky=tk.NW, padx=(0, 8))
-        initial_mode = self.settings.get("default_preview", "Barcode")
-        if initial_mode not in PREVIEW_MODES:
-            initial_mode = "Barcode"
-        self._preview_type_var = tk.StringVar(value=initial_mode)
-        for i, (label, value) in enumerate(
-                [("Barcode", "Barcode"), ("Ingredients", "Ingredient"),
-                 ("Combined", "Combined"), ("All three", "All")]):
-            ttk.Radiobutton(
-                pt_frame, text=label, value=value, variable=self._preview_type_var,
-                command=self._schedule_preview_update,
-            ).grid(row=i // 2, column=1 + (i % 2), sticky=tk.W, padx=4, pady=1)
-
-        # Scrollable preview container — holds the placeholder (when no product
-        # is selected) or 1–3 stacked preview tiles.  A scrollbar handles the
-        # case where the combined "All three" view is taller than the column.
-        preview_outer = ttk.Frame(parent)
-        preview_outer.pack(fill=tk.BOTH, expand=True, padx=8, pady=(4, 8))
-        preview_outer.rowconfigure(0, weight=1)
-        preview_outer.columnconfigure(0, weight=1)
-        self._preview_scrollcanvas = tk.Canvas(preview_outer, highlightthickness=0)
-        pv_scrollbar = ttk.Scrollbar(preview_outer, orient=tk.VERTICAL,
-                                     command=self._preview_scrollcanvas.yview)
-        self._preview_scrollcanvas.configure(yscrollcommand=pv_scrollbar.set)
-        self._preview_scrollcanvas.grid(row=0, column=0, sticky="nsew")
-        pv_scrollbar.grid(row=0, column=1, sticky="ns")
-        self._preview_inner = ttk.Frame(self._preview_scrollcanvas)
-        self._preview_scrollcanvas.create_window(
-            (0, 0), window=self._preview_inner, anchor="nw")
-        self._preview_inner.bind(
-            "<Configure>",
-            lambda _e: self._preview_scrollcanvas.configure(
-                scrollregion=self._preview_scrollcanvas.bbox("all")))
-
-        # Placeholder shown when no product is selected
-        self._preview_placeholder = tk.Canvas(
-            self._preview_inner, width=PREVIEW_MAX_W, height=160,
-            bg="white", highlightthickness=1, highlightbackground="#bbb")
-        self._preview_placeholder.create_text(
-            PREVIEW_MAX_W // 2, 80, text="(select a product)", fill="grey")
-
-        # Three preview tiles.  Each has a small caption (only shown when
-        # multiple are stacked) plus a bordered canvas sized to its label.
-        self._preview_tiles: dict[str, dict] = {}
-        for value, caption in [("Barcode", "Barcode"),
-                               ("Ingredient", "Ingredients"),
-                               ("Combined", "Combined")]:
-            tile = ttk.Frame(self._preview_inner)
-            cap = ttk.Label(tile, text=caption, font=("Arial", 8, "bold"),
-                            foreground="gray")
-            border = tk.Frame(tile, relief=tk.SOLID, bd=1, bg="white")
-            canvas = tk.Canvas(border, width=PREVIEW_MAX_W, height=80,
-                               bg="white", highlightthickness=0)
-            canvas.pack()
-            border.pack(anchor=tk.W)
-            self._preview_tiles[value] = {
-                "frame": tile, "caption": cap, "border": border,
-                "canvas": canvas, "image": None,
-            }
-
-        self._apply_combined_visibility()
-
-    # ── Button icons ──────────────────────────────────────────────────────────
-
-    def _make_icons(self) -> dict:
-        """Draw small white icons for the print buttons using Pillow."""
-        icons: dict[str, ImageTk.PhotoImage] = {}
-        size = 24
-
-        # Barcode — a row of vertical bars
-        img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-        d = ImageDraw.Draw(img)
-        for x, w in [(2, 2), (6, 1), (9, 3), (14, 1), (17, 2), (21, 1)]:
-            d.rectangle([x, 4, x + w - 1, 19], fill="white")
-        icons["barcode"] = ImageTk.PhotoImage(img)
-
-        # Ingredients — a bulleted list
-        img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-        d = ImageDraw.Draw(img)
-        for yy in (6, 12, 18):
-            d.ellipse([3, yy - 2, 7, yy + 2], fill="white")
-            d.rectangle([10, yy - 1, 21, yy + 1], fill="white")
-        icons["ingredient"] = ImageTk.PhotoImage(img)
-
-        # Combined — a label tag with text lines and a mini barcode
-        img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-        d = ImageDraw.Draw(img)
-        d.rectangle([3, 2, 20, 21], outline="white", width=2)
-        d.rectangle([6, 6, 17, 7], fill="white")
-        d.rectangle([6, 10, 17, 11], fill="white")
-        for x in range(6, 18, 2):
-            d.rectangle([x, 14, x, 18], fill="white")
-        icons["combined"] = ImageTk.PhotoImage(img)
-
-        return icons
-
-    def _apply_combined_visibility(self):
-        """Show or hide the Combined PRINT button per the Settings toggle.
-        The Combined preview radio is always available regardless."""
-        show = bool(self.settings.get("show_combined_button", False))
-        if show:
-            if not self._combined_btn.winfo_manager():
-                self._combined_btn.pack(fill=tk.X, padx=8, pady=3,
-                                        after=self._ingredient_btn)
-        else:
-            self._combined_btn.pack_forget()
+        # Status line (the same message is shown on the Print page)
+        ttk.Label(parent, textvariable=self._status_var, style="Status.TLabel",
+                  wraplength=CARD_WRAP).pack(anchor=tk.W, pady=(8, 0))
 
     # ── Quantity helpers ──────────────────────────────────────────────────────
 
@@ -857,28 +1052,44 @@ class AaojeeApp:
         return False
 
     def _on_search_enter(self, _e=None):
-        """Enter in the search box — what a barcode scanner sends after a code.
-        Opens the product with that barcode, or the only product in the list."""
+        """Enter in the search box.
+
+        A scanned barcode opens that product and keeps the cursor in Search,
+        ready for the next scan.  Typed text opens the first product in the
+        list (or the highlighted one) and, on the Print screen, moves to
+        Quantity so the next Enter prints (U-017)."""
         query = self._search_var.get().strip()
-        if query:
-            target = None
-            codes = scanned_code_to_data6(query)
-            if codes:
-                matches = self.db.get_products_by_barcode(codes)
-                if len(matches) == 1:
-                    target = matches[0]["id"]
-                    if target not in self._tree_id_map.values():
-                        # Hidden by the "Show:" filter — show everything.
-                        self._category_var.set(PRODUCT_CATEGORIES[0][0])
-                        self._refresh_product_list(query)
-            if target is None and len(self._tree_id_map) == 1:
-                target = next(iter(self._tree_id_map.values()))
-            if target is not None:
+        codes = scanned_code_to_data6(query) if query else []
+        if codes:
+            matches = self.db.get_products_by_barcode(codes)
+            if len(matches) == 1:
+                target = matches[0]["id"]
+                if target not in self._tree_id_map.values():
+                    # Hidden by the "Show:" filter — show everything.
+                    self._category_var.set(PRODUCT_CATEGORIES[0][0])
+                    self._refresh_product_list(query)
                 self._select_product_in_tree(target)
-            elif codes or (query.isdigit() and len(query) >= 6):
+            else:
                 self.root.bell()
                 self._count_var.set(f"No product has barcode {query}")
-        self._focus_search()
+            self._focus_search()
+            return "break"
+        if query.isdigit() and len(query) >= 6 and not self._tree_id_map:
+            self.root.bell()
+            self._count_var.set(f"No product has barcode {query}")
+            self._focus_search()
+            return "break"
+        items = self._tree.get_children()
+        if not items:
+            self.root.bell()
+            return "break"
+        if not self._tree.selection():
+            self._tree.selection_set(items[0])
+            self._tree.see(items[0])
+        self.root.update_idletasks()
+        if self._mode == MODE_PRINT:
+            # Let the selection load first, then move to Quantity
+            self.root.after_idle(self._focus_quantity)
         return "break"
 
     def _on_filter_change(self, *_):
@@ -1063,6 +1274,8 @@ class AaojeeApp:
     # ──────────────────────────────────────────────────────────────────────────
 
     def _on_new(self):
+        if not self._set_mode(MODE_EDIT):
+            return
         if not self._confirm_unsaved("starting a new product"):
             return
         self._clear_form()
@@ -1146,6 +1359,8 @@ class AaojeeApp:
                                 "Open a saved product first, then click Duplicate to make "
                                 "a copy of it for another size.")
             return
+        if not self._set_mode(MODE_EDIT):
+            return
         if not self._confirm_unsaved("making a copy"):
             return
         source = self.db.get_product(self._current_id)
@@ -1195,26 +1410,11 @@ class AaojeeApp:
         self.settings.save()
         self._schedule_preview_update()
 
-    def _on_spacing_change(self, *_):
-        try:
-            self.settings.set("label_spacing", float(self._spacing_var.get()))
-            self.settings.save()
-        except ValueError:
-            pass
-        self._schedule_preview_update()
-
-    def _on_margin_change(self, *_):
-        try:
-            self.settings.set("label_margin_in", float(self._margin_var.get()))
-            self.settings.save()
-        except ValueError:
-            pass
-        self._schedule_preview_update()
-
     def _get_margin(self) -> float:
+        """Side margin in inches (Settings → Settings…)."""
         try:
-            return float(self._margin_var.get())
-        except (AttributeError, ValueError):
+            return float(self.settings.get("label_margin_in", 0.08))
+        except (TypeError, ValueError):
             return 0.08
 
     # ──────────────────────────────────────────────────────────────────────────
@@ -1286,9 +1486,10 @@ class AaojeeApp:
         return True
 
     def _get_spacing(self) -> float:
+        """Label spacing (Settings → Settings…)."""
         try:
-            return float(self._spacing_var.get())
-        except (AttributeError, ValueError):
+            return float(self.settings.get("label_spacing", 1.0))
+        except (TypeError, ValueError):
             return 1.0
 
     def _resolve_label_size(self, label_type: str) -> str:
@@ -1607,6 +1808,8 @@ class AaojeeApp:
     # ──────────────────────────────────────────────────────────────────────────
 
     def _on_form_change(self, *_):
+        if self._mode == MODE_EDIT:
+            self.lock.touch()
         self._schedule_preview_update()
 
     def _schedule_preview_update(self, *_):
@@ -1621,7 +1824,7 @@ class AaojeeApp:
             tile["frame"].pack_forget()
             tile["caption"].pack_forget()
 
-    def _render_into_tile(self, value, product, tile_max_w, allow_height_cap):
+    def _render_into_tile(self, value, product, tile_max_w, max_h=None):
         """Render *value* (Barcode/Ingredient/Combined) into its tile."""
         tile = self._preview_tiles[value]
         try:
@@ -1648,8 +1851,8 @@ class AaojeeApp:
             return
         img_w, img_h = img.size
         scale = tile_max_w / img_w
-        if allow_height_cap:
-            scale = min(scale, PREVIEW_MAX_H / img_h)
+        if max_h:
+            scale = min(scale, max_h / img_h)
         disp_w = max(1, round(img_w * scale))
         disp_h = max(1, round(img_h * scale))
         img = img.resize((disp_w, disp_h), Image.LANCZOS)
@@ -1661,6 +1864,7 @@ class AaojeeApp:
     def _update_preview(self):
         self._preview_job = None
         data = self._collect_form_data()
+        self._update_card(data)
 
         # No product loaded — show the placeholder, hide all tiles
         if not data["name"]:
@@ -1671,21 +1875,16 @@ class AaojeeApp:
         self._preview_placeholder.pack_forget()
 
         mode = self._preview_type_var.get()
+        max_w, max_h = self._preview_limits()
         if mode == "All":
             active     = ["Barcode", "Ingredient", "Combined"]
-            tile_max_w = PREVIEW_STACKED_W
+            tile_max_w = max(PREVIEW_MIN_W - 60, round(max_w * PREVIEW_STACKED_RATIO))
             show_caps  = True
-            cap_height = False
-        elif mode in ("Barcode", "Ingredient", "Combined"):
-            active     = [mode]
-            tile_max_w = PREVIEW_MAX_W
-            show_caps  = False
-            cap_height = True
+            max_h      = None                   # stacked tiles scroll instead
         else:
-            active     = ["Barcode"]
-            tile_max_w = PREVIEW_MAX_W
+            active     = [mode if mode in ("Barcode", "Ingredient", "Combined") else "Barcode"]
+            tile_max_w = max_w
             show_caps  = False
-            cap_height = True
 
         # Re-pack tiles in fixed Barcode → Ingredient → Combined order
         self._hide_preview_tiles()
@@ -1694,7 +1893,7 @@ class AaojeeApp:
             tile["frame"].pack(anchor=tk.W, pady=(0, 6))
             if show_caps:
                 tile["caption"].pack(anchor=tk.W, before=tile["border"])
-            self._render_into_tile(v, data, tile_max_w, allow_height_cap=cap_height)
+            self._render_into_tile(v, data, tile_max_w, max_h=max_h)
 
     def _on_date_change(self, *_):
         self._schedule_preview_update()
@@ -1764,23 +1963,22 @@ class AaojeeApp:
         self.lock.lock()
         self._refresh_lock_ui()
 
-    def _on_layout_lock_btn(self):
-        if self.lock.is_unlocked():
-            self.lock.lock()
-        else:
-            self.lock.require(self.root, "Changing Spacing / Side Margin")
-        self._refresh_lock_ui()
-
     def _refresh_lock_ui(self):
-        """Grey out Spacing / Side Margin while a manager PIN is set and locked."""
+        """Show the manager-PIN state in the mode bar, and leave the Edit screen
+        once the PIN session has timed out (if nothing is unsaved)."""
+        if not self.lock.enabled:
+            self._lock_var.set("")
+            self._lock_btn.pack_forget()
+            return
         unlocked = self.lock.is_unlocked()
-        for spin in (self._spacing_spin, self._margin_spin):
-            spin.configure(state="normal" if unlocked else "disabled")
-        if self.lock.enabled:
-            self._layout_lock_btn.configure(text="Lock" if unlocked else "Unlock…")
-            self._layout_lock_btn.grid(row=0, column=4, sticky=tk.W, padx=(8, 0))
+        if (not unlocked and self._mode == MODE_EDIT and not self._is_dirty()):
+            self._set_mode(MODE_PRINT)
+        self._lock_var.set("🔓 Manager unlocked" if unlocked else "🔒 Locked")
+        if unlocked:
+            if not self._lock_btn.winfo_manager():
+                self._lock_btn.pack(side=tk.RIGHT, before=self._lock_label, padx=(0, 4))
         else:
-            self._layout_lock_btn.grid_remove()
+            self._lock_btn.pack_forget()
 
     def _schedule_lock_refresh(self):
         self._refresh_lock_ui()
@@ -2019,6 +2217,23 @@ class SettingsDialog(tk.Toplevel):
             variable=self._native_dpi_var).grid(row=8, column=0, columnspan=2,
                                                 sticky=tk.W, padx=10, pady=(4, 4))
 
+        # Label layout fine-tuning (moved here from the main screen, U-014)
+        lbl(9, "Label spacing:")
+        layout = ttk.Frame(f)
+        layout.grid(row=9, column=1, **pad, sticky=tk.W)
+        self._spacing_var = tk.StringVar(value=f"{float(settings.get('label_spacing', 1.0)):.2f}")
+        spacing = ttk.Spinbox(layout, textvariable=self._spacing_var, from_=0.5, to=3.0,
+                              increment=0.25, width=6, format="%.2f")
+        spacing.pack(side=tk.LEFT)
+        _block_mousewheel(spacing)
+        ttk.Label(layout, text="   Side margin:").pack(side=tk.LEFT)
+        self._margin_var = tk.StringVar(value=f"{float(settings.get('label_margin_in', 0.08)):.2f}")
+        margin = ttk.Spinbox(layout, textvariable=self._margin_var, from_=0.03, to=0.25,
+                             increment=0.01, width=6, format="%.2f")
+        margin.pack(side=tk.LEFT, padx=(4, 0))
+        _block_mousewheel(margin)
+        ttk.Label(layout, text="inches", foreground="gray").pack(side=tk.LEFT, padx=(4, 0))
+
         # Buttons
         btn_f = ttk.Frame(self, padding=(12, 0, 12, 12))
         btn_f.pack(fill=tk.X)
@@ -2050,6 +2265,12 @@ class SettingsDialog(tk.Toplevel):
         s.show_address     = self._show_ad_var.get()
         s.set("show_combined_button", self._combined_var.get())
         s.set("print_at_printer_dpi", self._native_dpi_var.get())
+        for key, var, low, high in (("label_spacing", self._spacing_var, 0.5, 3.0),
+                                    ("label_margin_in", self._margin_var, 0.03, 0.25)):
+            try:
+                s.set(key, max(low, min(high, float(var.get()))))
+            except ValueError:
+                pass
         chosen = self._preview_mode_var.get()
         for internal, label in PREVIEW_MODE_LABELS.items():
             if label == chosen:

@@ -44,7 +44,7 @@ echo.
 
 REM ---- Step 1: Install / update dependencies -----------------
 echo Installing Python dependencies...
-%PY% -m pip install --upgrade Pillow pywin32 pyinstaller
+%PY% -m pip install --upgrade Pillow pywin32 pyinstaller sv-ttk
 if errorlevel 1 (
     echo.
     echo ERROR: Installing dependencies failed.  Scroll up to read why.
@@ -70,7 +70,8 @@ REM be mistaken for a successful new build.
 if exist dist\AaojeeLabels.exe del /q dist\AaojeeLabels.exe
 
 echo Building the executable...
-%PY% -m PyInstaller --noconfirm --clean --onefile --windowed --name AaojeeLabels main.py
+REM --collect-data sv_ttk bundles the Windows 11 theme files (U-016)
+%PY% -m PyInstaller --noconfirm --clean --onefile --windowed --name AaojeeLabels --collect-data sv_ttk main.py
 
 echo.
 echo ============================================================

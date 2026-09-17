@@ -1,10 +1,11 @@
 """
 manager_lock.py — Optional manager PIN for Aaojee Label Maker.
 
-When a PIN is set, actions that change how labels look or that can lose data
-(Settings, Font Settings, Reset Layout, Spacing / Side Margin, Delete,
-Restore, Import, changing the PIN) ask for it first.  Printing, searching and
-editing products stay open to everyone.
+When a PIN is set, the Edit Products screen and actions that change how
+labels look or that can lose data (Settings, Font Settings, Reset Layout,
+Delete, Restore, Import, Change Prices, emptying the Trash, changing the PIN)
+ask for it first.  Printing, searching and the print queue stay open to
+everyone.
 
 After a correct PIN the program stays unlocked for UNLOCK_MINUTES since the
 last protected action, then locks itself again.  "Lock Now" locks at once.
@@ -68,6 +69,12 @@ class ManagerLock:
 
     def _extend(self):
         self._unlocked_until = self._clock() + UNLOCK_MINUTES * 60
+
+    def touch(self):
+        """Keep an unlocked session alive while the manager is working
+        (e.g. typing on the Edit Products screen)."""
+        if self.enabled and self.is_unlocked():
+            self._extend()
 
     def try_unlock(self, pin: str) -> bool:
         if self.enabled and verify_pin(pin, self._settings.get(PIN_SETTING_KEY)):

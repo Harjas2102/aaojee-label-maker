@@ -4,6 +4,9 @@
 # Image generation and label rendering
 Pillow>=9.0.0
 
+# Windows 11 look for the program window (optional: falls back to the standard theme)
+sv-ttk>=2.6
+
 # Windows printing and printer enumeration (Windows only)
 pywin32>=305; sys_platform == "win32"
 

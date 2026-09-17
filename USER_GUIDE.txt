@@ -7,45 +7,57 @@ DAY-TO-DAY USE
 ----------------------------------------------------------------
 
 OPENING THE PROGRAM
-  Double-click AaojeeLabels.exe.  The window has three parts:
-    • Left   — the product list, with Search and a "Show:" filter.
-    • Middle — Product Details (top) and Print Settings (bottom).
-    • Right  — Quantity, the big green Print buttons, and the
-               label preview.
+  Double-click AaojeeLabels.exe.  It opens full screen with two
+  tabs at the top:
+    🖨 Print Labels   — for everyday printing (opens first)
+    ✏ Edit Products  — for adding and changing products
+  Both show the product list on the left and a large label
+  preview on the right.
 
 FINDING A PRODUCT
-  Type any part of the product name in the Search box.  The list
-  filters instantly.  Use the "Show:" dropdown to see only:
+  The cursor starts in the big "Find a product" box.  Type any
+  part of the name — the list filters as you type.  Use the
+  "Show:" dropdown to see only:
     Cooked Food / Ingredient Labels (Date Mode "Best By"),
     Sweets, Spices, Dry Goods, or products with No category.
   Search and the filter work together.
   Click a column heading (Name, Barcode #, Size, Price) to sort
   by it; click it again to reverse.  Size sorts by actual weight.
-  Click a product to load it.  Double-click it to reload the
-  saved version.  Ctrl+F jumps to the Search box.
-
-  You can also type a barcode number in Search (e.g. 310800).
+  Click a product to open it.  You can also type a barcode number
+  (e.g. 310800).  Ctrl+F jumps back to the search box.
 
 SCANNING A LABEL TO FIND A PRODUCT
-  1. Click in the Search box (or press Ctrl+F).
-  2. Scan any printed label with the barcode scanner.
-  The product opens straight away.  The scanned number stays
+  With the cursor in the search box, scan any printed label.  The
+  product opens straight away and the scanned number stays
   highlighted, so you can scan the next label right away.
-  Typing a name and pressing Enter opens it if it is the only
-  match.  Press Esc to clear the Search box.
   If the program beeps and says "No product has barcode …", that
   barcode is not in this program.
 
-PRINTING LABELS
-  1. Click a product in the list.
-  2. Set Quantity (use − / + or type a number, e.g. 30).
+PRINTING LABELS — WITH THE KEYBOARD (fastest)
+  1. Type part of the name, e.g.  gujrati
+  2. Press Enter.  The first product in the list opens and the
+     cursor jumps to Quantity.  (Use the Up / Down arrow keys first
+     to pick a different product in the list.)
+  3. Type the quantity, e.g.  30
+  4. Press Enter to print barcode labels,
+     or Shift+Enter to print ingredient labels.
+  The cursor goes back to the search box, ready for the next one.
+  Other keys on the Print Labels screen:
+    F5 = Print Barcode   F6 = Print Ingredients
+    F7 = Print Combined  F8 = Add to Print Queue   Esc = back to search
+  Help → Keyboard Shortcuts lists them all.
+
+PRINTING LABELS — WITH THE MOUSE
+  1. Click a product in the list.  The large card shows its name,
+     size, price, barcode, and the date line that will print.
+  2. Set Quantity (use − / + or type a number).
   3. Check the Print Date.  It is today's date and moves to the
      next day on its own if the program is left open overnight.
      To print for another day, type it (month/day/year, e.g.
      9/17/2026) or click the calendar button.  A date you pick
      yourself is kept until you change it.
-  4. If needed, use the "Show / Hide on label" checkboxes to
-     leave off the Barcode, Price, $ Sign, Date or Address.
+  4. If needed, untick "Show on label" boxes to leave off the
+     Barcode, Price, $ Sign, Date or Address.
   5. Click:
        Print Barcode         — the barcode / price label
        Print Ingredients     — the ingredients label
@@ -53,18 +65,17 @@ PRINTING LABELS
                                label (only shown if turned on
                                in Settings)
 
-  The preview on the right shows what will print.  Use the
-  Preview choices (Barcode / Ingredients / Combined / All three)
-  to change what it shows.
+  The preview on the right shows what will print, as large as the
+  screen allows.  Choose Barcode / Ingredients / Combined / All
+  three above it.
 
-  The printer and label size are set once in Settings, so they
-  are not on the main screen.
+  The printer, label size, spacing and side margin are set once
+  in Settings, so they are not on the main screen.
 
   The program will not print, and tells you why, if:
     • the Print Date is not a real date, or
     • the Barcode # is not valid (the label would otherwise
       print with no barcode).
-  Fix the field and click Print again.
 
 PRINT QUEUE (printing many products at once)
   Use this for the morning batch instead of printing one product
@@ -98,9 +109,17 @@ TEST PRINT (barcode verification)
 ADDING & EDITING PRODUCTS
 ----------------------------------------------------------------
 
+THE EDIT PRODUCTS SCREEN
+  Click the "✏ Edit Products" tab (or press Ctrl+E).  If a manager
+  PIN is set, the program asks for it.  Click "🖨 Print Labels"
+  (Ctrl+P) to go back.  With a PIN set, the Edit screen closes by
+  itself after 5 minutes without any typing, unless there are
+  unsaved changes.
+
 ADDING A NEW PRODUCT
-  1. Click "+ New" (or press Ctrl+N).  A new unused barcode
-     number is filled in automatically.
+  1. Click "+ New" (or press Ctrl+N — this opens the Edit Products
+     screen if needed).  A new unused barcode number is filled in
+     automatically.
   2. Fill in the fields:
        Name *       — required.  Capitalised automatically while
                       "Auto-capitalise Name & Subtitle" is ticked.
@@ -143,8 +162,8 @@ EDITING A PRODUCT
 
 UNSAVED CHANGES
   If you have changed a product without clicking Save, and then
-  open another product, click + New, or close the program, the
-  program asks:
+  open another product, click + New, go back to Print Labels, or
+  close the program, the program asks:
     Yes    — save the changes first
     No     — throw the changes away
     Cancel — go back to the product you were editing
@@ -184,20 +203,14 @@ DATE MODES
   Changing the Print Date recalculates the Best By date.
 
 ----------------------------------------------------------------
-PRINT SETTINGS (main screen)
-----------------------------------------------------------------
-
-  Spacing      — space between lines on the label.
-  Side Margin  — space at the left and right edges, in inches.
-  These are remembered.  Staff should not normally need them.
-
-----------------------------------------------------------------
 SETTINGS  (Settings menu → Settings…)
 ----------------------------------------------------------------
 
   • Business address line — printed at the bottom of barcode and
     combined labels.
   • Default printer.
+  • Label spacing — space between lines on the label.
+  • Side margin — space at the left and right edges, in inches.
   • Label size for Barcode and Ingredient labels (2.25x1.25 or
     2.25x3.00).  Combined labels always use 2.25x3.00.
   • Best-By date offset — days added for Best By (default 10).
@@ -210,15 +223,17 @@ SETTINGS  (Settings menu → Settings…)
 
 MANAGER PIN  (Settings menu)
   A manager PIN stops accidental changes.  When a PIN is set,
-  these need it: Settings, Font Settings, Reset to Default Layout,
-  Spacing / Side Margin, Delete, Restore from Backup, Import,
+  these need it: the Edit Products screen, Settings, Font Settings,
+  Reset to Default Layout, Delete, Restore from Backup, Import,
   Change Prices, Delete Forever / Empty Trash, and changing or
-  removing the PIN.  Printing, searching, the print
-  queue, and adding / editing products do NOT need it.
+  removing the PIN.  Printing, searching and the print queue do
+  NOT need it.
   • Set / Change Manager PIN… — at least 4 characters.
   • After the PIN is entered, those actions stay unlocked for
-    5 minutes, then lock again.  "Lock Now" locks straight away.
-    The Unlock… / Lock button next to Spacing does the same.
+    5 minutes (kept alive while you type on the Edit screen), then
+    lock again.  The top-right corner shows 🔒 Locked or
+    🔓 Manager unlocked; its "Lock" button (or Settings → Lock Now)
+    locks straight away.
   • Remove Manager PIN… — turns the PIN off.
   Forgot the PIN?  Close the program, open settings.json in
   Notepad, delete the line that starts with "manager_pin_hash",
