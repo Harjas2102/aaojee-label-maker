@@ -1,0 +1,184 @@
+﻿action,id,name,field,old,new,reason
+update,7,SPICEY CASHEW,size,1.00 Lb,1 LB,1 size spelling
+update,14,CASHEWS,size,4LB,4 LB,1 size spelling
+update,19,TOASTED CORN,size,7 oz,7 OZ,1 size spelling
+update,21,MAYA COCONUT FLAKES,size,1LB,1 LB,1 size spelling
+update,22,YOGI WHEAT LADDO FLOUR,size,2LB,2 LB,1 size spelling
+update,23,FENUGREEK SEEDS,size,400GM,400 GM,1 size spelling
+update,24,FENNEL SEEDS,size,400GM,400 GM,1 size spelling
+update,25,MAYA PHOOL MAKHANA,size,100GM,100 GM,1 size spelling
+update,29,FLAT CINAMMON STICK,size,100GM,100 GM,1 size spelling
+update,30,SQUARE JAGGERY,size,400GM,400 GM,1 size spelling
+update,31,ANAR DANA POWDER,size,100GM,100 GM,1 size spelling
+update,34,PICKLE MASALA,size,200GM,200 GM,1 size spelling
+update,35,PAPRIKA,size,200GM,200 GM,1 size spelling
+update,37,KALA JEERA,size,100GM,100 GM,1 size spelling
+update,38,CRUSH CHILLI,size,400GM,400 GM,1 size spelling
+update,39,CURRY POWDER,size,400GM,400 GM,1 size spelling
+update,40,NUTMEG,size,100GM,100 GM,1 size spelling
+update,41,MAYA FATKADI,size,100GM,100 GM,1 size spelling
+update,45,CHANNA DAL,size,8LB,8 LB,1 size spelling
+update,49,MOONG DAL,ingredients,"Moong Lentils, Ginger Garlic, Cumin, Tomatoes, Cilantro, Salt, , Oil & Spices","Moong Lentils, Ginger Garlic, Cumin, Tomatoes, Cilantro, Salt, Oil & Spices",2 ingredient spacing/punctuation
+update,52,MAYA PEANUT BLANCHED,size,1LB,1 LB,1 size spelling
+update,53,URAD WHOLE,size,2LB,2 LB,1 size spelling
+update,54,URAD WHOLE,size,4LB,4 LB,1 size spelling
+update,55,URAD WHOLE,size,8LB,8 LB,1 size spelling
+update,56,URAD DAL,size,8LB,8 LB,1 size spelling
+update,57,URAD DAL,size,4LB,4 LB,1 size spelling
+update,58,URAD DAL,size,2LB,2 LB,1 size spelling
+update,59,MASALA IDLI,size,5PCS,5 PCS,1 size spelling
+update,61,MOONG CHILKA,size,4LB,4 LB,1 size spelling
+update,62,MOONG CHILKA,size,2LB,2 LB,1 size spelling
+update,63,URD CHILKA,size,2LB,2 LB,1 size spelling
+update,64,URD CHILKA,size,4LB,4 LB,1 size spelling
+update,65,DARK KIDNEY BEANS,size,4LB,4 LB,1 size spelling
+update,67,DARK KIDNEY BEANS,size,8LB,8 LB,1 size spelling
+update,68,LIGHT KIDNEY BEANS,size,8LB,8 LB,1 size spelling
+update,70,LIGHT KIDNEY BEANS,size,2LB,2 LB,1 size spelling
+update,71,KASHMIRI RAJMA,size,2LB,2 LB,1 size spelling
+update,72,KASHMIRI RAJMA,size,4LB,4 LB,1 size spelling
+update,73,KASHMIRI RAJMA,size,8LB,8 LB,1 size spelling
+update,74,BLACK EYE PEAS,size,8LB,8 LB,1 size spelling
+update,75,BLACK EYE PEAS,size,4LB,4 LB,1 size spelling
+update,76,BLACK EYE PEAS,size,2LB,2 LB,1 size spelling
+update,78,RED CHORI,size,4LB,4 LB,1 size spelling
+update,79,CHICKPEAS,size,4LB,4 LB,1 size spelling
+update,80,CHICKPEAS,size,8LB,8 LB,1 size spelling
+update,81,CHICKPEAS,size,2LB,2 LB,1 size spelling
+update,82,KALA CHANNA,size,2.00 lb,2 LB,1 size spelling
+update,83,KALA CHANNA,size,4LB,4 LB,1 size spelling
+update,84,KALA CHANNA,size,8LB,8 LB,1 size spelling
+update,85,MOTH WHOLE,size,4LB,4 LB,1 size spelling
+update,86,MOTH WHOLE,size,2LB,2 LB,1 size spelling
+update,87,MASOOR GOTA,size,2LB,2 LB,1 size spelling
+update,88,MASOOR GOTA,size,4LB,4 LB,1 size spelling
+update,92,TOOR DAL,size,2LB,2 LB,1 size spelling
+update,93,TOOR DAL,size,4lb,4 LB,1 size spelling
+update,95,TOOR DAL OILY,size,2LB,2 LB,1 size spelling
+update,96,TOOR DAL OILY,size,8LB,8 LB,1 size spelling
+update,97,ANGOOR TOOR DAL OILY,size,8LB,8 LB,1 size spelling
+update,98,TILDA BASMATI RICE,size,2LBS,2 LB,1 size spelling
+update,99,TILDA BASMATI RICE,size,4LBS,4 LB,1 size spelling
+update,100,CLOVES,size,2LB,2 LB,1 size spelling
+update,101,RAW PEANUTS,size,1LB,1 LB,1 size spelling
+update,102,RAW PEANUTS,size,2LB,2 LB,1 size spelling
+update,107,GREEN CHANNA,size,2LBS,2 LB,1 size spelling
+update,112,YELLOW PEAS,size,2LBS,2 LB,1 size spelling
+update,113,YELLOW PEAS,size,4LB,4 LB,1 size spelling
+update,121,BHINDI ALOO,ingredients,"Okra, Potato, Tomato, Carrom seed, tumeric,onions,spieces,salt &oil","Okra, Potato, Tomato, Carrom seed, tumeric, onions, spieces, salt & oil",2 ingredient spacing/punctuation
+update,124,AAOJEE BLACK TEA,size,800G,800 GM,1 size spelling
+update,134,MANGO MOOSE,name,MANGO MOOSE,MANGO MOUSSE,3 name spelling
+update,135,MANGO MOOSE,name,MANGO MOOSE,MANGO MOUSSE,3 name spelling
+update,137,WHOLE WHEAT ATTA,size,4LB,4 LB,1 size spelling
+update,138,GOBHI MUTTAR,notes,,CHECK (data cleanup 2026-09-17): ingredients and subtitle still need to be typed in — no source document (GOBI MATTAR.docx actually contains the GOBHI ALOO label).,5 flagged: needs ingredients
+update,139,ALOO MATTAR,ingredients,"Potato, Peas, Ginger, Garlic, Fenugreek, Tomatoes,Cilantro Salt,Onions, Oil & Spices","Potato, Peas, Ginger, Garlic, Fenugreek, Tomatoes, Cilantro Salt, Onions, Oil & Spices",2 ingredient spacing/punctuation
+update,141,TOASTED CORN,size,14 oz,14 OZ,1 size spelling
+update,144,GUJRATI DAL,ingredients,"Pigeon Peas Lentils, Tamarind, Jaggery, Mustard seeds,Tomatoes, Salt, Ginger, Lemon Juice, Green Chilli, Curry Leaves, Asafoetida, Oil & Spices","Pigeon Peas Lentils, Tamarind, Jaggery, Mustard seeds, Tomatoes, Salt, Ginger, Lemon Juice, Green Chilli, Curry Leaves, Asafoetida, Oil & Spices",2 ingredient spacing/punctuation
+update,146,BAY LEAF,size,25gms,25 GM,1 size spelling
+update,148,RED SPLIT LENTILS,size,4LB,4 LB,1 size spelling
+update,149,RED SPLIT LENTILS,size,2LB,2 LB,1 size spelling
+update,150,URAD WHITE SPLIT PEALED,size,2LB,2 LB,1 size spelling
+update,151,URAD WHITE SPLIT PEALED,size,4LB,4 LB,1 size spelling
+update,159,CINAMMON STICKS,size,14 oz,14 OZ,1 size spelling
+update,161,CINAMMON STICKS,size,7 oz,7 OZ,1 size spelling
+update,164,SUPARI TUKDA,size,7OZ,7 OZ,1 size spelling
+update,165,JUMBO CASHEW,size,1LB,1 LB,1 size spelling
+update,166,JUMBO CASHEW,size,2LB,2 LB,1 size spelling
+update,168,ROASTED PISTACHO,size,2LB,2 LB,1 size spelling
+update,169,JUMBO ALMOND,size,2LB,2 LB,1 size spelling
+update,170,JUMBO DATES,size,1.5LB,1.5 LB,1 size spelling
+update,171,JUMBO ALMOND,size,4LB,4 LB,1 size spelling
+update,172,JUMBO CASHEW,size,3LB,3 LB,1 size spelling
+update,176,BASMATI RICE,size,4.0LB,4 LB,1 size spelling
+update,182,FENNEL CANDY,size,14Oz,14 OZ,1 size spelling
+update,185,CARDAMOM SEEDS,size,3.5 oz,3.5 OZ,1 size spelling
+update,187,AAOJEE RASMALAI,size,2 PIECES,2 PCS,1 size spelling
+update,188,ROSE BRAND TUKMARIA,size,7oz,7 OZ,1 size spelling
+update,189,LAZIZA FIRNI,size,150GMS,150 GM,1 size spelling
+update,190,LAZIZA RABRI FALOODA,size,235GMS,235 GM,1 size spelling
+update,191,LAZIZA JELLY FALOODA,size,235gm,235 GM,1 size spelling
+update,192,LAZIZA KULFI MALAI MIX,size,152GMS,152 GM,1 size spelling
+update,197,ASSAM TEA,size,900GMS,900 GM,1 size spelling
+update,198,ASSAM TEA,size,2Lb,2 LB,1 size spelling
+update,199,ASSAM TEA,size,450GMS,450 GM,1 size spelling
+update,202,WHOLE WHEAT ATTA,size,8Lb,8 LB,1 size spelling
+update,204,FENNEL SEEDS,size,200GMS,200 GM,1 size spelling
+update,205,RICE FLOUR,size,4LBS,4 LB,1 size spelling
+update,206,MATER  SOYA WADI,name,MATER  SOYA WADI,MATER SOYA WADI,2 stray spaces
+update,209,MUSTARD OIL,size,500 mL,500 ML,1 size spelling
+update,214,ROSE BRAND JAVETRI,size,3.5 oz,3.5 OZ,1 size spelling
+update,215,FLEX SEEDS,size,7OZ,7 OZ,1 size spelling
+update,216,ROSE BRAND BLACK SALT,size,7oz,7 OZ,1 size spelling
+update,217,ALOO SABZI,ingredients,"Potatoes, Tomatoes, Cumin, Cilantro, Salt, Ginger, Chillis,Curry Leaves,Asafoetida, Oil & Spices","Potatoes, Tomatoes, Cumin, Cilantro, Salt, Ginger, Chillis, Curry Leaves, Asafoetida, Oil & Spices",2 ingredient spacing/punctuation
+update,218,COCONUT FLAKES,size,1 lb,1 LB,1 size spelling
+update,219,ROASTED KALA CHANA,size,1IB.,1 LB,1 size spelling
+update,223,TOOR DAL,size,8LB,8 LB,1 size spelling
+update,224,BROWN BASMATI RICE,size,4LBS,4 LB,1 size spelling
+update,226,COCONUT SLICES,size,200 GRAMS,200 GM,1 size spelling
+update,227,COCONUT POWDER,size,1LB,1 LB,1 size spelling
+update,229,PEANUTS BLANCHED,size,2LBS,2 LB,1 size spelling
+update,232,MOONG CHILKA,size,8LBS,8 LB,1 size spelling
+update,233,ROASTED SALTED CASHEWS,size,1LB,1 LB,1 size spelling
+update,235,FENNEL CANDY,size,0.5 lb,0.5 LB,1 size spelling
+update,238,GREEN PISTA,size,1 lb,1 LB,1 size spelling
+update,240,BASMATI RICE(PARBOILED),size,2 LBS,2 LB,1 size spelling
+update,243,MAKHANI SAUCE,date_mode,Packed,Best By,5 cooked item with ingredients set to Best By
+update,249,ROASTED PEANUT,size,14OZ,14 OZ,1 size spelling
+update,250,KAJU KATLI,ingredients,"Cashew, Sugar, Milk, Cardamom& butter","Cashew, Sugar, Milk, Cardamom & butter",2 ingredient spacing/punctuation
+update,251,PISTACHIO,size,4LBS,4 LB,1 size spelling
+update,258,WASABI FRIED GREEN PEAS,notes,,"CHECK (data cleanup 2026-09-17): ingredients and subtitle still need to be typed in — no source document (WASABI _FRIED _GREENPEAS.docx only says ""29Month"").",5 flagged: needs ingredients
+update,263,CUMIN SEEDS,size,200 gms,200 GM,1 size spelling
+update,272,SABUDANA KHICHDI,notes,,CHECK (data cleanup 2026-09-17): ingredients and subtitle still need to be typed in — no source document (SABUDANA KHICHDI.docx is empty).,5 flagged: needs ingredients
+update,273,SHAKKAR PARA,size,14 OZ.,14 OZ,1 size spelling
+update,277,STAR ANIES,size,200 gm,200 GM,1 size spelling
+update,298,KAJU  PISTA BURFI,name,KAJU  PISTA BURFI,KAJU PISTA BURFI,2 stray spaces
+update,303,FRYUMS,size,14OZ,14 OZ,1 size spelling
+update,304,STAR ANISE,size,400gm,400 GM,1 size spelling
+update,306,FALOODA SEV,size,50 G,50 GM,1 size spelling
+update,308,GAZAB AAM PAPAD BURFI,size,150 G,150 GM,1 size spelling
+update,313,SONA MASORI RICE,size,5 LBS,5 LB,1 size spelling
+update,314,CROWN CORIANDER SEEDS,size,200 gms,200 GM,1 size spelling
+update,316,CROWN GREEN CARDAMOM,size,200 G,200 GM,1 size spelling
+update,321,CROWN TURMERIC POWDER,size,200 G,200 GM,1 size spelling
+update,322,VOHRA FOODS GALAWAT,size,340 G,340 GM,1 size spelling
+update,323,RAW PEANUTS,size,3 lb,3 LB,1 size spelling
+update,324,POPPY SEEDS,size,7 OZ(200 GM),7 OZ (200 GM),1 size spelling
+update,326,CROWN MOONG WHOLE,size,4 LBS,4 LB,1 size spelling
+update,327,CUMIN SEEDS,size,3LBS,3 LB,1 size spelling
+update,336,TAMRIND  PASTE,size,7OZ,7 OZ,1 size spelling
+update,336,TAMRIND  PASTE,name,TAMRIND  PASTE,TAMRIND PASTE,2 stray spaces
+update,339,BLACK PEPPER PWDR,size,14 0Z,14 OZ,1 size spelling
+update,346,GUR REWARI,size,14 .1OZ,14.1 OZ,1 size spelling
+update,352,CINAMON STICK,size,3.5 oz,3.5 OZ,1 size spelling
+update,353,GREEN CARDAMOM,size,14  OZ(400 GM),14 OZ (400 GM),1 size spelling
+update,354,ROASTED CHANA,size,14  OZ,14 OZ,1 size spelling
+update,355,ROASTED CHANA,size,28  OZ,28 OZ,1 size spelling
+update,363,KESAR PISTA  BURFI,size,8OZ,8 OZ,1 size spelling
+update,363,KESAR PISTA  BURFI,name,KESAR PISTA  BURFI,KESAR PISTA BURFI,2 stray spaces
+update,372,POTATO POHA,date_mode,Packed,Best By,5 cooked item with ingredients set to Best By
+update,377,VERMICELLI  UPMA,name,VERMICELLI  UPMA,VERMICELLI UPMA,2 stray spaces
+update,381,MIX DRY FRUIT,size,2LB,2 LB,1 size spelling
+update,390,CHANDARKALA,size,7OZ,7 OZ,1 size spelling
+update,391,MIX DRY FRUIT  BURFI,name,MIX DRY FRUIT  BURFI,MIX DRY FRUIT BURFI,2 stray spaces
+update,401,RASGULLA,size,14OZ,14 OZ,1 size spelling
+update,404,SOYA  WADI,name,SOYA  WADI,SOYA WADI,2 stray spaces
+update,418,WALNUTS,size,1.5lb,1.5 LB,1 size spelling
+update,422,ALU BUKHARA,size,7OZ,7 OZ,1 size spelling
+update,134,MANGO MOOSE,notes,,CHECK (data cleanup 2026-09-17): another product has the same name and size but costs $5.99 (barcode 313900). Probably a different size — add the size to both.,4 flagged: duplicate name+size
+update,135,MANGO MOOSE,notes,,CHECK (data cleanup 2026-09-17): another product has the same name and size but costs $4.99 (barcode 313800). Probably a different size — add the size to both.,4 flagged: duplicate name+size
+update,176,BASMATI RICE,notes,,"CHECK (data cleanup 2026-09-17): another product has the same name, size and price (barcode 502700). Look both barcodes up in the POS and delete the one the POS does not use.",4 flagged: duplicate name+size
+update,241,BASMATI RICE,notes,,"CHECK (data cleanup 2026-09-17): another product has the same name, size and price (barcode 318900). Look both barcodes up in the POS and delete the one the POS does not use.",4 flagged: duplicate name+size
+update,287,DEER BROWN MUSTARD- BIG,notes,,"CHECK (data cleanup 2026-09-17): another product has the same name, size and price (barcode 562100). Look both barcodes up in the POS and delete the one the POS does not use.",4 flagged: duplicate name+size
+update,288,DEER BROWN MUSTARD- BIG,notes,,"CHECK (data cleanup 2026-09-17): another product has the same name, size and price (barcode 562000). Look both barcodes up in the POS and delete the one the POS does not use.",4 flagged: duplicate name+size
+update,315,MANGO CANDY,notes,,CHECK (data cleanup 2026-09-17): another product has the same name and size but costs $2.99 (barcode 565500). Probably a different size — add the size to both.,4 flagged: duplicate name+size
+update,317,MANGO CANDY,notes,,CHECK (data cleanup 2026-09-17): another product has the same name and size but costs $1.99 (barcode 565000). Probably a different size — add the size to both.,4 flagged: duplicate name+size
+update,371,RASMALAI,notes,,"CHECK (data cleanup 2026-09-17): another product has the same name, size and price (barcode 605900). Look both barcodes up in the POS and delete the one the POS does not use.",4 flagged: duplicate name+size
+update,379,RASMALAI,notes,,"CHECK (data cleanup 2026-09-17): another product has the same name, size and price (barcode 605100). Look both barcodes up in the POS and delete the one the POS does not use.",4 flagged: duplicate name+size
+update,396,QUINOA SALAD,notes,,"CHECK (data cleanup 2026-09-17): another product has the same name, size and price (barcode 607700). Look both barcodes up in the POS and delete the one the POS does not use.",4 flagged: duplicate name+size
+update,397,QUINOA SALAD,notes,,"CHECK (data cleanup 2026-09-17): another product has the same name, size and price (barcode 607600). Look both barcodes up in the POS and delete the one the POS does not use.",4 flagged: duplicate name+size
+insert,434,ALSI PINNI,(new product),,"Flex Seed, Chickpea Flour, Clarified Butter, Almonds, Raisins, Cashews, Coconut Powder, Fennel Powder, Oil & Sugar",6 added from unmatched .docx
+insert,435,ASSORTED NUTS,(new product),,"Roasted Salted Almonds, Pistachios, Roasted Salted Cashews, Raisins",6 added from unmatched .docx
+insert,436,LOBIA RASMISSA,(new product),,"Black eye beans, ginger, Garlic, onions, spieces, salt tomatoes & oil",6 added from unmatched .docx
+insert,437,MORIYO,(new product),,"Moriyo (Samo), Potatoes, Curry Leaves, Cumin Seeds, Cilantro, Red Whole Chilli, Salt, Sugar, Cashews, Lemon Juice, Ginger, Green Chilli & Oil",6 added from unmatched .docx
+insert,438,STRAWBERRY MOUSSE,(new product),,"Strawberry, Sugar, Yogurt, Gelatin, Heavy Cream",6 added from unmatched .docx
+insert,439,URAD CHANA DAL,(new product),,"Split Matpe Beans, Chickpea Lentils, Ginger, Garlic, Cumin, Tomatoes, Cilantro, Salt, Oil & Spices",6 added from unmatched .docx

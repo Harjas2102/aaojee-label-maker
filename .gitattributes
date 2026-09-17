@@ -1,0 +1,8 @@
+# Store text files with LF in git; check them out with LF everywhere.
+* text=auto eol=lf
+# Windows batch files MUST have CRLF or cmd.exe misreads them (see UPGRADE_TRACKER.md).
+*.bat text eol=crlf
+*.png binary
+*.db binary
+# Change logs written by the data scripts: keep byte-for-byte as written.
+*.csv -text

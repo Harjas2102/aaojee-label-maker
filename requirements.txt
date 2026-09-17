@@ -1,0 +1,14 @@
+# Aaojee Label Maker — Python dependencies
+# Install with:  pip install -r requirements.txt
+
+# Image generation and label rendering
+Pillow>=9.0.0
+
+# Windows printing and printer enumeration (Windows only)
+pywin32>=305; sys_platform == "win32"
+
+# Optional: Access .mdb importer (requires Microsoft Access ODBC driver)
+pyodbc>=4.0.0; sys_platform == "win32"
+
+# Packaging to .exe (run once during the build step, not needed at runtime)
+pyinstaller>=5.0

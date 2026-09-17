@@ -1,0 +1,128 @@
+================================================================
+  Aaojee Label Maker — Build Instructions
+  (For a non-developer on Windows 11)
+================================================================
+
+You only need to do this ONCE.  After the build you will have a
+double-clickable AaojeeLabels.exe that runs forever without needing
+Python, this source code, or any other tools.
+
+----------------------------------------------------------------
+WHAT YOU NEED
+----------------------------------------------------------------
+
+  • A Windows 11 PC with an internet connection.
+  • About 20 minutes (most of it is waiting for downloads).
+  • The "Aaojee Label Program" folder (the one containing this
+    file and the "source" subfolder).
+
+----------------------------------------------------------------
+STEP 1 — Install Python
+----------------------------------------------------------------
+
+1. Open a web browser and go to:
+       https://www.python.org/downloads/
+
+2. Click the big yellow "Download Python 3.x.x" button.
+
+3. Run the downloaded installer.
+   IMPORTANT: On the first screen, check the box that says:
+       ☑  Add Python to PATH
+   Then click "Install Now".
+
+4. When it finishes, click "Close".
+
+5. Test it worked: press  Win + R,  type  cmd,  press Enter.
+   In the black window, type:
+       python --version
+   You should see something like:  Python 3.12.4
+   If you see an error, restart your PC and try again.
+
+----------------------------------------------------------------
+STEP 2 — Run the build script
+----------------------------------------------------------------
+
+1. Open File Explorer and navigate to the "Aaojee Label Program"
+   folder (the one that contains this file).
+
+2. Double-click the file:
+       build.bat
+
+   A black window will open.  It will download some software
+   and then build the program.  This takes 2–5 minutes.
+
+3. When it finishes, you will see either:
+       SUCCESS!  Your executable is ready at: ...
+   or an error message.
+
+   If it succeeded, skip to Step 3.
+
+   If it failed with "pip is not recognised":
+     → Python was not added to PATH.  Re-run the Python installer,
+       choose "Modify", and check "Add Python to environment variables".
+
+----------------------------------------------------------------
+STEP 3 — Your finished program
+----------------------------------------------------------------
+
+After a successful build, the file  AaojeeLabels.exe  appears in:
+
+    Aaojee Label Program\AaojeeLabels.exe
+
+That is your program.  You can:
+  • Double-click it right there to run it.
+  • Copy it to your Desktop for easy access.
+  • Copy it to  C:\AaojeeLabels\  if you prefer a dedicated folder.
+
+The program creates its database (products.db) and backups folder
+next to itself, wherever you put it.
+
+----------------------------------------------------------------
+STEP 4 — Optional: set up the Access importer
+----------------------------------------------------------------
+
+If you want to import data from the old labeldata.mdb database:
+
+1. build.bat already installs "pyodbc" (the piece of Python the
+   importer needs) and builds it into the exe.  If you see a
+   warning that pyodbc failed to install, run this in a command
+   prompt and then run build.bat again:
+       pip install pyodbc
+
+2. On the PC that will run the import, install one free
+   Microsoft download:
+   https://www.microsoft.com/en-us/download/details.aspx?id=54920
+   "Microsoft Access Database Engine 2016 Redistributable"
+   Choose the x64 file (AccessDatabaseEngine_X64.exe) if you
+   installed the normal 64-bit Python.
+
+After this, File → Import from Old Database (.mdb)… in the
+program will work.  No rebuild is needed after step 2.
+
+----------------------------------------------------------------
+MOVING TO A NEW PC IN THE FUTURE
+----------------------------------------------------------------
+
+The program and all its data are self-contained.  To move to a
+new PC:
+
+1. Copy the entire folder that contains AaojeeLabels.exe,
+   products.db, settings.json, and the backups\ subfolder.
+
+2. Paste it on the new PC.
+
+3. Double-click AaojeeLabels.exe.
+
+That's it.  No re-installation needed.
+
+If you want to re-build the exe from source on the new PC,
+follow these same instructions from the beginning.
+
+----------------------------------------------------------------
+REBUILDING AFTER CHANGES
+----------------------------------------------------------------
+
+If the source code is ever updated or corrected, rebuild by
+running build.bat again.  The old exe will be overwritten.
+
+================================================================

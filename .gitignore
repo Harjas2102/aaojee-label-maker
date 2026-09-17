@@ -1,0 +1,31 @@
+# ── Live store data: lives on the store PC, never in git ─────────────────────
+products.db
+products.db-wal
+products.db-shm
+*.db
+settings.json
+print_queue.json
+backups/
+
+# ── Build output (rebuilt by build.bat) ──────────────────────────────────────
+AaojeeLabels.exe
+source/build/
+source/dist/
+*.spec
+__pycache__/
+*.pyc
+
+# ── Local-only copies and source material ────────────────────────────────────
+# Git history replaces the snapshot folders from here on; the old ones stay on disk.
+upgrade_snapshots/
+# Original Word / Access files and photos from the old system (keep on the flash drive)
+import_source/
+ingredient_docs/
+reference_images/
+# Personal notes
+Label program left for me.txt
+
+# ── Test output / temp files ─────────────────────────────────────────────────
+tools/label_diffs/
+*.tmp
+.DS_Store

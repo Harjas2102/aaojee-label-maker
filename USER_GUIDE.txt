@@ -1,0 +1,341 @@
+================================================================
+  Aaojee Label Maker — User Guide
+================================================================
+
+----------------------------------------------------------------
+DAY-TO-DAY USE
+----------------------------------------------------------------
+
+OPENING THE PROGRAM
+  Double-click AaojeeLabels.exe.  The window has three parts:
+    • Left   — the product list, with Search and a "Show:" filter.
+    • Middle — Product Details (top) and Print Settings (bottom).
+    • Right  — Quantity, the big green Print buttons, and the
+               label preview.
+
+FINDING A PRODUCT
+  Type any part of the product name in the Search box.  The list
+  filters instantly.  Use the "Show:" dropdown to see only:
+    Cooked Food / Ingredient Labels (Date Mode "Best By"),
+    Sweets, Spices, Dry Goods, or products with No category.
+  Search and the filter work together.
+  Click a column heading (Name, Barcode #, Size, Price) to sort
+  by it; click it again to reverse.  Size sorts by actual weight.
+  Click a product to load it.  Double-click it to reload the
+  saved version.  Ctrl+F jumps to the Search box.
+
+  You can also type a barcode number in Search (e.g. 310800).
+
+SCANNING A LABEL TO FIND A PRODUCT
+  1. Click in the Search box (or press Ctrl+F).
+  2. Scan any printed label with the barcode scanner.
+  The product opens straight away.  The scanned number stays
+  highlighted, so you can scan the next label right away.
+  Typing a name and pressing Enter opens it if it is the only
+  match.  Press Esc to clear the Search box.
+  If the program beeps and says "No product has barcode …", that
+  barcode is not in this program.
+
+PRINTING LABELS
+  1. Click a product in the list.
+  2. Set Quantity (use − / + or type a number, e.g. 30).
+  3. Check the Print Date.  It is today's date and moves to the
+     next day on its own if the program is left open overnight.
+     To print for another day, type it (month/day/year, e.g.
+     9/17/2026) or click the calendar button.  A date you pick
+     yourself is kept until you change it.
+  4. If needed, use the "Show / Hide on label" checkboxes to
+     leave off the Barcode, Price, $ Sign, Date or Address.
+  5. Click:
+       Print Barcode         — the barcode / price label
+       Print Ingredients     — the ingredients label
+       Print Combined Label  — both on one tall 2.25" x 3.00"
+                               label (only shown if turned on
+                               in Settings)
+
+  The preview on the right shows what will print.  Use the
+  Preview choices (Barcode / Ingredients / Combined / All three)
+  to change what it shows.
+
+  The printer and label size are set once in Settings, so they
+  are not on the main screen.
+
+  The program will not print, and tells you why, if:
+    • the Print Date is not a real date, or
+    • the Barcode # is not valid (the label would otherwise
+      print with no barcode).
+  Fix the field and click Print again.
+
+PRINT QUEUE (printing many products at once)
+  Use this for the morning batch instead of printing one product
+  at a time.
+  1. Open a product, set Quantity, click "+ Add to Print Queue".
+     Cooked food (products with ingredients) is added as
+     "Barcode + Ingredients"; everything else as "Barcode".
+     Adding the same product again adds to its quantity.
+  2. Repeat for every product in the batch.
+  3. Click "Print Queue (N)".  Check the list.  Select a row to
+     change its quantity (− / +) or which labels it prints, or
+     Remove it.
+  4. Click "Print All".  The program shows how many labels will
+     print and asks you to confirm.
+  The queue uses the Print Date and Show / Hide checkboxes on the
+  main window, and the products as last saved.
+  The list is kept (even after closing the program) until you
+  click "Clear All", so a daily batch can be printed again
+  tomorrow.  "Last printed" shows when each row was last printed.
+  If the printer stops partway, a message says which products
+  were already sent, so you don't print them twice.
+
+TEST PRINT (barcode verification)
+  Before relying on barcodes from a new or rebuilt program:
+  1. Load any product that has a barcode number.
+  2. Click "Test Print (1 barcode label)".
+  3. Scan the printed label at the POS.
+  4. Confirm it rings up the correct item.
+
+----------------------------------------------------------------
+ADDING & EDITING PRODUCTS
+----------------------------------------------------------------
+
+ADDING A NEW PRODUCT
+  1. Click "+ New" (or press Ctrl+N).  A new unused barcode
+     number is filled in automatically.
+  2. Fill in the fields:
+       Name *       — required.  Capitalised automatically while
+                      "Auto-capitalise Name & Subtitle" is ticked.
+       Subtitle     — the plain-English description shown in
+                      (parentheses).  Type it WITHOUT parentheses.
+       Ingredients  — comma-separated list.  Leave blank for
+                      packaged goods that have no ingredient list.
+       Allergens    — e.g. "Milk, Tree Nuts".  Click Pick… to tick
+                      them from the list of major allergens.
+                      Prints as a bold "Contains: …" line on
+                      ingredient and combined labels.
+       Size         — e.g. "2 LB", "8 OZ", "6 PCS".
+       Price ($)    — a number, e.g.  4.99  (no commas).
+       Net Wt       — e.g. "16 OZ".  Prints as "Net Wt: 16 OZ" on
+                      ingredient and combined labels.  Leave blank
+                      if not needed.
+       Category     — Sweets / Spices / Dry Goods, for the Show:
+                      filter.  Never printed.  If left as (none) on
+                      a new product, the program picks one when you
+                      save (you can change it).
+       Barcode #    — filled in for you; "Auto" picks a new one.
+                      You may type a 1–6 digit number instead.
+                      Fewer than 6 digits are padded with zeros on
+                      the right (e.g. "3143" becomes "314300").
+       Date Mode    — Best By: print date + 10 days (the number
+                                of days is set in Settings).
+                      Packed:  the print date.
+                      None:    no date line (for dry goods).
+       Notes        — internal notes, never printed.
+  3. Click Save (or press Ctrl+S).  "✓ Saved." appears when done.
+     If the name is missing, the price is not a number, or the
+     barcode is not valid, a red message explains what to fix and
+     nothing is saved.
+
+EDITING A PRODUCT
+  Click it in the list, change the fields, click Save.
+  Do not change a barcode number once it is set — the POS knows
+  the product by that number.  Unsaved changes stay in the form
+  while you use the Search box.
+
+UNSAVED CHANGES
+  If you have changed a product without clicking Save, and then
+  open another product, click + New, or close the program, the
+  program asks:
+    Yes    — save the changes first
+    No     — throw the changes away
+    Cancel — go back to the product you were editing
+
+ADDING ANOTHER SIZE OF A PRODUCT
+  Open the product, click "Duplicate".  A new, unsaved copy opens
+  with the same name, ingredients, allergens and price, a new
+  barcode number, and a blank Size.  Type the new Size (and Price
+  / Net Wt), then Save.  Remember to add the new barcode number
+  to the POS.
+
+DELETING A PRODUCT
+  Load it, click Delete, confirm.  The product moves to the Trash
+  (File → Trash…).  It is removed from this program only; the POS
+  is unaffected.
+
+TRASH  (File → Trash…)
+  Lists deleted products.
+    Restore          — puts the product back exactly as it was.
+    Delete Forever…  — removes it permanently.
+    Empty Trash…     — removes everything in the Trash.
+  A deleted product's barcode number is not handed out again by
+  "Auto" while it is in the Trash.
+
+DUPLICATE BARCODE WARNING
+  If the barcode number is already used by another product, the
+  program names that product and asks before saving.
+
+----------------------------------------------------------------
+DATE MODES
+----------------------------------------------------------------
+
+  Packed  : Label says  "Packed : 9/17/2026"   (print date)
+  Best By : Label says  "Best By : 9/27/2026"  (print date + 10)
+  None    : No date line at all (for nuts, dry goods, etc.)
+
+  Changing the Print Date recalculates the Best By date.
+
+----------------------------------------------------------------
+PRINT SETTINGS (main screen)
+----------------------------------------------------------------
+
+  Spacing      — space between lines on the label.
+  Side Margin  — space at the left and right edges, in inches.
+  These are remembered.  Staff should not normally need them.
+
+----------------------------------------------------------------
+SETTINGS  (Settings menu → Settings…)
+----------------------------------------------------------------
+
+  • Business address line — printed at the bottom of barcode and
+    combined labels.
+  • Default printer.
+  • Label size for Barcode and Ingredient labels (2.25x1.25 or
+    2.25x3.00).  Combined labels always use 2.25x3.00.
+  • Best-By date offset — days added for Best By (default 10).
+  • Which elements show on labels by default.
+  • Show the "Print Combined Label" button.
+  • Default preview shown when the program opens.
+  • Print at the printer's own resolution — on (recommended) for
+    sharper, more reliable barcodes.  Untick only if labels start
+    printing the wrong size.
+
+MANAGER PIN  (Settings menu)
+  A manager PIN stops accidental changes.  When a PIN is set,
+  these need it: Settings, Font Settings, Reset to Default Layout,
+  Spacing / Side Margin, Delete, Restore from Backup, Import,
+  Change Prices, Delete Forever / Empty Trash, and changing or
+  removing the PIN.  Printing, searching, the print
+  queue, and adding / editing products do NOT need it.
+  • Set / Change Manager PIN… — at least 4 characters.
+  • After the PIN is entered, those actions stay unlocked for
+    5 minutes, then lock again.  "Lock Now" locks straight away.
+    The Unlock… / Lock button next to Spacing does the same.
+  • Remove Manager PIN… — turns the PIN off.
+  Forgot the PIN?  Close the program, open settings.json in
+  Notepad, delete the line that starts with "manager_pin_hash",
+  save, and start the program again.
+
+FONT SETTINGS  (Settings menu → Font Settings…)
+  Change the font, size and bold for each part of the label.
+  Settings → Reset to Default Layout puts the fonts back to the
+  built-in look.
+
+----------------------------------------------------------------
+PRINT HISTORY  (File → Print History…)
+----------------------------------------------------------------
+
+  Every print is recorded: when, which product, which label, how
+  many, the date printed on the label, the printer, and whether it
+  came from a Print button, Test Print or the Print Queue.
+  Choose Today / Last 7 days / Last 30 days / All, search by name
+  or barcode, and "Save as Spreadsheet…" to keep a copy.
+  Useful for tracing which batch a label came from.
+
+----------------------------------------------------------------
+CHANGING PRICES  (Tools menu)
+----------------------------------------------------------------
+
+CHANGE PRICES…
+  1. Choose which products: the ones in the list right now (use
+     Search / Show: first), a category, or all products.
+  2. Type an amount — a percent or dollars.  Use a minus sign to
+     lower prices (e.g. -5).
+  3. Choose rounding: nearest cent, up to .49 or .99, or up to .99.
+  4. Check the preview.  Double-click a row to leave that product
+     out.
+  5. Click "Apply Price Changes".  A backup is made first.  The
+     program then offers to save a spreadsheet of the changes —
+     use it to change the same prices in the POS.
+  "Undo Last Change…" puts the old prices back (any price you
+  edited by hand since is left alone).
+
+EXPORT PRICE LIST…
+  Saves every product's barcode, name, size, price and category
+  as a spreadsheet (opens in Excel).
+
+----------------------------------------------------------------
+BACKUP & RESTORE
+----------------------------------------------------------------
+
+AUTOMATIC BACKUPS
+  Each time the program starts, it saves a timestamped copy of
+  the database to the "backups" folder next to the exe.  The
+  newest 30 are kept.  A backup is also made just before a
+  Restore or an Import.
+
+MANUAL EXPORT (USB backup)
+  File → Export / Backup Database…
+  Save a copy to a USB drive or another location.
+
+RESTORE FROM BACKUP
+  File → Restore from Backup…
+  Pick a backup file.  The current database is replaced (a backup
+  of it is saved first, so this can be undone).  If the file you
+  pick is not a products database, nothing is changed.
+
+----------------------------------------------------------------
+MOVING TO A NEW PC
+----------------------------------------------------------------
+
+1. Close the program, then copy the entire folder that contains:
+     AaojeeLabels.exe
+     products.db
+     settings.json
+     print_queue.json   (only there once the queue has been used)
+     data_changes\       (records of one-time data cleanups)
+     backups\
+
+2. Paste the folder on the new PC.
+
+3. Double-click AaojeeLabels.exe.
+
+Everything — products, settings, backups — comes with it.
+The labels use the "Arial Narrow" font, which comes with
+Microsoft Office.  If the new PC does not have it, labels print
+in Arial instead.
+
+Tip: before moving, use File → Export to save a copy to a USB
+drive as an extra safety net.
+
+----------------------------------------------------------------
+IMPORTING FROM THE OLD DATABASE
+----------------------------------------------------------------
+
+If you have the old labeldata.mdb file from C:\LABELNWET:
+
+1. Make sure the Microsoft Access Database Engine is installed
+   (see BUILD_INSTRUCTIONS.txt, Step 4).
+
+2. File → Import from Old Database (.mdb)…
+
+3. Choose the labeldata.mdb file.
+
+4. The program imports all products it can read.  Products whose
+   barcode number already exists are skipped, so running the
+   import twice does not create duplicates.
+
+5. A summary tells you how many were imported, skipped, or had
+   errors.
+
+Note: the old database does not contain ingredient text or
+subtitles (those were in Word documents).  Imported cooked dishes
+need their ingredients filled in by hand.
+
+----------------------------------------------------------------
+NEED HELP?
+----------------------------------------------------------------
+
+This program is built in Python with its full source code in the
+"source" folder.  Any Python programmer can read and modify it.
+To rebuild the exe from source, see BUILD_INSTRUCTIONS.txt.
+
+================================================================
