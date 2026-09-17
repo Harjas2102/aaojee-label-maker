@@ -8,9 +8,13 @@ here.
 
 - Every upgrade gets an ID (`U-001`, `U-002`, …). Add new ones at the bottom of the
   [Upgrade log](#upgrade-log) and add a row to the [Index](#index).
-- Before a batch of changes, copy the current `source/` into
-  `upgrade_snapshots/<date>_<description>/` so it can be restored.
-- Code changes only reach the store after rebuilding with `build.bat` (close the program first).
+- **From U-014 on, the project is in Git** (see `DEVELOPING.md`). Each upgrade is one or more
+  commits, and the commit IDs are listed with the entry. `git show <id>` shows exactly what
+  changed, and `git revert <id>` undoes it.
+- Before U-014, changes were protected by copying `source/` into `upgrade_snapshots/`.
+  Those folders are kept on disk (not in Git).
+- Code changes only reach the store after rebuilding with `build.bat` or
+  `update_and_build.bat` (close the program first).
 
 ---
 
@@ -32,6 +36,12 @@ here.
 | U-012 | 2026-09-17 | Trash (undo delete)                       | Done, not yet built | Restore snapshot (see U-012 note) |
 | U-013 | 2026-09-17 | Better product list (price, sort, categories) | Code: not yet built · Categories data: **Live** | `assign_categories.py --undo`; or restore snapshot |
 | —     | 2026-09-17 | Database schema v2 (for U-007–U-013)      | **Live** (applied with U-013 data) | See [Schema v2](#schema-v2-2026-09-17) |
+| U-014 | 2026-09-17 | Two screens: Print Labels / Edit Products | Done, not yet built | `git revert` the UI commit, or restore snapshot |
+| U-015 | 2026-09-17 | Bigger, resizing preview                  | Done, not yet built | (part of the UI commit) |
+| U-016 | 2026-09-17 | Windows 11 look (sv-ttk theme)            | Done, not yet built | Uninstall `sv-ttk` and rebuild: the program falls back to the old theme |
+| U-017 | 2026-09-17 | Keyboard printing flow                    | Done, not yet built | (part of the UI commit) |
+| U-018 | 2026-09-17 | Git version control + GitHub sync         | **Live** locally; GitHub push pending login | — |
+| U-019 | 2026-09-17 | Automated tests on every change           | **Live** (hook on); GitHub runs after first push | `git config --unset core.hooksPath` turns the hook off |
 
 "Not yet built" means the source is changed but `AaojeeLabels.exe` hasn't been rebuilt with it.
 Update the status to **Live** once the new build is in use at the store.
@@ -633,7 +643,194 @@ product gets "Sweets" suggested.
 
 ---
 
+### U-014 — Two screens: Print Labels and Edit Products
+
+**What it does.** A dark bar at the top has two tabs:
+- **🖨 Print Labels** opens first. It has:
+  - a large **product card**: name, subtitle, size · price · barcode, the date line that will
+    print, and the Contains line;
+  - a big **Quantity** stepper and Print Date;
+  - "Show on label" checkboxes;
+  - the big print buttons (with their keyboard keys), print queue buttons and Test Print.
+- **✏ Edit Products** has the product form, with Save / Delete / Duplicate / New.
+  - **When a manager PIN is set, opening it needs the PIN.** This is a change from U-003, where
+    editing products was open to everyone.
+  - The PIN session is kept alive while typing on this screen. After 5 idle minutes the screen
+    returns to Print Labels on its own, unless there are unsaved changes.
+  - Leaving it with unsaved changes asks Save / Discard / Cancel, and Discard puts the saved
+    values back.
+- The **product list** (left) and **preview** (right) are shared by both screens.
+- **Spacing and Side Margin moved to Settings → Settings…**, which already needs the PIN. The
+  U-003 "Unlock… / Lock" button next to Spacing is gone. The PIN state now shows in the top
+  bar: 🔒 Locked, or 🔓 Manager unlocked with a Lock button.
+- File → **New Product** / Ctrl+N and **Duplicate** switch to Edit Products first.
+- **Keys:** Ctrl+E opens Edit Products, Ctrl+P returns to Print Labels, Ctrl+S saves (Edit screen
+  only).
+- **Window:** the program opens maximised.
+
+**Why.** Cashiers mostly print. Separating printing from editing makes the everyday screen
+simpler and harder to change by accident.
+
+**Files.** `source/app_window.py`:
+- new `_build_mode_bar()`, `_update_mode_bar()`, `_set_mode()`, `_revert_form()`,
+  `_build_print_page()`, `_update_card()`;
+- `_build_ui()` rebuilt: shared list + centre page + preview;
+- `_refresh_lock_ui()` now drives the top bar and the auto-return;
+- `_get_spacing()` / `_get_margin()` read from settings;
+- SettingsDialog gains Label spacing / Side margin;
+- removed `_build_right_panel()`, `_build_print_controls()`, `_build_print_actions()`,
+  `_on_spacing_change()`, `_on_margin_change()`, `_on_layout_lock_btn()`.
+
+`source/manager_lock.py`: new `touch()`.
+
+**Snapshot before U-014 – U-017:** `upgrade_snapshots/2026-09-17_before-ui-overhaul/`. **Git:** commit
+`3d63432`.
+
+---
+
+### U-015 — Bigger preview
+
+**What it does.** The preview column now takes all the width left after the list (340 px) and
+the centre column (540 px). A single label is drawn as large as the column and window height
+allow, up to 760 px wide, and redraws when the window is resized. "All three" shows the tiles
+at 70% of that width and can be scrolled with the mouse wheel. The preview choices are in a 2×2
+grid, so none are cut off at 1280 px. On screens at least 1600 px wide, the list widens to
+450 px so long names and sizes fit.
+
+**Files.** `app_window.py`: `_build_preview_column()`, `_on_preview_resize()`,
+`_preview_limits()`, `_on_body_resize()`, `_render_into_tile(..., max_h)`, `_update_preview()`;
+constants `PREVIEW_MIN_W`, `PREVIEW_LIMIT_W`, `PREVIEW_STACKED_RATIO`, `LIST_PANEL_W`,
+`LIST_PANEL_WIDE_W`, `CENTER_W`.
+
+---
+
+### U-016 — Windows 11 look
+
+**What it does.** Uses the **sv-ttk** "Sun Valley" light theme (Windows 11 style) for all
+standard controls, with Segoe UI fonts, flat coloured buttons, a 15 pt search box and 30 px list
+rows. If `sv_ttk` isn't installed, the program falls back to the previous Windows theme and still
+works.
+
+**New dependency:** `sv-ttk`, a small pure-Python package with theme image files. It passed the
+handoff's packaging-risk bar:
+- `build.bat` installs it and bundles its files with `--collect-data sv_ttk` (verified: the
+  test build includes the theme files and launches themed);
+- it is added to `requirements.txt`.
+
+**Files.** `app_window.py` (`_setup_window()`, optional `import sv_ttk`), `build.bat`,
+`requirements.txt`, `.github/workflows/tests.yml`.
+
+**Turn off.** Remove `sv-ttk` (`python -m pip uninstall sv-ttk`) and rebuild.
+
+---
+
+### U-017 — Keyboard printing flow
+
+**What it does.** On the Print Labels screen:
+- The cursor starts in the search box.
+- Type a name, then **Enter**: the first match (or the one chosen with **↑ / ↓**) opens and the
+  cursor jumps to **Quantity**.
+- Type a number, then **Enter** prints barcode labels; **Shift+Enter** prints ingredient labels.
+- The cursor then returns to Search, ready for the next product.
+- **F5 / F6 / F7** print barcode / ingredients / combined; **F8** adds to the print queue;
+  **Esc** returns to Search.
+- A **scanned** barcode still opens the product and keeps the cursor in Search for the next scan
+  (U-001).
+- Print keys do nothing on the Edit screen.
+- Help → **Keyboard Shortcuts** lists everything.
+
+**Change from U-001.** Enter on typed text used to open a product only if it was the single
+match. It now opens the first match.
+
+**Files.** `app_window.py`: `_on_search_enter()`, `_move_selection()`, `_focus_quantity()`,
+`_print_key()`, `_show_shortcuts()`, key bindings in `_build_menu()`, `_build_left_panel()`,
+`_build_print_page()`.
+
+---
+
+### U-018 — Git version control and GitHub
+
+**What it does.**
+- The project folder is a Git repository (branch `main`).
+- `.gitignore` keeps live store data, build output, old-system originals, pre-Git snapshots and
+  database copies out of Git.
+- `.gitattributes` forces CRLF for `.bat` files (the `build.bat` failure earlier today) and LF
+  for everything else, and stores the `changes.csv` logs byte-for-byte.
+- Commits so far:
+  1. `1da9dab` Baseline: the state after U-001 – U-013.
+  2. `08d2918` Automated tests (U-019).
+  3. `3d63432` UI overhaul (U-014 – U-017).
+  4. Docs and tooling (this entry).
+- **`update_and_build.bat`** (store PC) runs `git pull --ff-only`, then `build.bat`.
+- **`DEVELOPING.md`** explains the workflow: Mac or PC → commit → push → store PC update.
+
+**GitHub.** The workflow file is ready, but the private repository isn't created yet. This PC
+has no GitHub login, so that step needs the owner (see the chat instructions). After the first
+push, every push runs the tests and builds the `.exe` on GitHub. **Not yet verified on GitHub.**
+
+**Why.** It replaces the zip → flash drive → unzip loop, and gives an exact history of every
+change and a safe undo (`git revert`).
+
+---
+
+### U-019 — Tests that run on every change
+
+**What it does.** 69 automated tests plus a pixel-level "labels unchanged" check, run automatically
+in two places:
+- **before every commit** that touches code (`.githooks/pre-commit`: quick tests + label check;
+  the commit is stopped on failure);
+- **on GitHub for every push** (all tests + label check against the previous commit, then an
+  `.exe` build).
+
+Also runnable by hand: `run_tests.bat`, `python tools/run_tests.py [--quick]`,
+`python tools/compare_labels.py`. The earlier ad-hoc test scripts from U-001 – U-013 were rewritten
+into this suite. See `DEVELOPING.md` §2 for the full list.
+
+**Proven to work.**
+- The label check caught a deliberate one-pixel layout change in 945 of 4,457 renders and saved
+  before/after pictures, then passed again after it was reverted.
+- The hook ran and passed on the test commit and the UI overhaul commit.
+
+**Files.** `tests/` (`helpers.py`, `test_barcode.py`, `test_labels.py`, `test_database.py`,
+`test_modules.py`, `test_gui.py`, `fixtures/products.json`, `fixtures/settings.json`),
+`tools/run_tests.py`, `tools/compare_labels.py`, `.githooks/pre-commit`,
+`.github/workflows/tests.yml`, `run_tests.bat`.
+
+**Turn off the hook.** `git config --unset core.hooksPath`. For a one-off intended label change:
+`ALLOW_LABEL_CHANGES=1 git commit ...`.
+
+---
+
+### Tests for U-014 – U-019
+
+- **Full suite:** 69 tests, all passing (39 non-window + 30 window tests).
+- **Label check:** all 4,457 label renders identical to the baseline commit, so the UI overhaul
+  didn't change a single printed pixel.
+- **Window tests for the new screens:**
+  - starts on Print Labels with Search focused;
+  - theme loads;
+  - the Edit screen needs the PIN, times out back to Print, but not with unsaved edits;
+  - leaving with unsaved edits: Cancel stays, Discard reverts;
+  - New opens the Edit screen; Ctrl+S is ignored on the Print screen;
+  - spacing and margin are saved from Settings;
+  - type → Enter → quantity → Enter prints and returns to Search;
+  - Shift+Enter, F5 and F8 work; print keys are ignored on the Edit screen;
+  - ↑ / ↓ move through the list;
+  - scans keep focus in Search;
+  - the preview grows with the window.
+- **Real build:** built with `build.bat` into a scratch folder; theme files bundled; launched
+  maximised on the real data with the new theme.
+- **Screenshots checked:** 1920×989 and 1280×720; both screens fit at 1280×720.
+- **Not tested:** real printers, a real scanner, GitHub Actions.
+
+---
+
 ## Rolling back
+
+**Undo the UI overhaul (U-014 – U-017), keeping everything else:** find the commit with
+`git log --oneline` and run `git revert <commit id>`, then rebuild. Without Git: copy
+`upgrade_snapshots/2026-09-17_before-ui-overhaul/source/*.py` over `source/` and rebuild. The
+database is unaffected.
 
 **Undo only U-007 – U-013 (keep U-001 – U-005):**
 1. Close the program.
@@ -685,4 +882,11 @@ version ignores them.
 - [ ] Tools → Change Prices…: preview only, then Close without applying (U-011).
 - [ ] Delete a test product, restore it from File → Trash… (U-012).
 - [ ] Click the Price heading to sort; try Show: Sweets / Spices / Dry Goods (U-013).
+- [ ] Program opens full screen on **Print Labels**. Type a name → Enter → type 1 → Enter prints
+      one barcode label (U-014 / U-017).
+- [ ] Scan a label: the product opens and the cursor stays in Search (U-001 / U-017).
+- [ ] If a PIN is set: the Edit Products tab asks for it; Spacing / Side Margin are in Settings (U-014).
+- [ ] The window looks like Windows 11 (rounded, light controls). If it looks like the old grey
+      theme, `sv-ttk` didn't install; re-run `build.bat` with internet (U-016).
+- [ ] Double-click `run_tests.bat` once on the store PC: all tests pass (U-019).
 - [ ] Update the Index statuses above to **Live**.

@@ -100,6 +100,28 @@ After this, File → Import from Old Database (.mdb)… in the
 program will work.  No rebuild is needed after step 2.
 
 ----------------------------------------------------------------
+GETTING UPDATES FROM GITHUB (after the first build)
+----------------------------------------------------------------
+
+The project is kept in a private GitHub repository (see
+DEVELOPING.md).  When a new version has been pushed there:
+
+1. Close Aaojee Label Maker.
+2. Double-click  update_and_build.bat  in the project folder.
+   It downloads the newest code and runs build.bat for you.
+3. Do a Test Print and scan it at the POS.
+
+The store's data (products.db, settings.json, backups) is never
+touched by updates — it is not stored on GitHub.
+
+GitHub also builds AaojeeLabels.exe automatically for every
+update: on the repository page open Actions, click the newest
+run, and download "AaojeeLabels-exe" under Artifacts.
+
+To check the program works before using it, double-click
+run_tests.bat (takes about a minute and a half).
+
+----------------------------------------------------------------
 MOVING TO A NEW PC IN THE FUTURE
 ----------------------------------------------------------------
 

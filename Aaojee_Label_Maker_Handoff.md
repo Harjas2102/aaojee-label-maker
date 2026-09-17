@@ -691,7 +691,10 @@ must be verified against these before shipping:
 ## 17. Maintenance log
 
 > Feature upgrades from 2026-09-17 onward (scan-to-find, print queue, manager PIN,
-> unsaved-changes warning, native-DPI printing, …) are logged in **`UPGRADE_TRACKER.md`**.
+> unsaved-changes warning, native-DPI printing, allergens, Trash, the two-screen UI, …) are
+> logged in **`UPGRADE_TRACKER.md`**.  The project is now in Git with automated tests; the
+> development / build / GitHub workflow that replaces the flash-drive loop in §3 is described
+> in **`DEVELOPING.md`**.
 
 ### 2026-09-17 — Bug-fix / optimization sweep (no intended UI or label changes)
 
