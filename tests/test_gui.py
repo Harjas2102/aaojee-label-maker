@@ -333,6 +333,10 @@ class TestPrinting(GuiTestCase):
 
     def test_preview_grows_with_window(self):
         app = self.app
+        root = self.h.root
+        if root.winfo_screenwidth() < 1800 or root.winfo_screenheight() < 950:
+            # GitHub's test machines have a 1024x768 screen; Windows won't make the window larger.
+            self.skipTest("screen too small to resize the window")
         app._preview_type_var.set("Barcode")
         self.h.root.geometry("1280x800")
         self.h.pump(400)

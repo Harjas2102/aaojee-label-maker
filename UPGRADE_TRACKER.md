@@ -40,8 +40,8 @@ here.
 | U-015 | 2026-09-17 | Bigger, resizing preview                  | Done, not yet built | (part of the UI commit) |
 | U-016 | 2026-09-17 | Windows 11 look (sv-ttk theme)            | Done, not yet built | Uninstall `sv-ttk` and rebuild: the program falls back to the old theme |
 | U-017 | 2026-09-17 | Keyboard printing flow                    | Done, not yet built | (part of the UI commit) |
-| U-018 | 2026-09-17 | Git version control + GitHub sync         | **Live** locally; GitHub push pending login | — |
-| U-019 | 2026-09-17 | Automated tests on every change           | **Live** (hook on); GitHub runs after first push | `git config --unset core.hooksPath` turns the hook off |
+| U-018 | 2026-09-17 | Git version control + GitHub sync         | **Live** — private repo github.com/Harjas2102/aaojee-label-maker | — |
+| U-019 | 2026-09-17 | Automated tests on every change           | **Live** (hook on; GitHub runs tests + builds the .exe on every push) | `git config --unset core.hooksPath` turns the hook off |
 
 "Not yet built" means the source is changed but `AaojeeLabels.exe` hasn't been rebuilt with it.
 Update the status to **Live** once the new build is in use at the store.
