@@ -17,7 +17,7 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.14"
+          python-version: "3.13"    # 3.14 ships Tk 9, which breaks the sv-ttk look
 
       - name: Install test requirements
         run: python -m pip install Pillow sv-ttk
@@ -52,7 +52,7 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.14"
+          python-version: "3.13"    # 3.14 ships Tk 9, which breaks the sv-ttk look
 
       - name: Install build requirements
         run: python -m pip install Pillow pywin32 pyinstaller pyodbc sv-ttk
