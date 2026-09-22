@@ -44,6 +44,7 @@ here.
 | U-019 | 2026-09-17 | Automated tests on every change           | **Live** (hook on; GitHub runs tests + builds the .exe on every push) | `git config --unset core.hooksPath` turns the hook off |
 | U-020 | 2026-09-17 | U-006 / U-013 re-run on the store's database | Done: `september_store_copy/READY_FOR_STORE/products.db`, not yet installed | Put back the store's original file (see U-020) |
 | U-021 | 2026-09-17 | Make Aaojee labels scan in Square         | Test passed (GTIN); update file built 2026-09-22, not yet imported | Re-import `square_export_before_U-021.xlsx` rows (see U-021) |
+| U-022 | 2026-09-22 | Print Date always goes back to today      | Done, not yet built | `git revert` the U-022 commit |
 
 "Not yet built" means the source is changed but `AaojeeLabels.exe` hasn't been rebuilt with it.
 Update the status to **Live** once the new build is in use at the store.
@@ -1005,6 +1006,49 @@ changes on an unchanged one.
 **After importing:** export the library again and run
 `python build_square_update.py --check <new export>.xlsx`. It should say only the planned changes
 were made.
+
+---
+
+### U-022 — Print Date always goes back to today
+
+**Problem (owner, 2026-09-22).** Workers had to choose the date again all the time. The field
+*was* filled with today when the program started (checked with the store's own build). But once
+anyone picked another date (tomorrow while prepping, or a slip on the calendar), that date was
+treated as deliberate and **kept until the program was restarted**. It no longer moved at
+midnight either. Everyone after that printed with the wrong date unless they noticed.
+
+**What it does now.**
+- Starts on today, and still moves to the next day at midnight when it's showing today.
+- A date someone picks is kept **while it's in use**: each print, or change to the date,
+  restarts a 15-minute clock. After **15 minutes with no printing**, it goes back to today by
+  itself. The check runs once a minute, and never at the moment of printing, so the date can't
+  change under someone's finger.
+- While the date isn't today, **"⚠ Not today's date"** shows next to the field (or "⚠ Not a
+  valid date" for a typo).
+- A **Today** button next to the calendar puts it back immediately.
+
+**Files.** `source/app_window.py`:
+- `CUSTOM_DATE_MINUTES = 15`;
+- `_roll_print_date(expire_custom=False)` (new expiry rule);
+- new `_update_date_warning()`;
+- `_schedule_date_rollover()` passes `expire_custom=True`;
+- `_on_date_change()` and `_print_product()` restart the clock;
+- Today button and warning label in `_build_print_page()`.
+
+`USER_GUIDE.txt` (printing step 3).
+
+**Tested.**
+- 5 new window tests:
+  - starts on today with no warning;
+  - a picked date warns and is kept while printing;
+  - it goes back to today after 15 unused minutes;
+  - it never changes at the moment of printing;
+  - Today button and bad-date warning.
+- Full suite 74/74 passes; all 4,457 label renders unchanged.
+- The same Print Date problem was checked in the GitHub-built `.exe` the store runs, before the
+  fix.
+
+**Change the wait.** Edit `CUSTOM_DATE_MINUTES` in `source/app_window.py`.
 
 ---
 

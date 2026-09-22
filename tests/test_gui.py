@@ -319,6 +319,61 @@ class TestPrinting(GuiTestCase):
         self.app._roll_print_date()
         self.assertEqual(self.app._parse_print_date(), date.today())
 
+    # ── U-022: today's date is pre-filled and comes back by itself ──────────
+
+    def _pick(self, d):
+        self.app._print_date_var.set(f"{d.month}/{d.day}/{d.year}")
+        self.h.pump(50)
+
+    def test_starts_on_today_with_no_warning(self):
+        from datetime import date
+        self.assertEqual(self.app._parse_print_date(), date.today())
+        self.assertEqual(self.app._date_warning_var.get(), "")
+
+    def test_picked_date_warns_and_is_kept_while_in_use(self):
+        import app_window
+        from datetime import date, timedelta
+        tomorrow = date.today() + timedelta(days=1)
+        self._pick(tomorrow)
+        self.assertIn("Not today", self.app._date_warning_var.get())
+        # 10 minutes later, still printing with it: kept, and the clock restarts
+        self.app._date_last_used -= 10 * 60
+        self.app._print_label_type("Barcode")
+        self.app._roll_print_date(expire_custom=True)
+        self.assertEqual(self.app._parse_print_date(), tomorrow)
+        self.app._date_last_used -= (app_window.CUSTOM_DATE_MINUTES - 1) * 60
+        self.app._roll_print_date(expire_custom=True)
+        self.assertEqual(self.app._parse_print_date(), tomorrow)
+
+    def test_picked_date_goes_back_to_today_when_unused(self):
+        import app_window
+        from datetime import date, timedelta
+        self._pick(date.today() - timedelta(days=2))
+        self.app._date_last_used -= app_window.CUSTOM_DATE_MINUTES * 60 + 1
+        self.app._schedule_date_rollover()           # the once-a-minute check
+        self.assertEqual(self.app._parse_print_date(), date.today())
+        self.assertEqual(self.app._date_warning_var.get(), "")
+
+    def test_date_never_changes_at_the_moment_of_printing(self):
+        import app_window
+        from datetime import date, timedelta
+        tomorrow = date.today() + timedelta(days=1)
+        self._pick(tomorrow)
+        self.app._date_last_used -= app_window.CUSTOM_DATE_MINUTES * 60 + 1
+        self.app._print_label_type("Barcode")
+        row = self.app.db.get_print_history()[0]
+        self.assertEqual(row["print_date"], f"{tomorrow.month}/{tomorrow.day}/{tomorrow.year}")
+
+    def test_today_button_and_bad_date_warning(self):
+        from datetime import date
+        self.app._print_date_var.set("13/45/2026")
+        self.h.pump(50)
+        self.assertIn("Not a valid date", self.app._date_warning_var.get())
+        self.app._print_date_var.set(self.app._today_str())
+        self.h.pump(50)
+        self.assertEqual(self.app._parse_print_date(), date.today())
+        self.assertEqual(self.app._date_warning_var.get(), "")
+
     def test_card_and_preview(self):
         app = self.app
         app._update_preview()

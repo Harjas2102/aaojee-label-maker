@@ -51,11 +51,16 @@ PRINTING LABELS — WITH THE MOUSE
   1. Click a product in the list.  The large card shows its name,
      size, price, barcode, and the date line that will print.
   2. Set Quantity (use − / + or type a number).
-  3. Check the Print Date.  It is today's date and moves to the
-     next day on its own if the program is left open overnight.
+  3. The Print Date is already today's date — nothing to do.
+     It moves to the next day on its own if the program is left
+     open overnight.
      To print for another day, type it (month/day/year, e.g.
-     9/17/2026) or click the calendar button.  A date you pick
-     yourself is kept until you change it.
+     9/17/2026) or click the calendar button.  While it isn't
+     today, "⚠ Not today's date" shows next to it.  The date you
+     picked stays while you keep printing; after 15 minutes with
+     no printing it goes back to today by itself, so the next
+     person always starts on today.  The "Today" button puts it
+     back straight away.
   4. If needed, untick "Show on label" boxes to leave off the
      Barcode, Price, $ Sign, Date or Address.
   5. Click:

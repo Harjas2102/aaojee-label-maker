@@ -28,6 +28,7 @@ import math
 import calendar
 import contextlib
 import io
+import time
 from datetime import date, datetime
 
 import tkinter as tk
@@ -106,6 +107,11 @@ def _size_sort_key(size: str):
 # (no margins).  U-015: the preview column takes all the width left over, and
 # a single label is drawn as large as that column allows (up to
 # PREVIEW_LIMIT_W wide); "All three" tiles are PREVIEW_STACKED_RATIO of that.
+# U-022: a Print Date other than today is only kept while someone is using it.
+# After this many minutes with no printing (and no change to the date) the
+# field goes back to today by itself.
+CUSTOM_DATE_MINUTES   = 15
+
 PREVIEW_MIN_W         = 300
 PREVIEW_LIMIT_W       = 760
 PREVIEW_STACKED_RATIO = 0.7
@@ -180,6 +186,8 @@ class AaojeeApp:
         # The day the Print Date field was last automatically set to "today".
         # While the field still shows that day, it rolls over at midnight.
         self._auto_print_date: date = date.today()
+        # When the Print Date was last changed or used for printing (U-022).
+        self._date_last_used: float = time.monotonic()
         # Form contents as last loaded/saved — used to detect unsaved changes.
         self._clean_snapshot: dict | None = None
         # Printer name → native DPI (or None if unusable), read once per session.
@@ -569,6 +577,14 @@ class AaojeeApp:
         self._date_entry = ttk.Entry(date_row, textvariable=self._print_date_var, width=12)
         self._date_entry.pack(side=tk.LEFT, padx=(8, 4))
         ttk.Button(date_row, text="📅", width=3, command=self._open_calendar).pack(side=tk.LEFT)
+        ttk.Button(date_row, text="Today", width=6,
+                   command=lambda: self._print_date_var.set(self._today_str())).pack(
+            side=tk.LEFT, padx=(4, 0))
+        # U-022: shown only while the date isn't today
+        self._date_warning_var = tk.StringVar()
+        self._date_warning = tk.Label(date_row, textvariable=self._date_warning_var,
+                                      font=(UI_FONT, 9, "bold"), fg="#9a3412", bg=self._bg)
+        self._date_warning.pack(side=tk.LEFT, padx=(8, 0))
 
         toggle_frame = ttk.Frame(parent)
         toggle_frame.pack(fill=tk.X, pady=(0, 10))
@@ -1440,20 +1456,45 @@ class AaojeeApp:
     def _get_pack_date(self) -> date:
         return self._parse_print_date() or date.today()
 
-    def _roll_print_date(self):
-        """Advance the Print Date to today if it is still showing the day it was
-        automatically set to (i.e. nobody picked a different date on purpose),
-        so leaving the program open overnight never prints yesterday's date."""
+    def _roll_print_date(self, expire_custom: bool = False):
+        """Keep the Print Date on today.
+
+        * If it still shows the day it was automatically set to, it moves to
+          the new day at midnight (so leaving the program open overnight never
+          prints yesterday's date).
+        * U-022: if someone picked a different date, it is kept while they
+          use it, but after CUSTOM_DATE_MINUTES with no printing it goes back
+          to today (only when *expire_custom*, i.e. from the once-a-minute
+          check — never at the moment of printing, so a date can't change
+          under someone's finger).
+        """
         today   = date.today()
         current = self._parse_print_date()
         if current == self._auto_print_date and current != today:
             self._print_date_var.set(self._today_str())
             current = today
+        elif (current != today and expire_custom
+              and time.monotonic() - self._date_last_used >= CUSTOM_DATE_MINUTES * 60):
+            self._print_date_var.set(self._today_str())
+            current = today
         if current == today:
             self._auto_print_date = today
+        self._update_date_warning()
+
+    def _update_date_warning(self):
+        """Show a warning next to the Print Date while it isn't today."""
+        current = self._parse_print_date()
+        if current is None:
+            text = "⚠ Not a valid date"
+        elif current != date.today():
+            text = "⚠ Not today's date"
+        else:
+            text = ""
+        if self._date_warning_var.get() != text:
+            self._date_warning_var.set(text)
 
     def _schedule_date_rollover(self):
-        self._roll_print_date()
+        self._roll_print_date(expire_custom=True)
         self.root.after(60_000, self._schedule_date_rollover)
 
     def _check_print_inputs(self, title: str, label_type: str,
@@ -1544,6 +1585,7 @@ class AaojeeApp:
         if native_dpi:
             img = to_monochrome(img)
         print_labels(img, printer, size, copies=copies)
+        self._date_last_used = time.monotonic()      # U-022: a picked date is in use
         self._log_print(product, label_type, size, show_flags, printer, copies, source)
 
     def _log_print(self, product, label_type, label_size, show_flags, printer, copies, source):
@@ -1896,6 +1938,9 @@ class AaojeeApp:
             self._render_into_tile(v, data, tile_max_w, max_h=max_h)
 
     def _on_date_change(self, *_):
+        self._date_last_used = time.monotonic()
+        if hasattr(self, "_date_warning_var"):
+            self._update_date_warning()
         self._schedule_preview_update()
 
     # ──────────────────────────────────────────────────────────────────────────
