@@ -14,6 +14,8 @@ data_changes/*/store_original_settings.json
 
 # Old POS (Sellorama) backup + Square migration files: sales and customer databases (U-021)
 POS Upgrade Files for Context/
+# Fresh copies of the store's Sellorama database for the Square sync (U-021)
+store_sync/
 # Square library exports and import files (store data)
 data_changes/*/*.xlsx
 

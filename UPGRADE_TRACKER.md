@@ -43,7 +43,7 @@ here.
 | U-018 | 2026-09-17 | Git version control + GitHub sync         | **Live** — private repo github.com/Harjas2102/aaojee-label-maker | — |
 | U-019 | 2026-09-17 | Automated tests on every change           | **Live** (hook on; GitHub runs tests + builds the .exe on every push) | `git config --unset core.hooksPath` turns the hook off |
 | U-020 | 2026-09-17 | U-006 / U-013 re-run on the store's database | Done: `september_store_copy/READY_FOR_STORE/products.db`, not yet installed | Put back the store's original file (see U-020) |
-| U-021 | 2026-09-17 | Make Aaojee labels scan in Square         | In progress: step 1 (one-item test at the store) | Nothing changed in Square yet |
+| U-021 | 2026-09-17 | Make Aaojee labels scan in Square         | Test passed (GTIN); update file built 2026-09-22, not yet imported | Re-import `square_export_before_U-021.xlsx` rows (see U-021) |
 
 "Not yet built" means the source is changed but `AaojeeLabels.exe` hasn't been rebuilt with it.
 Update the status to **Live** once the new build is in use at the store.
@@ -973,6 +973,38 @@ Findings from the Square export of 2026-09-17 (a snapshot of the June import; Sq
 
 **Undo.** Nothing changed in Square yet. After the import, re-importing the baseline export
 puts the old SKU/GTIN values back.
+
+**Step 1 result (store test).** `TEST_A_gtin.xlsx` imported without errors and ALOO MATTER now
+scans. Square accepts the 8-digit UPC-E in GTIN even though it fails the GTIN-8 check, so the fix
+uses GTIN and leaves the 6-digit SKU alone.
+
+**Steps 2–3 (2026-09-22): `build_square_update.py`.** Owner's copy of Sellorama's database is in
+`store_sync/Products.accdb` (kept out of Git). Square is still the June snapshot, but it has hand
+edits (title-case "Aaojee …" names, categories, tax on 22 hot-food items, 20 items added only in
+Square). So the script is a three-way comparison — June import file, Square now, Sellorama now —
+and changes only:
+- **GTIN** on 806 items with a 6-digit SKU (SKU `000000` CORN PALAK skipped: placeholder).
+- **Price** on 54 items where Sellorama changed it. Not applied where the price was edited in
+  Square after June (1: Aaojee Spring Roll, $0.91 in Square vs $2.99 in Sellorama).
+- **98 new items** added in Sellorama since June (tax N, category matched to Square's spelling).
+  RAYOVAC CLAUDE TEST (`012800517725`) is left out.
+
+Names, categories and tax are never changed. Every item that is touched is sent with all its
+rows, so Square never sees half an item. No scan code or new barcode matches an existing one
+(the script stops if it does).
+
+Outputs: `square_UPDATE_U-021.xlsx` (1,285 rows: 1,187 existing, 98 new), `changes.csv`,
+`REVIEW_U-021.xlsx` (not applied: 23 label codes that Sellorama calls a different product,
+103 label prices that differ from Sellorama, 11 label products not in Sellorama, 5 name
+differences, 20 Square-only items).
+
+**Tested:** every cell of the update file matches the baseline except the planned changes
+(0 mismatches); `--check` passes on a simulated after-import export and reports all 860
+changes on an unchanged one.
+
+**After importing:** export the library again and run
+`python build_square_update.py --check <new export>.xlsx`. It should say only the planned changes
+were made.
 
 ---
 
