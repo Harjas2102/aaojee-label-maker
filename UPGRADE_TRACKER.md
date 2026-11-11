@@ -49,7 +49,7 @@ here.
 | U-024 | 2026-11-11 | Owner's ingredient corrections (canola oil, hing with wheat shown, butter / ghee / egg noodles named, recipe fixes) | Data: **Live** (store database, 2026-11-11) | `apply_ingredient_fixes.py --undo` |
 | U-025 | 2026-11-11 | Sauces / pani puri masala written out from their packages; Golgappa water; Sooji Halwa order; label spacing capped at 2.5 | **Live**: data 2026-11-11; spacing cap in the `.exe` installed 2026-11-11 14:42 | `apply_bought_in_ingredients.py --undo` |
 | U-026 | 2026-11-11 | Barcode label: the date no longer runs into the barcode ("Best By :" over the date) | **Live**: `.exe` installed 2026-11-11 15:11 (GitHub build of `401bd8b`) | `git revert` the U-026 commit |
-| U-027 | 2026-11-11 | Main label follows the label roll (3-inch roll → Enter / queue print Combined) | Done, not yet built | Settings → Label roll → 2.25 × 1.25 |
+| U-027 | 2026-11-11 | Main label follows the label roll (3-inch roll → Enter / queue print Combined) | **Live**: `.exe` installed 2026-11-11 16:26 (GitHub build of `3443477`); the store is still set to the 1.25" roll | Settings → Label roll → 2.25 × 1.25 |
 
 "Not yet built" means the source is changed but `AaojeeLabels.exe` hasn't been rebuilt with it.
 Update the status to **Live** once the new build is in use at the store.
@@ -1403,6 +1403,12 @@ The program does not change the driver's label size itself.
 - Two existing tests now answer the new roll question.
 - Full suite 109/109.
 - All 4,457 label renders are identical (no label drawing changed).
+
+**Installed** 2026-11-11 16:26. The push's GitHub run was stuck in GitHub's Actions outage
+(2026-11-11 20:48 UTC, "Impact across multiple GitHub products including Actions"), so the
+same commit was built by a manual run (43102222216: tests and build passed). The previous
+`.exe` was kept as `AaojeeLabels_before_U-027.exe`. With the store's 1.25" roll setting, the
+window looks and works as before.
 
 ---
 
