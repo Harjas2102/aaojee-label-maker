@@ -45,9 +45,9 @@ here.
 | U-020 | 2026-09-17 | U-006 / U-013 re-run on the store's database | Done: `september_store_copy/READY_FOR_STORE/products.db`, not yet installed | Put back the store's original file (see U-020) |
 | U-021 | 2026-09-17 | Make Aaojee labels scan in Square         | Test passed (GTIN); update file built 2026-09-22, not yet imported | Re-import `square_export_before_U-021.xlsx` rows (see U-021) |
 | U-022 | 2026-09-22 | Print Date always goes back to today      | Done, not yet built | `git revert` the U-022 commit |
-| U-023 | 2026-11-11 | **Allergen law (NY AML § 199-g)**: CONTAINS line on every product with ingredients | Data: **Live** (store database, 2026-11-11 13:40) · Code: not yet built | Data: `apply_allergens.py --undo`; code: `git revert` (not advised: the law requires the line) |
+| U-023 | 2026-11-11 | **Allergen law (NY AML § 199-g)**: CONTAINS line on every product with ingredients | **Live**: data in the store database 2026-11-11 13:40; code in the `.exe` installed 2026-11-11 14:42 (GitHub build of `f5a2119`) | Data: `apply_allergens.py --undo`; code: `git revert` (not advised: the law requires the line) |
 | U-024 | 2026-11-11 | Owner's ingredient corrections (canola oil, hing with wheat shown, butter / ghee / egg noodles named, recipe fixes) | Data: **Live** (store database, 2026-11-11) | `apply_ingredient_fixes.py --undo` |
-| U-025 | 2026-11-11 | Sauces / pani puri masala written out from their packages; Golgappa water; Sooji Halwa order; label spacing capped at 2.5 | Data: **Live** (store database, 2026-11-11) · Spacing cap: not yet built | `apply_bought_in_ingredients.py --undo` |
+| U-025 | 2026-11-11 | Sauces / pani puri masala written out from their packages; Golgappa water; Sooji Halwa order; label spacing capped at 2.5 | **Live**: data 2026-11-11; spacing cap in the `.exe` installed 2026-11-11 14:42 | `apply_bought_in_ingredients.py --undo` |
 
 "Not yet built" means the source is changed but `AaojeeLabels.exe` hasn't been rebuilt with it.
 Update the status to **Live** once the new build is in use at the store.
@@ -1303,6 +1303,16 @@ U-024 + U-025).
 **Applied** to the store's database on 2026-11-11 with the program closed. Final `--check`:
 68 products with ingredients, 46 with a CONTAINS line, 22 without. Every allergen is named by
 a word in its ingredient list.
+
+---
+
+**Installed** 2026-11-11 14:42. The GitHub build of `f5a2119` (run 43088741788: tests and
+build passed) was checked to bundle Python 3.13 / Tk 8.6, the sv-ttk theme and the new
+allergen code, then copied into the program folder as `AaojeeLabels.exe`. The previous
+`.exe` was kept as `AaojeeLabels_before_U-023.exe`. Test launch: the window opened with
+all 451 products, then closed normally. To go back, close the program and rename the files
+the other way round. The data stays as it is: the old `.exe` prints the same allergens as
+`Contains: …`.
 
 ---
 
