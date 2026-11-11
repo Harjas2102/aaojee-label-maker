@@ -48,6 +48,7 @@ here.
 | U-023 | 2026-11-11 | **Allergen law (NY AML § 199-g)**: CONTAINS line on every product with ingredients | **Live**: data in the store database 2026-11-11 13:40; code in the `.exe` installed 2026-11-11 14:42 (GitHub build of `f5a2119`) | Data: `apply_allergens.py --undo`; code: `git revert` (not advised: the law requires the line) |
 | U-024 | 2026-11-11 | Owner's ingredient corrections (canola oil, hing with wheat shown, butter / ghee / egg noodles named, recipe fixes) | Data: **Live** (store database, 2026-11-11) | `apply_ingredient_fixes.py --undo` |
 | U-025 | 2026-11-11 | Sauces / pani puri masala written out from their packages; Golgappa water; Sooji Halwa order; label spacing capped at 2.5 | **Live**: data 2026-11-11; spacing cap in the `.exe` installed 2026-11-11 14:42 | `apply_bought_in_ingredients.py --undo` |
+| U-026 | 2026-11-11 | Barcode label: the date no longer runs into the barcode ("Best By :" over the date) | Done, not yet built | `git revert` the U-026 commit |
 
 "Not yet built" means the source is changed but `AaojeeLabels.exe` hasn't been rebuilt with it.
 Update the status to **Live** once the new build is in use at the store.
@@ -336,8 +337,7 @@ If anything is off, untick the setting (no rebuild needed) and note it here.
 
 **Known limit (existing, not caused by this).** On the 2.25×1.25 barcode label, a long date line
 ("Best By : 12/28/2026") can come within the barcode's left quiet zone (the blank margin
-scanners need). This happened before this change too. If a label scans poorly, this is a
-candidate to fix.
+scanners need). This happened before this change too. **Fixed in U-026.**
 
 ---
 
@@ -1313,6 +1313,44 @@ allergen code, then copied into the program folder as `AaojeeLabels.exe`. The pr
 all 451 products, then closed normally. To go back, close the program and rename the files
 the other way round. The data stays as it is: the old `.exe` prints the same allergens as
 `Contains: …`.
+
+---
+
+### U-026 — Barcode label: the date no longer runs into the barcode
+
+**Problem (owner, 2026-11-11, photos of printed labels and the preview).** On barcode
+labels, "Best By : 11/21/2026" ran into the barcode's first bars. The left edge of the
+printed sticker was also cut off. The owner fixed that with an offset in the printer's
+Windows printing preferences, so no program change was needed for it.
+
+**Cause.** The date is drawn in the left column at the Date font size (10 pt) and was never
+fitted to it. Measured at the store's settings, the date doesn't fit at any resolution:
+- two-digit months (October to December) run into the **bars**;
+- even "9/7/2026" runs into the quiet zone, the white margin a scanner needs. That is
+  U-005's known limit.
+
+**Fix** (owner's choice of two options shown side by side). When the date doesn't fit
+beside the barcode, it is printed as **"Best By :" with the date on the line below, at the
+same size**. A date that fits on one line still prints as before. If two lines don't fit
+either (only with very large font settings), the one line is made smaller.
+`label_renderer.py`: new `_date_lines()`; `_layout_barcode()` uses it.
+
+**Labels.** 1,756 of 4,457 checked renders changed. All of them are barcode labels of
+products with a date line, at both sizes. No ingredient or combined label changed, and no
+barcode label without a date.
+
+**Tested.**
+- New `TestBarcodeLabelDate`. For every 7th fixture product with a barcode, Best By and
+  Packed with the widest dates (12/31, 12/28), both barcode label sizes, at 150, 203 and
+  600 DPI:
+  - the date ends before the barcode's quiet zone;
+  - it stays above the address.
+
+  The test fails on the old layout (the date ends at dot 276; the quiet zone starts at
+  242).
+- All barcodes still decode (`test_native_dpi_decodes`). Full suite 105/105.
+
+**After installing:** Test Print one barcode label and scan it at the register.
 
 ---
 

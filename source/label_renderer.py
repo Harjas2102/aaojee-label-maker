@@ -773,20 +773,45 @@ def _layout_barcode(draw, product, pack_date, show_flags, font_settings, fs,
         ly += ph + gap(0.04)
 
     # ── Date (below price, left-aligned) ──────────────────────────────────────
+    # U-026: the date must stay in the left column, clear of the barcode and its
+    # quiet zone (the white margin a scanner needs).  "Best By : 11/21/2026" is
+    # wider than the column, so it goes on two lines at the same size.
     if show_flags.get("date", True):
         date_line = format_date_line(date_mode, pack_date, bestby_offset)
         if date_line:
-            date_fnt = load_font(fs("date")["family"], fs("date")["size"],
-                                 bold=fs("date").get("bold", False), dpi=dpi)
-            draw.text((left_edge, ly), date_line, font=date_fnt, fill="black")
-            _, dh = _text_size(draw, date_line, date_fnt)
-            ly += dh + gap(0.03)
+            bottom = h_px - margin - addr_reserve
+            for text, date_fnt in _date_lines(draw, date_line, fs("date"), left_col_w,
+                                              bottom - ly, dpi, gap(0.01)):
+                draw.text((left_edge, ly), text, font=date_fnt, fill="black")
+                _, dh = _text_size(draw, "Ay", date_fnt)
+                ly += dh + gap(0.01)
 
     # ── Address (anchored at the bottom, centred full width) ──────────────────
     if addr_fnt is not None and address_line:
         _, ah  = _text_size(draw, address_line, addr_fnt)
         addr_y = h_px - margin - ah
         _draw_text_centred(draw, address_line, addr_fnt, addr_y, w_px)
+
+
+def _date_lines(draw, date_line: str, spec: dict, max_w: int, max_h: int, dpi: int,
+                line_gap: int) -> list[tuple[str, Any]]:
+    """The barcode label's date as [(text, font)] that fits *max_w* (U-026).
+
+    One line at the set size if it fits; otherwise "Best By :" over the date at
+    the same size; only if that doesn't fit either (very large font settings)
+    one line made smaller."""
+    family, size, bold = spec["family"], spec["size"], spec.get("bold", False)
+    fnt = load_font(family, size, bold=bold, dpi=dpi)
+    if _text_size(draw, date_line, fnt)[0] <= max_w:
+        return [(date_line, fnt)]
+    if " : " in date_line:
+        head, tail = date_line.split(" : ", 1)
+        lines = [f"{head} :", tail]
+        _, lh = _text_size(draw, "Ay", fnt)
+        if (all(_text_size(draw, t, fnt)[0] <= max_w for t in lines)
+                and 2 * lh + line_gap <= max_h):
+            return [(t, fnt) for t in lines]
+    return [(date_line, _fit_font(draw, date_line, family, size, 4, max_w, dpi, bold=bold))]
 
 
 # ──────────────────────────────────────────────────────────────────────────────

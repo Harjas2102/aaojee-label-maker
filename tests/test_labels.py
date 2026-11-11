@@ -180,6 +180,62 @@ class TestInfoLines(unittest.TestCase):
         self.assertIsInstance(caught.exception, RuntimeError)   # shown as a print error
 
 
+class _DrawSpy:
+    """Wraps ImageDraw to record every text drawn and every barcode bar."""
+
+    def __init__(self, draw, log):
+        self._d, self._log = draw, log
+
+    def __getattr__(self, name):
+        return getattr(self._d, name)
+
+    def text(self, xy, text, font=None, **kw):
+        self._log["text"].append((text, self._d.textbbox(xy, text, font=font)))
+        return self._d.text(xy, text, font=font, **kw)
+
+    def rectangle(self, box, **kw):
+        self._log["bars"].append(box)
+        return self._d.rectangle(box, **kw)
+
+
+class TestBarcodeLabelDate(unittest.TestCase):
+    """U-026: the date on the barcode label never runs into the barcode or the white
+    quiet zone a scanner needs ("Best By : 11/21/2026" used to overlap the bars)."""
+
+    def test_date_clear_of_barcode_and_address(self):
+        from barcode_engine import QUIET_MODULES
+        s = helpers.fixture_settings()
+        products = [p for p in helpers.fixture_products() if p["barcode_number"]][::7]
+        orig_draw = lr.ImageDraw.Draw
+        try:
+            for p in products:
+                for mode, pack in (("Best By", date(2026, 12, 21)), ("Packed", date(2026, 12, 28))):
+                    for size in ("2.25x1.25", "2.25x3.00"):
+                        for dpi in (150, 203, 600):
+                            log = {"text": [], "bars": []}
+                            lr.ImageDraw.Draw = lambda im, _o=orig_draw, _l=log: _DrawSpy(_o(im), _l)
+                            lr.render_label(dict(p, date_mode=mode), "Barcode", size, pack, FLAGS_ALL,
+                                            s, s["address_line"], 10, dpi, s["label_spacing"],
+                                            s["label_margin_in"])
+                            with self.subTest(product=p["name"], mode=mode, size=size, dpi=dpi):
+                                module = min(b[2] - b[0] + 1 for b in log["bars"])
+                                quiet_start = min(b[0] for b in log["bars"]) - QUIET_MODULES * module
+                                dates = [bb for t, bb in log["text"]
+                                         if t.startswith(mode) or t[:2].rstrip("/").isdigit()
+                                         and "/" in t]
+                                self.assertGreaterEqual(len(dates), 1)
+                                address_top = next(bb[1] for t, bb in log["text"]
+                                                   if t == s["address_line"])
+                                for bb in dates:
+                                    self.assertLess(bb[2], quiet_start)
+                                    self.assertLessEqual(bb[3], address_top)
+                                drawn = " ".join(t for t, _ in log["text"])
+                                self.assertIn("12/31/2026" if mode == "Best By" else "12/28/2026",
+                                              drawn)
+        finally:
+            lr.ImageDraw.Draw = orig_draw
+
+
 class TestDates(unittest.TestCase):
     def test_date_lines(self):
         self.assertEqual(lr.format_date_line("Best By", PACK_DATE, 10), "Best By : 9/27/2026")
