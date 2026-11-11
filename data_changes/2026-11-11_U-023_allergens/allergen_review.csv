@@ -1,0 +1,69 @@
+﻿id,name,barcode,ingredients,allergens field,printed under the ingredients,why
+139,ALOO MATTAR,314300,"Potato, Peas, Ginger, Garlic, Fenugreek, Tomatoes, Cilantro Salt, Onions, Oil & Spices",,(no CONTAINS line),None of the 9 major allergens in the ingredients
+217,ALOO SABZI,402200,"Potatoes, Tomatoes, Cumin, Cilantro, Salt, Ginger, Chillis, Curry Leaves, Asafoetida, Oil & Spices",Wheat,CONTAINS: WHEAT,Wheat: asafoetida (the store's hing contains wheat flour - owner)
+442,ALSI PINNI,,"Flex Seed, Chickpea Flour, Clarified Butter, Almonds, Raisins, Cashews, Coconut Powder, Fennel Powder, Oil & Sugar","Milk, Almonds, Cashews","CONTAINS: MILK, ALMONDS, CASHEWS",Milk: clarified butter (ghee); Almonds: almonds; Cashews: cashews
+443,ASSORTED NUTS,,"Roasted Salted Almonds, Pistachios, Roasted Salted Cashews, Raisins","Almonds, Cashews, Pistachios","CONTAINS: ALMONDS, CASHEWS, PISTACHIOS",Almonds: almonds; Cashews: cashews; Pistachios: pistachios
+122,BAINGAN ALOO,312600,"Eggplant, Potatoes, Tomatoes, Ginger, Garlic, Cilantro, Salt, Oil & Spices",,(no CONTAINS line),None of the 9 major allergens in the ingredients
+11,BAINGAN BHARTHA,301300,"Eggplant, Green Peas, Tomatoes, Cilantro, Salt, Ginger, Onions, Oil & Spices",,(no CONTAINS line),None of the 9 major allergens in the ingredients
+255,BESAN BURFI,558600,"chickpea flour, Clarified Butter, cardamom, almonds, Oil & Sugar","Milk, Almonds","CONTAINS: MILK, ALMONDS",Milk: clarified butter (ghee); Almonds: almonds
+211,BESAN PINNI,405500,"Chickpea Flour, Clarified Butter, Almonds, Raisins, Cashews, Coconut Powder, Fennel Powder, Oil & Sugar","Milk, Almonds, Cashews","CONTAINS: MILK, ALMONDS, CASHEWS",Milk: clarified butter (ghee); Almonds: almonds; Cashews: cashews
+121,BHINDI ALOO,312500,"Okra, Potato, Tomato, Carrom seed, tumeric, onions, spieces, salt & oil",,(no CONTAINS line),None of the 9 major allergens in the ingredients
+126,BHINDI MASALA,313000,"Okra, Tomatoes, Carrom seed, Turmeric, Onions, Salt, Oil & Spices",,(no CONTAINS line),None of the 9 major allergens in the ingredients
+116,CHANA MASALA,610400,"Chickpeas, Ginger, tamarind, Cumin, caromseed, Tomatoes, Cilantro, Salt, Oil & spices",,(no CONTAINS line),None of the 9 major allergens in the ingredients
+105,CHANNA DAL COOKED,310800,"Chickpea Lentils, Ginger Garlic, Cumin, Tomatoes, Cilantro, Salt, Oil & Spices",,(no CONTAINS line),None of the 9 major allergens in the ingredients
+182,FENNEL CANDY,319600,"Fennel, sugar, FD&C Yellow #5, FD&C Red #3, FD&C Green #3, White Natural",,(no CONTAINS line),None of the 9 major allergens in the ingredients
+178,FRUIT CUSTARD,319100,"Milk, Custard Powder, Assorted Fruits, Sugar, and Vanilla",Milk,CONTAINS: MILK,Milk: milk
+119,GAJJAR HALWA,312300,"Carrots, Milk, Cashews, Pistachio, Clarified butter & Sugar","Milk, Cashews, Pistachios","CONTAINS: MILK, CASHEWS, PISTACHIOS","Milk: milk, clarified butter (ghee); Cashews: cashews; Pistachios: pistachio"
+106,GOBHI ALOO,310900,"Cauliflower, Potato, Tomato, Ginger, Garlic, Cilantro, Salt, Turmeric, Oil & Spices",,(no CONTAINS line),None of the 9 major allergens in the ingredients
+433,GOLGAPPA PANI,100001,"MINT, CILENTRO",,(no CONTAINS line),None of the 9 major allergens in the ingredients
+201,GUJARATI BATATA RINGER,402400,"Eggplant, Jaggery, Tamarind, Mustard Seeds, Cumin, Tomatoes, Cilantro, Salt, Ginger, Green Chillis, Curry Leaves, Asafoetida, Oil & Spices",Wheat,CONTAINS: WHEAT,Wheat: asafoetida (the store's hing contains wheat flour - owner)
+144,GUJRATI DAL,315000,"Pigeon Peas Lentils, Tamarind, Jaggery, Mustard seeds, Tomatoes, Salt, Ginger, Lemon Juice, Green Chilli, Curry Leaves, Asafoetida, Oil & Spices",Wheat,CONTAINS: WHEAT,Wheat: asafoetida (the store's hing contains wheat flour - owner)
+292,GUJRATI KHICHDI,562500,"Rice, Split Pigeon Peas, Mustard Seeds, Turmeric, Mix Vegetable, Salt, Asafoetida, Whole Red Chilli, Curry Leaves, Oil & Spices",Wheat,CONTAINS: WHEAT,Wheat: asafoetida (the store's hing contains wheat flour - owner)
+162,GULAB JAMUN,317100,"Sugar, Milk Solids, Oil, Cardamom, Paneer, Vinegar, Flour, Citric Acid, Saffron","Milk, Wheat","CONTAINS: MILK, WHEAT","Milk: milk solids, paneer; Wheat: flour (wheat flour)"
+118,HAKKA NOODLES,312200,"Noodles, Carrots, Onions, Cabbage, Bell Pepper, Vinegar, Chilly Sauce, Soy Sauce, MSG, Salt & Oil","Eggs, Wheat, Soybeans","CONTAINS: EGGS, WHEAT, SOYBEANS","Eggs: the noodles are egg noodles (owner); Wheat: noodles (wheat), soy sauce (brewed with wheat); Soybeans: soy sauce"
+156,IDLI,316400,"Rice Flour, Lentils Flour, Salt, Fenugreek Powder, Sodium Bicarbonate & Oil",,(no CONTAINS line),None of the 9 major allergens in the ingredients
+163,KADAHI PANEER,317200,"Green Peppers, panir, Fenugreek, Tomatoes, Ginger, Onion, Garlic, Cilantro, Salt, Oil & Spices",Milk,CONTAINS: MILK,Milk: panir (paneer)
+360,KADHAI MUSHROOM,604100,"Green Peppers, Mushrooms, Fenugreek, Tomatoes, Ginger, Onion, Garlic, Cilantro, Salt, Oil & Spices",,(no CONTAINS line),None of the 9 major allergens in the ingredients
+152,KADHI PAKORA,316000,"Yogurt, Chickpea Flour, Onions, Cumin, Mustard Seed, Fenugreek, Coriander, Seeded Chili, Curry leaves & Asafoetida, Oil & Spices","Milk, Wheat","CONTAINS: MILK, WHEAT",Milk: yogurt; Wheat: asafoetida (the store's hing contains wheat flour - owner)
+250,KAJU KATLI,503500,"Cashew, Sugar, Milk, Cardamom & butter","Milk, Cashews","CONTAINS: MILK, CASHEWS","Milk: milk, butter; Cashews: cashew"
+115,KALA CHANNA COOKED,312000,"Bengal Grams, Ginger, Green Chilli, Cumin, Dry Mango Powder, Tomatoes, Cilantro, Salt, Oil & Spices",,(no CONTAINS line),None of the 9 major allergens in the ingredients
+297,KALA KUND,563000,"Milk, Sugar, Almond, Pistachio & Cardamom","Milk, Almonds, Pistachios","CONTAINS: MILK, ALMONDS, PISTACHIOS",Milk: milk; Almonds: almond; Pistachios: pistachio
+111,KARELA ALOO,311400,"Bitter Gourd, Potatoes, Ginger, Garlic, Fenugreek, Tomatoes, Cilantro, Salt, Oil & Spices",,(no CONTAINS line),None of the 9 major allergens in the ingredients
+179,KHEER (RICE PUDDING),319200,"Rice, Milk, Saffron, Almonds, Raisins, Pista, Cardamom, Cashew, Sugar","Milk, Almonds, Cashews, Pistachios","CONTAINS: MILK, ALMONDS, CASHEWS, PISTACHIOS",Milk: milk; Almonds: almonds; Cashews: cashew; Pistachios: pista
+281,LADOO,561500,"Wheat Flour, Farina, Jaggery, Clarified Butter, Almonds, Raisins, Cashews, Cardamom, Nutmeg, Sesame Seeds & Poppy Seeds","Milk, Almonds, Cashews, Wheat, Sesame","CONTAINS: MILK, ALMONDS, CASHEWS, WHEAT, SESAME","Milk: clarified butter (ghee); Almonds: almonds; Cashews: cashews; Wheat: wheat flour, farina; Sesame: sesame seeds"
+158,LEMON RICE,316600,"Basmati Rice, Cashews, Mustard Seeds, Lentils, Turmeric, Curry Leaves, Lemon Juice, Asafoetida, Salt, Oil & Spices","Cashews, Wheat","CONTAINS: CASHEWS, WHEAT",Cashews: cashews; Wheat: asafoetida (the store's hing contains wheat flour - owner)
+441,LOBIA RASMISSA,100009,"Black eye beans, ginger, Garlic, onions, spieces, salt tomatoes & oil",,(no CONTAINS line),None of the 9 major allergens in the ingredients
+382,MAKHANI DAL,606200,"Black Lentil, Kidney Beans, Ginger, Garlic, Fenugreek, Butter, Heavy Cream, Salt, Oil & Spices",Milk,CONTAINS: MILK,"Milk: butter, heavy cream"
+103,MAKHANI PANEER,310600,"Paneer Cheese, Tomato, Ginger, Garlic, Fenugreek, Butter, Sugar, Onions, Heavy Cream, Salt, Oil & Spices",Milk,CONTAINS: MILK,"Milk: paneer cheese, butter, heavy cream"
+243,MAKHANI SAUCE,502900,"Tomato, Ginger, Garlic, Fenugreek, Butter, Sugar, Onions, Heavy Cream, Salt, Oil & Spices",Milk,CONTAINS: MILK,"Milk: butter, heavy cream"
+451,MALABAR VEG,100011,"poppy seeds,cashews,coconut milk mix veg",Cashews,CONTAINS: CASHEWS,Cashews: cashews (coconut milk is not dairy and coconut is not a major allergen)
+10,MALAI KOFTA,301200,"Cottage cheese, Tomatoes, Ginger, Garlic, Fenugreek, Butter, Heavy Cream, Salt, Onions, Potatoes, Oil & Spices",Milk,CONTAINS: MILK,"Milk: cottage cheese, butter, heavy cream"
+134,MANGO MOUSSE,313800,"Mango Pulp, Sugar, Yogurt, Gelatin, Heavy Cream, Vanilla",Milk,CONTAINS: MILK,"Milk: yogurt, heavy cream"
+128,MATTAR PANEER,313200,"Cottage Cheese, Peas, Ginger, Cashew, Makhana, Garlic, Fenugreek, Tomatoes, Cilantro, Salt, Onions, Oil & Spices","Milk, Cashews","CONTAINS: MILK, CASHEWS",Milk: cottage cheese; Cashews: cashew (makhana is not a tree nut)
+177,MINT CHUTNEY,319000,"Mint, Cilantro, Chilli, Lemon, Garlic, Ginger, Dry Mangos, Yogurt, Salt & Spices",Milk,CONTAINS: MILK,Milk: yogurt
+123,MIX VEG,312700,"Cauliflower, Potatoes, Eggplant, Carrot, Bell Pepper, Peas, Ginger, Garlic, Fenugreek, Tomatoes, Cilantro, Salt, Oil & Spices",,(no CONTAINS line),None of the 9 major allergens in the ingredients
+129,MIX VEG MAKHANI,313300,"Cottage Cheese, Tomatoes, Ginger Garlic, Fenugreek, Butter, Heavy Cream, Mushroom, Cashew, Carrot, Peas, Bell Pepper, Makhana, Salt, Oil & Spices","Milk, Cashews","CONTAINS: MILK, CASHEWS","Milk: cottage cheese, butter, heavy cream; Cashews: cashew"
+49,MOONG DAL,305200,"Moong Lentils, Ginger Garlic, Cumin, Tomatoes, Cilantro, Salt, Oil & Spices",,(no CONTAINS line),None of the 9 major allergens in the ingredients
+444,MORIYO,,"Moriyo (Samo), Potatoes, Curry Leaves, Cumin Seeds, Cilantro, Red Whole Chilli, Salt, Sugar, Cashews, Lemon Juice, Ginger, Green Chilli & Oil",Cashews,CONTAINS: CASHEWS,Cashews: cashews
+173,NAVRATAN KORMA,318600,"Mix Veggies, Potatoes, Onions, Ginger, Garlic, Cilantro, Heavy Cream, Tomatoes, Makhana, Oil & Spices",Milk,CONTAINS: MILK,Milk: heavy cream (makhana is not a tree nut)
+131,PALAK PANEER,313500,"Spinach, Cheese, Tomatoes, Ginger, Garlic, Fenugreek, Butter, Heavy Cream, Salt, Spinach, Oil & Spices",Milk,CONTAINS: MILK,"Milk: cheese, butter, heavy cream"
+9,PANEER BHURJI,301100,"Cottage Cheese, Peas, Tomatoes, Ginger, Garlic, Fenugreek, Cilantro, Salt, Onion, Oil & Spices",Milk,CONTAINS: MILK,Milk: cottage cheese
+194,PAV BHAJI,401200,"Cauliflower, Cabbage, Green Peas, Eggplant, Potatoes, Tomatoes, Cilantro, Salt, Oil & Spices",Milk,CONTAINS: MILK,"Milk: cooked with butter, not in the ingredient list (owner)"
+140,PEAS PILAF,314400,"Rice, Peas, Cumin, Cilantro, Salt, Almonds, Oil & Spices",Almonds,CONTAINS: ALMONDS,Almonds: almonds
+108,PLAIN PALAK,311100,"Spinach, Tomato, Ginger, Garlic, Fenugreek, Butter, heavy cream, Salt, Spinach, Oil & spices",Milk,CONTAINS: MILK,"Milk: butter, heavy cream"
+372,POTATO POHA,605200,"Peanuts, Onions, Mustard Seeds, Potatoes, Curry Leaves, Red Chilli, Rice Flakes, Tumeric, Salt & Oil, Cilantro",Peanuts,CONTAINS: PEANUTS,Peanuts: peanuts
+114,RAJMA,311800,"Kidney Bean, Tomatoes, Ginger, Garlic, Onions, Spices, Salt & Oil",,(no CONTAINS line),None of the 9 major allergens in the ingredients
+133,RICE PILAF,313700,"Rice, Cumin, Black Cardamom, Bay Leaves, Salt & Oil",,(no CONTAINS line),None of the 9 major allergens in the ingredients
+110,SAMBER,311300,"Pigeon Peas Lentils, Tamarind, Mustard, Cumin, Tomatoes, Cilantro, Salt, Asafoetida, Oil & Spices",Wheat,CONTAINS: WHEAT,Wheat: asafoetida (the store's hing contains wheat flour - owner)
+104,SARSO KA SAAG,310700,"Mustard Green, Tomato, Ginger, Garlic, Fenugreek, Butter, Heavy Cream, Salt, Spinach, Oil & Spices",Milk,CONTAINS: MILK,"Milk: butter, heavy cream"
+257,SCHEZWAN FRIED RICE,558800,"Rice, Mix Veg, Spices, Ginger, Garlic, Tomatoes, MSG, Celery, Chilli Sauce, Soya sauce, Vinegar, Scallions, Oil & Salt","Wheat, Soybeans","CONTAINS: WHEAT, SOYBEANS",Wheat: soya sauce (brewed with wheat); Soybeans: soya sauce
+273,SHAKKAR PARA,560600,"Enriched Flour, Sugar, Vegetable Oil & Cardamom Seeds",Wheat,CONTAINS: WHEAT,Wheat: enriched flour (wheat flour)
+386,SHRIKHAND,606600,"Yogurt, Sugar, Pistachio, Almonds, Cardamom & Saffron","Milk, Almonds, Pistachios","CONTAINS: MILK, ALMONDS, PISTACHIOS",Milk: yogurt; Almonds: almonds; Pistachios: pistachio
+319,SOOJI HALWA,565700,"Almonds, Raisins, Saffron, Cardamom, Sugar, Cream of Wheat","Milk, Almonds, Wheat","CONTAINS: MILK, ALMONDS, WHEAT","Milk: made with ghee, not in the ingredient list (owner); Almonds: almonds; Wheat: cream of wheat"
+248,SOYA PILAU,503400,"Soya Chunks, Rice, Cumin, Bay Leaf, Cinnamon, Cardamom, Cloves, Salt & Veg Oil,paneer","Milk, Soybeans","CONTAINS: MILK, SOYBEANS",Milk: paneer; Soybeans: soya chunks
+445,STRAWBERRY MOUSSE,,"Strawberry, Sugar, Yogurt, Gelatin, Heavy Cream",Milk,CONTAINS: MILK,"Milk: yogurt, heavy cream"
+155,TADKA DAL,316300,"Mixed Lentils, Ginger, Garlic, Cumin, Tomatoes, Cilantro, Salt, Mustard Seed, Curry Leaves, Oil & Spices",,(no CONTAINS line),None of the 9 major allergens in the ingredients
+132,UPMA,313600,"Cream of Wheat, Mustard Seeds, Lentils, Onions, Curry Leaves, Mix Veggies, Red Chillies & Milk","Milk, Wheat","CONTAINS: MILK, WHEAT",Milk: milk; Wheat: cream of wheat
+446,URAD CHANA DAL,,"Split Matpe Beans, Chickpea Lentils, Ginger, Garlic, Cumin, Tomatoes, Cilantro, Salt, Oil & Spices",,(no CONTAINS line),None of the 9 major allergens in the ingredients
+280,VEG PILAF,561400,"Basmati Rice, Green Beans, Carrots, Corn, Green Peas, Cumin, Black Cardamom, Bay Leaves, Mushroom, Cashews, Salt, Oil & Spices",Cashews,CONTAINS: CASHEWS,Cashews: cashews
+311,VEG SINDHI BIRYANI,564500,"Rice, Green Beans, Carrots, Corn, Green Peas, Spices, Ginger, Tomatoes, Onions, Extract of Pandanus tectorius, Cilantro, Oil, Salt & Saffron",,(no CONTAINS line),None of the 9 major allergens in the ingredients

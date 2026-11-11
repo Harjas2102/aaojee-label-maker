@@ -32,7 +32,7 @@ MAX_PICTURES = 12
 
 VARIANTS = [("Barcode", "2.25x1.25"), ("Barcode", "2.25x3.00"), ("Ingredient", "2.25x1.25"),
             ("Ingredient", "2.25x3.00"), ("Combined", "2.25x3.00")]
-EXTRAS = {"allergens": "Milk, Tree Nuts", "net_weight": "16 OZ"}
+EXTRAS = {"allergens": "Milk, Cashews", "net_weight": "16 OZ"}
 
 
 # ── worker: runs in a separate Python process against one copy of source/ ────
@@ -150,7 +150,13 @@ def main() -> int:
         for k in changed[:20]:
             print("   ", k, "" if not str(new[k]).startswith("ERROR") else new[k])
         shutil.rmtree(DIFF_DIR, ignore_errors=True)
-        os.makedirs(DIFF_DIR)
+        # OneDrive can keep the folder (or a picture in it) for a moment after deleting it
+        os.makedirs(DIFF_DIR, exist_ok=True)
+        for old_png in os.listdir(DIFF_DIR):
+            try:
+                os.remove(os.path.join(DIFF_DIR, old_png))
+            except OSError:
+                pass
         sample = changed[:MAX_PICTURES]
         dirs = [os.path.join(tmp, "old_png"), os.path.join(tmp, "new_png")]
         for d in dirs:

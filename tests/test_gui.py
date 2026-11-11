@@ -14,6 +14,7 @@ ALOO_MATTAR = "03143009"        # 8-digit scan of barcode 314300
 CHANNA_DAL_COOKED = "03108006"   # 310800
 CHANNA_DAL_2LB = "03046009"      # 304600
 GUJRATI_DAL = "03150009"         # 315000
+PANEER_BHURJI = "301100"         # typed 6-digit barcode
 
 
 @unittest.skipUnless(helpers.GUI_ENABLED, "window tests skipped (--quick)")
@@ -120,6 +121,9 @@ class TestScreens(GuiTestCase):
         dialog._save()
         self.assertEqual(self.app.settings.get("label_spacing"), 1.25)
         self.assertEqual(self.app._get_spacing(), 1.25)
+        # U-025: spacing never goes above 2.5, even if settings.json says more
+        self.app.settings.set("label_spacing", 3.0)
+        self.assertEqual(self.app._get_spacing(), 2.5)
         self.assertEqual(self.app._get_margin(), 0.10)
         self.assertTrue(opened)
 
@@ -434,6 +438,132 @@ class TestTools(GuiTestCase):
         app._category_var.set("Spices")
         app._on_filter_change()
         self.assertTrue(all(p["category"] == "Spices" for p in app.visible_products()))
+
+
+# ── U-023: allergens — the CONTAINS line (NY Agriculture and Markets Law § 199-g)
+
+class TestAllergens(GuiTestCase):
+    """PANEER BHURJI: "Cottage Cheese, Peas, …", allergens "Milk"."""
+
+    def setUp(self):
+        super().setUp()
+        self.h.open_barcode(PANEER_BHURJI)
+        self.assertEqual(self.app._name_var.get(), "PANEER BHURJI")
+
+    def saved(self) -> str:
+        return self.app.db.get_product(self.app._current_id)["allergens"]
+
+    def test_card_shows_contains_line_and_warning(self):
+        app = self.app
+        app._update_preview()
+        self.assertEqual(app._card_allergens_var.get(), "CONTAINS: MILK")
+        self.assertEqual(app._card_allergen_warn_var.get(), "")
+        app._allergens_var.set("")
+        app._update_preview()
+        self.assertIn("MILK is not on the CONTAINS line", app._card_allergen_warn_var.get())
+        self.assertEqual(app._allergen_check_var.get(), app._card_allergen_warn_var.get())
+
+    def test_save_offers_to_add_missing_allergens(self):
+        app = self.app
+        app._allergens_var.set("")
+        self.h.answers[:] = [None]                    # Cancel: stay, nothing saved
+        self.assertFalse(app._on_save())
+        self.assertEqual(self.saved(), "Milk")
+        self.assertIn("“cheese”", self.h.last_message())
+        self.h.answers[:] = [False]                   # No: save as it is
+        self.assertTrue(app._on_save())
+        self.assertEqual(self.saved(), "")
+        self.h.answers[:] = [True]                    # Yes: add MILK, then save
+        self.assertTrue(app._on_save())
+        self.assertEqual(self.saved(), "Milk")
+        self.assertEqual(app._allergens_var.get(), "Milk")
+        app._ingredients_text.insert("end-1c", ", Cashews")
+        self.h.answers[:] = [True]
+        self.assertTrue(app._on_save())
+        self.assertEqual(self.saved(), "Milk, Cashews")
+        self.assertIn("CASHEWS", self.h.last_message())
+
+    def test_broad_names_and_non_allergens_refused(self):
+        app = self.app
+        app._allergens_var.set("Milk, Tree Nuts")
+        self.assertFalse(app._on_save())
+        self.assertIn("Name each kind of tree nut", app._status_var.get())
+        app._allergens_var.set("Milk, Coconut")
+        self.assertFalse(app._on_save())
+        self.assertIn("Coconut is not a major food allergen", app._status_var.get())
+        self.assertEqual(self.saved(), "Milk")
+
+    def test_typed_names_saved_in_standard_form(self):
+        app = self.app
+        app._allergens_var.set("kaju, milk")
+        self.assertTrue(app._on_save())
+        self.assertEqual(self.saved(), "Milk, Cashews")
+        self.assertEqual(app._allergens_var.get(), "Milk, Cashews")
+
+    def test_unknown_name_needs_confirming(self):
+        app = self.app
+        app._allergens_var.set("Milk, Swai")
+        self.h.answers[:] = [False]
+        self.assertFalse(app._on_save())
+        self.assertIn("Swai", self.h.last_message())
+        self.h.answers[:] = [True]
+        self.assertTrue(app._on_save())
+        self.assertEqual(self.saved(), "Milk, Swai")
+
+    def test_print_asks_when_contains_line_looks_incomplete(self):
+        app = self.app
+        app._allergens_var.set("")
+        self.h.answers[:] = [False]                   # don't print
+        app._print_label_type("Ingredient")
+        self.assertEqual(self.h.printed, [])
+        self.assertIn("Allergen check", self.h.last_message())
+        self.h.answers[:] = [True]                    # print anyway
+        app._print_label_type("Ingredient")
+        self.assertEqual(len(self.h.printed), 1)
+        app._print_label_type("Barcode")              # no CONTAINS line: no question
+        self.assertEqual(len(self.h.printed), 2)
+        app._allergens_var.set("Milk")
+        app._print_label_type("Combined")             # complete: no question
+        self.assertEqual(len(self.h.printed), 3)
+
+    def test_queue_asks_when_contains_line_looks_incomplete(self):
+        app = self.app
+        app.db.save_product({"id": app._current_id, "allergens": ""})
+        app.print_queue.add(app._current_id, "Barcode + Ingredients", 1)
+        app._open_print_queue()
+        self.h.pump()
+        self.h.answers[:] = [False]
+        app._queue_window._print_all()
+        self.assertEqual(self.h.printed, [])
+        self.assertIn("PANEER BHURJI", self.h.last_message())
+
+    def test_label_too_long_is_refused_with_a_message(self):
+        app = self.app
+        app._ingredients_text.insert("end-1c", ", Cottage Cheese, Peas, Tomatoes" * 60)
+        app._print_label_type("Ingredient")
+        self.assertEqual(self.h.printed, [])
+        self.assertEqual(self.h.messages[-1][:2], ("showerror", "Print Error"))
+        self.assertIn("nothing was printed", self.h.last_message())
+
+    def test_picker(self):
+        from allergens import AllergenPicker
+        app = self.app
+        app._allergens_var.set("")
+        app._open_allergen_picker()
+        self.h.pump()
+        picker = [w for w in self.h.root.winfo_children() if isinstance(w, AllergenPicker)][-1]
+        self.assertFalse(picker._vars["Milk"].get())
+        picker._tick_hints()
+        self.assertTrue(picker._vars["Milk"].get())
+        self.assertEqual(picker._preview_var.get(), "Will print:  CONTAINS: MILK")
+        picker._vars["Cashews"].set(True)
+        picker._other_var.set("Tree Nuts")
+        picker._ok()                                  # refused: too broad
+        self.assertTrue(picker.winfo_exists())
+        self.assertIn("tree nut", picker._problem_var.get())
+        picker._other_var.set("")
+        picker._ok()
+        self.assertEqual(app._allergens_var.get(), "Milk, Cashews")
 
 
 if __name__ == "__main__":

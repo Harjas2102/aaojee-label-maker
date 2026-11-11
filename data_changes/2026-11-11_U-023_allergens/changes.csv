@@ -1,0 +1,47 @@
+﻿id,name,size,barcode,field,old,new,why
+217,ALOO SABZI,,402200,allergens,,Wheat,Wheat: asafoetida (the store's hing contains wheat flour - owner)
+442,ALSI PINNI,,,allergens,,"Milk, Almonds, Cashews",Milk: clarified butter (ghee); Almonds: almonds; Cashews: cashews
+443,ASSORTED NUTS,1.5 LB,,allergens,,"Almonds, Cashews, Pistachios",Almonds: almonds; Cashews: cashews; Pistachios: pistachios
+255,BESAN BURFI,14 OZ,558600,allergens,,"Milk, Almonds",Milk: clarified butter (ghee); Almonds: almonds
+211,BESAN PINNI,14 OZ,405500,allergens,,"Milk, Almonds, Cashews",Milk: clarified butter (ghee); Almonds: almonds; Cashews: cashews
+178,FRUIT CUSTARD,,319100,allergens,,Milk,Milk: milk
+119,GAJJAR HALWA,,312300,allergens,,"Milk, Cashews, Pistachios","Milk: milk, clarified butter (ghee); Cashews: cashews; Pistachios: pistachio"
+201,GUJARATI BATATA RINGER,,402400,allergens,,Wheat,Wheat: asafoetida (the store's hing contains wheat flour - owner)
+144,GUJRATI DAL,,315000,allergens,,Wheat,Wheat: asafoetida (the store's hing contains wheat flour - owner)
+292,GUJRATI KHICHDI,,562500,allergens,,Wheat,Wheat: asafoetida (the store's hing contains wheat flour - owner)
+162,GULAB JAMUN,,317100,allergens,,"Milk, Wheat","Milk: milk solids, paneer; Wheat: flour (wheat flour)"
+118,HAKKA NOODLES,,312200,allergens,,"Eggs, Wheat, Soybeans","Eggs: the noodles are egg noodles (owner); Wheat: noodles (wheat), soy sauce (brewed with wheat); Soybeans: soy sauce"
+163,KADAHI PANEER,,317200,allergens,,Milk,Milk: panir (paneer)
+152,KADHI PAKORA,,316000,allergens,,"Milk, Wheat",Milk: yogurt; Wheat: asafoetida (the store's hing contains wheat flour - owner)
+250,KAJU KATLI,14 OZ,503500,allergens,,"Milk, Cashews","Milk: milk, butter; Cashews: cashew"
+297,KALA KUND,14 OZ,563000,allergens,,"Milk, Almonds, Pistachios",Milk: milk; Almonds: almond; Pistachios: pistachio
+179,KHEER (RICE PUDDING),,319200,allergens,,"Milk, Almonds, Cashews, Pistachios",Milk: milk; Almonds: almonds; Cashews: cashew; Pistachios: pista
+281,LADOO,,561500,allergens,,"Milk, Almonds, Cashews, Wheat, Sesame","Milk: clarified butter (ghee); Almonds: almonds; Cashews: cashews; Wheat: wheat flour, farina; Sesame: sesame seeds"
+158,LEMON RICE,,316600,allergens,,"Cashews, Wheat",Cashews: cashews; Wheat: asafoetida (the store's hing contains wheat flour - owner)
+382,MAKHANI DAL,,606200,allergens,,Milk,"Milk: butter, heavy cream"
+103,MAKHANI PANEER,,310600,allergens,,Milk,"Milk: paneer cheese, butter, heavy cream"
+243,MAKHANI SAUCE,,502900,allergens,,Milk,"Milk: butter, heavy cream"
+451,MALABAR VEG,,100011,allergens,,Cashews,Cashews: cashews (coconut milk is not dairy and coconut is not a major allergen)
+10,MALAI KOFTA,,301200,allergens,,Milk,"Milk: cottage cheese, butter, heavy cream"
+134,MANGO MOUSSE,,313800,allergens,,Milk,"Milk: yogurt, heavy cream"
+128,MATTAR PANEER,,313200,allergens,,"Milk, Cashews",Milk: cottage cheese; Cashews: cashew (makhana is not a tree nut)
+177,MINT CHUTNEY,16 OZ,319000,allergens,,Milk,Milk: yogurt
+129,MIX VEG MAKHANI,,313300,allergens,,"Milk, Cashews","Milk: cottage cheese, butter, heavy cream; Cashews: cashew"
+444,MORIYO,,,allergens,,Cashews,Cashews: cashews
+173,NAVRATAN KORMA,,318600,allergens,,Milk,Milk: heavy cream (makhana is not a tree nut)
+131,PALAK PANEER,,313500,allergens,,Milk,"Milk: cheese, butter, heavy cream"
+9,PANEER BHURJI,,301100,allergens,,Milk,Milk: cottage cheese
+194,PAV BHAJI,,401200,allergens,,Milk,"Milk: cooked with butter, not in the ingredient list (owner)"
+140,PEAS PILAF,,314400,allergens,,Almonds,Almonds: almonds
+108,PLAIN PALAK,,311100,allergens,,Milk,"Milk: butter, heavy cream"
+372,POTATO POHA,,605200,allergens,,Peanuts,Peanuts: peanuts
+110,SAMBER,,311300,allergens,,Wheat,Wheat: asafoetida (the store's hing contains wheat flour - owner)
+104,SARSO KA SAAG,,310700,allergens,,Milk,"Milk: butter, heavy cream"
+257,SCHEZWAN FRIED RICE,,558800,allergens,,"Wheat, Soybeans",Wheat: soya sauce (brewed with wheat); Soybeans: soya sauce
+273,SHAKKAR PARA,14 OZ,560600,allergens,,Wheat,Wheat: enriched flour (wheat flour)
+386,SHRIKHAND,,606600,allergens,,"Milk, Almonds, Pistachios",Milk: yogurt; Almonds: almonds; Pistachios: pistachio
+319,SOOJI HALWA,,565700,allergens,,"Milk, Almonds, Wheat","Milk: made with ghee, not in the ingredient list (owner); Almonds: almonds; Wheat: cream of wheat"
+248,SOYA PILAU,,503400,allergens,,"Milk, Soybeans",Milk: paneer; Soybeans: soya chunks
+445,STRAWBERRY MOUSSE,,,allergens,,Milk,"Milk: yogurt, heavy cream"
+132,UPMA,,313600,allergens,,"Milk, Wheat",Milk: milk; Wheat: cream of wheat
+280,VEG PILAF,,561400,allergens,,Cashews,Cashews: cashews

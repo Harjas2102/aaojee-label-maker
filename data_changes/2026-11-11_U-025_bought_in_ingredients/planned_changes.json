@@ -1,0 +1,38 @@
+[
+ {
+  "id": 118,
+  "name": "HAKKA NOODLES",
+  "old_ingredients": "Egg Noodles, Carrots, Onions, Cabbage, Bell Pepper, Vinegar, Chilly Sauce, Soy Sauce, MSG, Salt & Canola Oil",
+  "new_ingredients": "Egg Noodles, Carrots, Onions, Cabbage, Bell Pepper, Vinegar, Chilli Sauce (Chili, Sugar, Salt, Garlic, Acetic Acid, Potassium Sorbate and Sodium Bisulfite as preservatives, Xanthan Gum), Soy Sauce (Water, Soybeans, Sugar, Salt, Wheat Flour), MSG, Salt & Canola Oil",
+  "old_allergens": "Eggs, Wheat, Soybeans",
+  "new_allergens": "Eggs, Wheat, Soybeans",
+  "why": "chilli sauce (Sriracha) and soy sauce ingredients from their labels (owner, 2026-11-11)"
+ },
+ {
+  "id": 257,
+  "name": "SCHEZWAN FRIED RICE",
+  "old_ingredients": "Rice, Mix Veg, Spices, Ginger, Garlic, Tomatoes, MSG, Celery, Chilli Sauce, Soya sauce, Vinegar, Scallions, Canola Oil & Salt",
+  "new_ingredients": "Rice, Mix Veg, Spices, Ginger, Garlic, Tomatoes, MSG, Celery, Chilli Sauce (Chili, Sugar, Salt, Garlic, Acetic Acid, Potassium Sorbate and Sodium Bisulfite as preservatives, Xanthan Gum), Soy Sauce (Water, Soybeans, Sugar, Salt, Wheat Flour), Vinegar, Scallions, Canola Oil & Salt",
+  "old_allergens": "Wheat, Soybeans",
+  "new_allergens": "Wheat, Soybeans",
+  "why": "chilli sauce (Sriracha) and soy sauce ingredients from their labels (owner, 2026-11-11)"
+ },
+ {
+  "id": 433,
+  "name": "GOLGAPPA PANI",
+  "old_ingredients": "MINT, CILANTRO, SPICES, TAMARIND, LEMON JUICE, GREEN CHILLIES",
+  "new_ingredients": "Water, Mint, Cilantro, Pani Puri Masala (Salt, Cumin, Unripe Dried Mango, Black Salt, Citric Acid, Tamarind, Mint Leaves, Dried Ginger, Yellow Chilli, Black Pepper, Musk Melon, Turmeric, Cloves, Caraway, Asafoetida), Tamarind, Lemon Juice, Green Chillies",
+  "old_allergens": "",
+  "new_allergens": "Wheat",
+  "why": "added water; spices = MDH Pani Puri Masala, ingredients from its package (its asafoetida treated as containing wheat); written in normal capitals so it prints larger (owner, 2026-11-11)"
+ },
+ {
+  "id": 319,
+  "name": "SOOJI HALWA",
+  "old_ingredients": "Almonds, Raisins, Saffron, Cardamom, Clarified Butter, Sugar, Cream of Wheat",
+  "new_ingredients": "Cream of Wheat, Sugar, Clarified Butter, Almonds, Raisins, Cardamom, Saffron",
+  "old_allergens": "Milk, Almonds, Wheat",
+  "new_allergens": "Milk, Almonds, Wheat",
+  "why": "reordered from most to least by weight (owner, 2026-11-11)"
+ }
+]

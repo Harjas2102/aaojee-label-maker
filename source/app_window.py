@@ -52,7 +52,9 @@ from settings_manager import Settings
 from manager_lock import ManagerLock
 from print_queue import PrintQueue, PrintQueueWindow, LABEL_CHOICES, default_choice
 from categories import CATEGORIES, suggest_category
-from allergens import AllergenPicker
+from allergens import (AllergenPicker, GENERIC_HINTS, add_allergens, contains_line,
+                       describe_missing, label_problems, missing_allergens,
+                       normalize_allergens, parse_allergens, unknown_names)
 from print_history import PrintHistoryWindow
 from trash_window import TrashWindow
 from price_tools import PriceChangeDialog, export_price_list
@@ -64,6 +66,9 @@ import importer as mdb_importer
 # ──────────────────────────────────────────────────────────────────────────────
 
 LABEL_SIZES = ["2.25x3.00", "2.25x1.25"]
+# U-025: above this the longest ingredient lists (e.g. GUJRATI DAL) no longer fit the
+# combined label.  The owner set the limit at 2.5 (the store uses 1.75).
+MAX_LABEL_SPACING = 2.5
 DATE_MODES  = ["Packed", "Best By", "None"]
 
 # Category filters for the product list.  Extensible: to offer another filter,
@@ -547,6 +552,11 @@ class AaojeeApp:
         ttk.Label(card, textvariable=self._card_allergens_var, style="Card.TLabel",
                   font=(UI_FONT, 10, "bold"), foreground="#9b2c2c",
                   wraplength=CARD_WRAP).pack(anchor=tk.W)
+        # U-023: shown only when the CONTAINS line looks wrong or incomplete
+        self._card_allergen_warn_var = tk.StringVar()
+        ttk.Label(card, textvariable=self._card_allergen_warn_var, style="Card.TLabel",
+                  font=(UI_FONT, 9, "bold"), foreground="#b42318",
+                  wraplength=CARD_WRAP).pack(anchor=tk.W)
 
         # Quantity
         qty_frame = ttk.Frame(parent)
@@ -640,6 +650,8 @@ class AaojeeApp:
             self._card_details_var.set("Type a name or scan a label to begin.")
             self._card_date_var.set("")
             self._card_allergens_var.set("")
+            self._card_allergen_warn_var.set("")
+            self._allergen_check_var.set("")
             return
         self._card_subtitle_var.set(f"({data['subtitle']})" if data["subtitle"] else "")
         parts = []
@@ -651,7 +663,11 @@ class AaojeeApp:
         date_line = format_date_line(data["date_mode"] or "Packed", self._get_pack_date(),
                                      self.settings.bestby_offset_days)
         self._card_date_var.set(date_line or "No date line")
-        self._card_allergens_var.set(f"Contains: {data['allergens']}" if data["allergens"] else "")
+        self._card_allergens_var.set(contains_line(data["allergens"]))
+        problems = label_problems(data)
+        warning = ("⚠ Allergen check: " + "  ".join(problems)) if problems else ""
+        self._card_allergen_warn_var.set(warning)
+        self._allergen_check_var.set(warning)
 
     # ── PREVIEW COLUMN (U-015) ────────────────────────────────────────────────
 
@@ -882,11 +898,17 @@ class AaojeeApp:
         ttk.Label(form, text="Allergens").grid(row=3, column=0, sticky=tk.W, pady=3, padx=(0, 6))
         al_frame = ttk.Frame(form)
         al_frame.grid(row=3, column=1, columnspan=3, sticky=tk.EW, pady=3)
+        al_row = ttk.Frame(al_frame)
+        al_row.pack(fill=tk.X)
         self._allergens_var = tk.StringVar()
         self._allergens_var.trace_add("write", self._on_form_change)
-        ttk.Entry(al_frame, textvariable=self._allergens_var).pack(side=tk.LEFT, fill=tk.X, expand=True)
-        ttk.Button(al_frame, text="Pick…", width=6,
+        ttk.Entry(al_row, textvariable=self._allergens_var).pack(side=tk.LEFT, fill=tk.X, expand=True)
+        ttk.Button(al_row, text="Pick…", width=6,
                    command=self._open_allergen_picker).pack(side=tk.LEFT, padx=(4, 0))
+        # U-023: anything that looks missing from the CONTAINS line
+        self._allergen_check_var = tk.StringVar()
+        ttk.Label(al_frame, textvariable=self._allergen_check_var, foreground="#b42318",
+                  wraplength=CARD_WRAP - 100).pack(anchor=tk.W)
 
         # Row 4 — Size | Price  (short fields, sized to content)
         ttk.Label(form, text="Size").grid(row=4, column=0, sticky=tk.W, pady=3, padx=(0, 6))
@@ -1254,8 +1276,8 @@ class AaojeeApp:
             "name":           _cap(self._name_var.get()),
             "subtitle":       _cap(self._subtitle_var.get()),
             "ingredients":    ingredients,
-            "allergens":      ", ".join(a.strip() for a in self._allergens_var.get().split(",")
-                                        if a.strip()),
+            # U-023: standard names in the law's order ("soy" → "Soybeans")
+            "allergens":      normalize_allergens(self._allergens_var.get()),
             "net_weight":     " ".join(self._net_weight_var.get().split()).upper(),
             "category":       "" if self._category_field_var.get() == NO_CATEGORY
                               else self._category_field_var.get(),
@@ -1283,7 +1305,69 @@ class AaojeeApp:
                 price_ok = False
             if not price_ok:
                 return False, "Price must be a number, e.g. 4.99 (or leave it blank)."
+        # U-023: no broad names ("Tree Nuts") or non-allergens ("Coconut")
+        _, problems = parse_allergens(data["allergens"])
+        if problems:
+            return False, "Allergens: " + "  ".join(problems)
         return True, ""
+
+    def _confirm_allergens(self, data: dict) -> bool:
+        """U-023, before saving: offer to add the allergens the ingredients
+        point to, and confirm names the program doesn't know.  May update
+        data["allergens"].  Returns False to stay on the form unsaved."""
+        missing = missing_allergens(data["ingredients"], data["allergens"])
+        if missing:
+            addable = [k for k in missing if k not in GENERIC_HINTS]
+            lines = "\n".join("•  " + describe_missing(k, v) for k, v in missing.items())
+            add_text = ("Yes = add " + ", ".join(k.upper() for k in addable) + "    "
+                        if addable else "")
+            answer = messagebox.askyesnocancel(
+                "Allergens — check before saving",
+                "These major food allergens look missing from the CONTAINS line:\n\n"
+                f"{lines}\n\n"
+                "New York law requires the CONTAINS line to name every major food "
+                "allergen in the food.\n\n"
+                f"{add_text}No = save as it is    Cancel = go back",
+                icon="warning")
+            if answer is None:
+                return False
+            if answer:
+                data["allergens"] = add_allergens(data["allergens"], addable)
+                if len(addable) < len(missing):
+                    # A "which kind?" one (nuts / fish / shellfish) needs a person
+                    self._allergens_var.set(data["allergens"])
+                    self._status_var.set("⚠ Type which kind in Allergens (e.g. Cashews, Cod, "
+                                         "Shrimp), then Save again.")
+                    return False
+        unknown = unknown_names(data["allergens"])
+        if unknown and not messagebox.askyesno(
+                "Allergens",
+                "The program doesn't recognise:  " + ", ".join(unknown) + "\n\n"
+                "Only the 9 major food allergens may be on the CONTAINS line (fish and "
+                "shellfish by their kind, e.g. Cod, Shrimp).\n\nKeep it as typed?",
+                icon="warning"):
+            return False
+        return True
+
+    def _confirm_allergen_label(self, products: list[dict], title: str, parent=None) -> bool:
+        """U-023, before printing ingredient / combined labels: warn when a
+        CONTAINS line looks wrong or incomplete.  Returns True to go ahead."""
+        found = [(p, label_problems(p)) for p in products]
+        found = [(p, probs) for p, probs in found if probs]
+        if not found:
+            return True
+        text = "\n\n".join(f"{p.get('name') or '(unnamed)'}:\n"
+                           + "\n".join("•  " + x for x in probs) for p, probs in found[:6])
+        if len(found) > 6:
+            text += f"\n\n…and {len(found) - 6} more products."
+        kw = {"parent": parent} if parent is not None else {}
+        return messagebox.askyesno(
+            title,
+            "⚠ Allergen check: the CONTAINS line may be wrong.\n\n" + text + "\n\n"
+            "Selling packaged food with an allergen missing from its label breaks "
+            "New York law. Ask a manager to fix the Allergens on the Edit Products "
+            "screen.\n\nPrint anyway?",
+            icon="warning", default=messagebox.NO, **kw)
 
     # ──────────────────────────────────────────────────────────────────────────
     # CRUD actions
@@ -1326,6 +1410,10 @@ class AaojeeApp:
                 )
                 if not answer:
                     return False
+
+        # U-023: the CONTAINS line must name every major allergen in the food
+        if not self._confirm_allergens(data):
+            return False
 
         # U-013: a new product saved without a category gets a best guess
         suggested = ""
@@ -1527,9 +1615,9 @@ class AaojeeApp:
         return True
 
     def _get_spacing(self) -> float:
-        """Label spacing (Settings → Settings…)."""
+        """Label spacing (Settings → Settings…), at most MAX_LABEL_SPACING."""
         try:
-            return float(self.settings.get("label_spacing", 1.0))
+            return min(MAX_LABEL_SPACING, float(self.settings.get("label_spacing", 1.0)))
         except (TypeError, ValueError):
             return 1.0
 
@@ -1619,6 +1707,11 @@ class AaojeeApp:
                                         flags["date"], flags["barcode"]):
             return
 
+        # U-023: ingredient / combined labels carry the CONTAINS line
+        if label_type in ("Ingredient", "Combined") and not self._confirm_allergen_label(
+                [self._collect_form_data()], "Print"):
+            return
+
         printer = self._resolve_printer("Print")
         if not printer:
             return
@@ -1702,7 +1795,9 @@ class AaojeeApp:
         self._open_single("_price_window", PriceChangeDialog)
 
     def _open_allergen_picker(self):
-        AllergenPicker(self.root, self._allergens_var.get(), self._allergens_var.set)
+        ingredients = " ".join(self._ingredients_text.get("1.0", "end-1c").split())
+        AllergenPicker(self.root, self._allergens_var.get(), self._allergens_var.set,
+                       ingredients=ingredients)
 
     def _on_export_price_list(self):
         path = filedialog.asksaveasfilename(
@@ -1811,6 +1906,13 @@ class AaojeeApp:
                     "These products have an invalid Barcode # and would print "
                     "without a barcode:\n\n" + "\n".join(bad), parent=window)
                 return []
+
+        # U-023: same allergen check as single printing
+        if not self._confirm_allergen_label(
+                [p for _, p, types, _ in jobs
+                 if any(t in ("Ingredient", "Combined") for t in types)],
+                "Print Queue", parent=window):
+            return []
 
         printer = self._resolve_printer("Print Queue")
         if not printer:
@@ -2267,7 +2369,7 @@ class SettingsDialog(tk.Toplevel):
         layout = ttk.Frame(f)
         layout.grid(row=9, column=1, **pad, sticky=tk.W)
         self._spacing_var = tk.StringVar(value=f"{float(settings.get('label_spacing', 1.0)):.2f}")
-        spacing = ttk.Spinbox(layout, textvariable=self._spacing_var, from_=0.5, to=3.0,
+        spacing = ttk.Spinbox(layout, textvariable=self._spacing_var, from_=0.5, to=MAX_LABEL_SPACING,
                               increment=0.25, width=6, format="%.2f")
         spacing.pack(side=tk.LEFT)
         _block_mousewheel(spacing)
@@ -2310,7 +2412,7 @@ class SettingsDialog(tk.Toplevel):
         s.show_address     = self._show_ad_var.get()
         s.set("show_combined_button", self._combined_var.get())
         s.set("print_at_printer_dpi", self._native_dpi_var.get())
-        for key, var, low, high in (("label_spacing", self._spacing_var, 0.5, 3.0),
+        for key, var, low, high in (("label_spacing", self._spacing_var, 0.5, MAX_LABEL_SPACING),
                                     ("label_margin_in", self._margin_var, 0.03, 0.25)):
             try:
                 s.set(key, max(low, min(high, float(var.get()))))

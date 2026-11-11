@@ -45,6 +45,9 @@ here.
 | U-020 | 2026-09-17 | U-006 / U-013 re-run on the store's database | Done: `september_store_copy/READY_FOR_STORE/products.db`, not yet installed | Put back the store's original file (see U-020) |
 | U-021 | 2026-09-17 | Make Aaojee labels scan in Square         | Test passed (GTIN); update file built 2026-09-22, not yet imported | Re-import `square_export_before_U-021.xlsx` rows (see U-021) |
 | U-022 | 2026-09-22 | Print Date always goes back to today      | Done, not yet built | `git revert` the U-022 commit |
+| U-023 | 2026-11-11 | **Allergen law (NY AML § 199-g)**: CONTAINS line on every product with ingredients | Data: **Live** (store database, 2026-11-11 13:40) · Code: not yet built | Data: `apply_allergens.py --undo`; code: `git revert` (not advised: the law requires the line) |
+| U-024 | 2026-11-11 | Owner's ingredient corrections (canola oil, hing with wheat shown, butter / ghee / egg noodles named, recipe fixes) | Data: **Live** (store database, 2026-11-11) | `apply_ingredient_fixes.py --undo` |
+| U-025 | 2026-11-11 | Sauces / pani puri masala written out from their packages; Golgappa water; Sooji Halwa order; label spacing capped at 2.5 | Data: **Live** (store database, 2026-11-11) · Spacing cap: not yet built | `apply_bought_in_ingredients.py --undo` |
 
 "Not yet built" means the source is changed but `AaojeeLabels.exe` hasn't been rebuilt with it.
 Update the status to **Live** once the new build is in use at the store.
@@ -486,6 +489,10 @@ weight text, at spacing 1.0 / 1.75 / 3.0 and 203 / 300 DPI:
 - **all existing labels are still pixel-identical** (4,721 renders).
 
 **Undo.** Clear the Allergens field on a product; its labels go back to exactly how they were.
+
+> **Changed by U-023 (2026-11-11).** The line now prints as `CONTAINS: MILK, CASHEWS`, tree nuts
+> must be named by kind (the "Tree Nuts" box is gone), and the field was filled in for every
+> product with ingredients, as New York law now requires. See U-023.
 
 ---
 
@@ -1052,6 +1059,253 @@ midnight either. Everyone after that printed with the wrong date unless they not
 
 ---
 
+### U-023 — Allergen labeling law: CONTAINS line on every product with ingredients
+
+**Why.** New York Agriculture and Markets Law **§ 199-g** (L. 2025, ch. 494) takes effect on
+**2026-11-12**: "Every food establishment shall label all prepackaged food with a written
+notification on the package or on a label attached to the package identifying any ingredient
+with which a product is made that constitutes a major food allergen." Prepackaged means
+prepared, prepacked and sold on the same premises, which covers everything the store cooks and
+packs before it is ordered. The Department of Agriculture and Markets guidance ("New Allergen
+Law.pdf", kept in the program folder on the store PC) allows two methods. The owner chose
+**Method 2**: one "Contains" statement right after or next to the ingredient list, naming
+**every** major allergen. An allergen missing from that line is a violation even if it is in
+the ingredient list. The ingredient text itself does not change.
+
+**Rules followed.** These come from FD&C Act § 403(w) and FDA's *Questions and Answers
+Regarding Food Allergens*, Edition 5 (Jan 2025). The PDF cites both, and NY enforces them
+through 1 NYCRR 259.1 and AML § 201.
+- **The nine:** milk, eggs, fish, crustacean shellfish, tree nuts, peanuts, wheat, soybeans,
+  sesame. Ingredients that contain their protein count too: ghee and butter are milk (Q&A
+  B.7); wheat flour inside a spice such as compounded hing is wheat (Q&A B.4); soy sauce is
+  soy and wheat.
+- **Named by kind:** tree nuts, fish and shellfish must be named specifically (Q&A C.5). Only
+  FDA's Table 1 nuts count: almond, Brazil nut, cashew, hazelnut, macadamia, pecan, pine nut,
+  pistachio, and the walnuts. **Coconut was removed in 2025**, and makhana, nutmeg and chestnut
+  are not on the list. Non-major allergens may not go in the Contains statement (Q&A C.8,
+  D.10).
+- **Same type size as the ingredient list** (Q&A D.6). "Contains" must start with a capital C
+  (D.7). The line is printed **bold, in the same font size as the ingredients**, in capitals
+  like the Department's own example: `CONTAINS: WHEAT, MILK, SESAME`.
+- **Highly refined oils are exempt.** Cold-pressed, expeller-pressed and unrefined peanut or
+  sesame oils are not (§ 199-g(1)(c)(ii)(A); PDF "Care needed").
+
+**Data: 68 products reviewed** (every active product with ingredient text on 2026-11-11; the
+backups confirm none was lost).
+- **46 get a CONTAINS line; 22 have none of the nine** (vegetable dishes and dals cooked in
+  oil). Each product's allergens and the reason are in
+  `data_changes/2026-11-11_U-023_allergens/apply_allergens.py` (`REVIEW`) and, after applying,
+  `allergen_review.csv`.
+- **Two independent passes.** A word-by-word review of every ingredient list, and the
+  program's own suggestion check (`allergen_hints`). They agree on 65 of 68. The other 3 are
+  hidden allergens the owner confirmed.
+- **Owner's answers (2026-11-11):**
+  - the store's hing contains wheat flour → **Wheat** on Aloo Sabzi, Gujarati Batata Ringer,
+    Gujrati Dal, Gujrati Khichdi, Kadhi Pakora, Lemon Rice, Samber;
+  - Hakka Noodles uses egg noodles → **Eggs**;
+  - Sooji Halwa is made with ghee and Pav Bhaji with butter, though their ingredient lists
+    don't say so → **Milk**;
+  - cooking oil: **Laxmi Canola Oil** about 99% of the time (label photo: ingredients "Canola
+    Oil"; canola is not a major allergen). **Laxmi Vegetable Oil** is used only once or twice a
+    year (label photo: ingredients "Soybean Oil"). Highly refined soybean oil is exempt, but
+    the label doesn't say "refined", so written confirmation is to be asked of House of Spices.
+    Until it arrives, dishes cooked in it should get Soybeans, or be cooked in canola.
+  - Both labels also say "produced in a facility that processes peanuts, tree nuts and soy".
+    That is cross-contact, which FDA says is **not** declared in a Contains statement (Q&A D.11).
+- **Applying it.** The script only changes a product whose ingredient text is still exactly
+  what was reviewed (fingerprint), never overwrites an Allergens value typed by hand, and stops
+  if any product with ingredients isn't in the review. It is tested on a copy of the store's
+  database:
+  - only `allergens` (and `updated_at`) change, on 46 products;
+  - `--check` passes;
+  - `--undo` puts every value back;
+  - each of the three stops triggers.
+
+**Program changes.**
+| File | Change |
+|------|--------|
+| `source/allergens.py` | Rewritten: the nine allergens, FDA's tree nut list, standard names (`soy` → Soybeans, `kaju` → Cashews, `ghee` → Milk), the law's order, `parse_allergens()`, `contains_line()`, `allergen_hints()` / `missing_allergens()` (suggestions from the ingredient words, with exceptions such as coconut milk, cream of wheat, rice flour, eggplant, nutmeg, refined oils), `label_problems()`. New picker: 6 boxes + 9 tree nut boxes + a box for fish / shellfish / other kinds, "From the ingredients … Tick these", a live "Will print" line; refuses broad or non-allergen names. |
+| `source/label_renderer.py` | `info_lines()` prints `CONTAINS: …` from `contains_line()`. **New `LabelTextDoesNotFit`**: if any ingredient or CONTAINS line would be cut off the label, the label is refused with a message, where it used to be clipped silently. With the real data nothing is refused at any spacing from 1.0 to 3.0, on any label size, at 150 / 203 / 600 DPI. |
+| `source/app_window.py` | Print card shows the CONTAINS line and a red "⚠ Allergen check" line; the same warning appears under Allergens on the Edit screen. Save refuses broad or non-allergen names (`_validate_form`) and offers to add allergens the ingredients point to (`_confirm_allergens`: Yes = add, No = save as is, Cancel). Printing ingredient / combined labels, and the Print Queue, ask first when a CONTAINS line looks incomplete (`_confirm_allergen_label`; default = don't print). Typed allergens are saved in standard form. |
+| `tests/test_allergens.py` | **New:** names, order, broad / non-allergen names, 25 tricky ingredient phrases, the 68-product review table, the fixture against the review. |
+| `tests/test_labels.py`, `tests/test_gui.py` | The CONTAINS format; real allergens fit every label at every resolution and spacing; same type size as the ingredients; too-long text is refused, not cut; Save / Print / Queue / picker behaviour (9 window tests). |
+| `tests/fixtures/products.json` | Filled in `allergens` for the fixture's 45 products with allergens (the reviewed values; SOYA PILAU's older text without paneer gets Soybeans). |
+| `tools/compare_labels.py` | The extra-lines sample uses `Milk, Cashews` (not the now-refused `Tree Nuts`). |
+| `run_tests.bat` | Fixed: a stray carriage-return byte had replaced `\r` in `tools\run_tests.py`, so double-clicking it never ran the tests; it now also finds Python through the `py` launcher, as `build.bat` does. |
+
+**Labels.** Of 4,457 checked renders, 337 changed, all intended: the ingredient and combined
+labels of products with allergens (`Contains: Milk` → `CONTAINS: MILK`, otherwise the same
+layout) and the extra-lines samples. No barcode label and no product without allergens
+changed. Committed with `ALLOW_LABEL_CHANGES=1` / `[label change]`.
+
+**Tested.**
+- 100 automated tests pass (26 new).
+- The data script was tested on a copy of the store's database (see above).
+- All 68 products were rendered with the store's settings on every label type and size at
+  150, 203 and 600 DPI: nothing is cut off, and the CONTAINS line is always the same size as
+  the ingredients.
+
+**Not covered by this upgrade (owner to decide).**
+- **Products without ingredient text are not covered.** 383 active products have no
+  ingredient text. Many are bought-in packaged goods, which carry the maker's label. But any
+  that the store **prepares or repacks** and sells prepackaged also need allergen labeling.
+  The owner confirmed that nothing made in the store is sold with only a barcode label: those
+  products get ingredient lists. A fill-in workbook, `data_changes/2026-11-11_U-023_allergens/
+  Ingredients to fill in (U-023).xlsx` (not in Git), lists 191 products in two groups.
+  - **Group 1, 137 products:** every "Best By" product, every "Sweets" product and every
+    uncategorised product without ingredients. Many uncategorised cooked dishes are set to
+    "Packed", e.g. CHILLI PANEER, GOBHI MANCHURIAN, VEG LO-MEIN, RAITA, AAOJEE SANDWICH,
+    FARRO SALAD (farro is wheat).
+  - **Group 2, 54 products:** dry goods and spices with an allergen word in the name.
+
+  The owner fills in the ingredients. The allergens are then worked out and applied the same
+  way as for the 68 products.
+  - Some are clearly allergen foods, e.g. PANEER TIKKA, PANEER KORMA, SPINACH CASHEW PILAF,
+    COLE SLAW (mayonnaise has egg), RAVA IDLI, RASMALAI, KAJU PISTA BURFI.
+  - 7 are a second barcode of a product that does have ingredients, e.g. GULAB JAMUN
+    559300 / 604600, MANGO MOUSSE 313900 / 100006, BESAN BURFI 606500.
+  - Nuts repacked into store bags (e.g. ALMOND, ROASTED PISTACHO) need a CONTAINS line too
+    unless the name already says the nut. FDA allows "almonds" in the name instead (Q&A D.2).
+
+  Their ingredients and allergens need typing in.
+- **Ingredient lists that look incomplete.** The CONTAINS line can only be as complete as what
+  the kitchen tells the program. Lists such as GOLGAPPA PANI ("MINT, CILENTRO"), MALABAR VEG
+  and the dishes cooked with ghee or butter that isn't listed (Sooji Halwa, Pav Bhaji) should
+  be completed.
+- **Bought-in ingredients.** The program can't see inside them: spice mixes, sauces, custard
+  powder, gelatin (fish gelatin would be an allergen), noodles, oils. Their package labels
+  should be checked whenever a supplier or brand changes.
+- **Barcode-only labels** have no CONTAINS line. A package that gets only a barcode label has
+  no allergen statement.
+
+**Data applied to the store's database** on 2026-11-11 at 13:40, with the program closed:
+- 46 products filled in;
+- `--check` passed;
+- only `allergens` and `updated_at` changed.
+
+The store's current `.exe` already prints them as a bold `Contains: …` line. The copy from
+just before is `data_changes/2026-11-11_U-023_allergens/products_before_U-023.db` (not in
+Git).
+
+**Install** (store PC, program closed):
+1. Install the new `AaojeeLabels.exe` (renaming the old one first).
+2. Run
+   `py data_changes\2026-11-11_U-023_allergens\apply_allergens.py --db "<program folder>\products.db"`
+   (dry run), then the same with `--apply`, then `--check`.
+
+The older `.exe` also prints the Contains line from the same data, as `Contains: Milk`, which
+is also compliant. So the data can go in first if needed.
+
+**Undo.**
+- Data: `apply_allergens.py --undo --db …` puts back every value not edited by hand since.
+  `products_before_U-023.db` (in the folder, not in Git) is the full copy from before.
+- Code: `git revert` the U-023 commit. This is not advised: the law requires the line.
+
+---
+
+### U-024 — Owner's ingredient corrections (after U-023)
+
+**Why.** After seeing U-023's proof, the owner asked for these changes on 2026-11-11:
+- Name the oil.
+- Put the reason for every hidden allergen into the ingredient list, so a CONTAINS item never
+  appears "without any context".
+- Fix several recipes.
+
+**Changes:** 56 products, 59 values. Every change and its reason is in
+`data_changes/2026-11-11_U-024_ingredient_fixes/planned_changes.json`.
+- **Oil → "Canola Oil"** in all 50 products that mention oil, including "Veg Oil" (SOYA PILAU)
+  and "Vegetable Oil" (SHAKKAR PARA). Per the owner, the kitchen uses Laxmi Canola Oil and
+  vegetable oil is not in use.
+- **Reasons for hidden allergens written in:**
+  - every "Asafoetida" → "Asafoetida (Wheat Flour)" (8 products);
+  - HAKKA NOODLES "Noodles" → "Egg Noodles";
+  - PAV BHAJI + Butter;
+  - SOOJI HALWA + Clarified Butter.
+- **Recipe fixes:**
+  - CHANA MASALA + Dry Fenugreek and Asafoetida (Wheat Flour) → now **CONTAINS: WHEAT**;
+  - GOLGAPPA PANI: CILENTRO → CILANTRO, + SPICES, TAMARIND, LEMON JUICE, GREEN CHILLIES;
+  - FRUIT CUSTARD: Assorted Fruits (Banana, Blueberry, Strawberry, Grape, Lychee, Mandarin
+    Orange, Pineapple);
+  - GAJJAR HALWA + Green Cardamom;
+  - PEAS PILAF − Almonds and VEG PILAF − Cashews → **no CONTAINS line** for either.
+- HAKKA NOODLES keeps SOYBEANS. It comes from the soy sauce, not from oil.
+
+**Result:** 68 products with ingredients; 45 have a CONTAINS line and 23 have none. Every allergen on
+every CONTAINS line is now named by a word in that product's ingredient list. The program's
+own suggestion check matches each line exactly. U-023 needed three owner-confirmed exceptions;
+none remain.
+
+**Safety and testing.**
+- A product changes only if its ingredients and allergens are still exactly the old values.
+- `--apply` saves `products_before_U-024.db` and writes `changes.csv`.
+- Tested on a copy of the store database: only `ingredients` (56), `allergens` (3) and
+  `updated_at` change; `--check` passes; `--undo` restores everything; an edit made in the
+  meantime stops it.
+- Every new text fits every label at 150, 203 and 600 DPI at spacings 1.0, 1.75 and 2.5.
+  This was checked with both the store's current `.exe` code and the new code. **Limit:** at
+  the maximum spacing 3.0, GUJRATI DAL's combined label is too long; the current `.exe`
+  would cut it and the new one refuses it. Keep Label spacing at 2.5 or less (the store uses
+  1.75).
+- U-023's `--check` now skips the products U-024 changed. U-024's `--check` covers all 68.
+
+**Applied** to the store's database on 2026-11-11 with the program closed. `--check` passed.
+
+**Followed by U-025** (the sauces and masala, Golgappa Pani water, Sooji Halwa order).
+New products and missing ingredient lists are being collected in the fill-in workbook
+(group 0: MANGO LASSI, new, and DAHI VADA ×3 barcodes).
+
+---
+
+### U-025 — Bought-in parts written out; Golgappa Pani water; Sooji Halwa order
+
+**Why.** The owner sent the ingredient lists from the packages (2026-11-11):
+- **Soy sauce:** Water, Soybeans, Sugar, Salt, Wheat Flour. Its label says "Contains: soy,
+  wheat, sulfites".
+- **Sriracha chilli sauce:** Chili, Sugar, Salt, Garlic, Acetic Acid, Potassium Sorbate and
+  Sodium Bisulfite as preservatives, Xanthan Gum. Its label says "Contains sulphite".
+- **MDH Pani Puri Masala:** 15 spices including Asafoetida. Its label says "may contain mustard".
+
+The owner also asked for water in Golgappa Pani, and for Sooji Halwa's order to be fixed.
+
+**Changes** (4 products; `data_changes/2026-11-11_U-025_bought_in_ingredients/`):
+- **HAKKA NOODLES, SCHEZWAN FRIED RICE:** "Chilli Sauce (…)" and "Soy Sauce (…)" with the
+  package ingredients in brackets. Their WHEAT and SOYBEANS are now explained on the label.
+  The CONTAINS lines are unchanged.
+- **GOLGAPPA PANI:**
+  - "Water" first;
+  - "Spices" became "Pani Puri Masala (…)" with MDH's ingredients;
+  - written in normal capitals instead of ALL CAPS, so it prints at 7.1 pt instead of 6 pt on
+    the 2.25 × 1.25 label;
+  - **CONTAINS: WHEAT**. MDH lists "Asafoetida" without saying whether it is cut with wheat,
+    so it is treated like the store's own hing. Remove it only if MDH confirms in writing that
+    theirs is wheat-free.
+- **SOOJI HALWA:** most to least by weight: Cream of Wheat, Sugar, Clarified Butter, Almonds,
+  Raisins, Cardamom, Saffron.
+- **Not on any CONTAINS line:** sulfites and mustard are not among the 9 major allergens (FDA
+  Q&A D.10). The sulfite stays visible as sodium bisulfite in the chilli sauce's brackets,
+  as on its label. The "may contain mustard" is a cross-contact advisory (Q&A D.11).
+
+**Label spacing capped at 2.5** (owner). `app_window.py`: `MAX_LABEL_SPACING = 2.5`. The
+Settings spinbox and Save stop at 2.5, and `_get_spacing()` never returns more, even if
+`settings.json` says otherwise. Above 2.5 the longest lists no longer fit the combined label.
+
+**Shared check:** `data_changes/review_chain.py`. When a later change corrects a product again,
+an earlier change's `--check` hands it over. **U-025's `--check` covers everything** (U-023 +
+U-024 + U-025).
+
+**Tested.**
+- On a copy of the store database: only those 4 products' `ingredients` (and GOLGAPPA PANI's
+  `allergens`) change; all three checks pass; `--undo` restores everything.
+- Every new text fits every label at 150, 203 and 600 DPI at spacings 1.0, 1.75 and 2.5, with
+  both the current `.exe` code and the new code.
+- `tests/test_allergens.py` covers the chain U-023 → U-024 → U-025.
+
+**Applied** to the store's database on 2026-11-11 with the program closed. Final `--check`:
+68 products with ingredients, 46 with a CONTAINS line, 22 without. Every allergen is named by
+a word in its ingredient list.
+
+---
+
 ## Rolling back
 
 **Undo the UI overhaul (U-014 – U-017), keeping everything else:** find the commit with
@@ -1120,4 +1374,8 @@ version ignores them.
       ran the tests.)
 - [ ] The product list shows **446** products. Search `LOBIA`: one product, barcode 100009, with
       ingredients. Search `ROCK SUGAR`: it's there (a cashier's product) (U-020).
+- [ ] Open MAKHANI PANEER: the card says `CONTAINS: MILK`; print one Ingredients label and one
+      Combined label and check the CONTAINS line is under the ingredients, bold (U-023).
+- [ ] Open ALOO MATTAR: no CONTAINS line and no warning (no major allergens) (U-023).
+- [ ] `apply_allergens.py --check --db …` says CHECK PASSED (U-023).
 - [ ] Update the Index statuses above to **Live**.

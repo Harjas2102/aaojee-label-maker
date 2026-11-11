@@ -13,7 +13,9 @@ FLAGS_ALL = dict(barcode=True, price=True, dollar_sign=True, date=True, address=
 FLAGS_NONE = dict(barcode=False, price=False, dollar_sign=False, date=False, address=False)
 VARIANTS = [("Barcode", "2.25x1.25"), ("Barcode", "2.25x3.00"), ("Ingredient", "2.25x1.25"),
             ("Ingredient", "2.25x3.00"), ("Combined", "2.25x3.00")]
-WORST_EXTRAS = {"allergens": "Milk, Eggs, Tree Nuts, Peanuts, Wheat, Soybeans, Sesame",
+# More allergens than any real product has (LADOO has 5), plus a long net weight
+WORST_EXTRAS = {"allergens": "Milk, Eggs, Almonds, Cashews, Pistachios, Peanuts, Wheat, "
+                             "Soybeans, Sesame",
                 "net_weight": "32 OZ (907 GM)"}
 
 
@@ -75,12 +77,15 @@ class TestBarcodesScan(unittest.TestCase):
 
 
 class TestInfoLines(unittest.TestCase):
-    """U-007 / U-008: Contains / Net Wt lines."""
+    """U-007 / U-008 / U-023: CONTAINS / Net Wt lines."""
 
     def test_info_lines(self):
         self.assertEqual(lr.info_lines({}), [])
         self.assertEqual(lr.info_lines({"allergens": " Milk ", "net_weight": "16 OZ"}),
-                         [("Contains: Milk", True), ("Net Wt: 16 OZ", False)])
+                         [("CONTAINS: MILK", True), ("Net Wt: 16 OZ", False)])
+        # U-023: standard names in the law's order, as in the state's example
+        self.assertEqual(lr.info_lines({"allergens": "kaju, soy, milk"}),
+                         [("CONTAINS: MILK, CASHEWS, SOYBEANS", True)])
 
     def test_lines_only_on_ingredient_and_combined(self):
         p = next(x for x in helpers.fixture_products() if x["name"] == "GUJRATI DAL")
@@ -91,38 +96,88 @@ class TestInfoLines(unittest.TestCase):
             self.assertEqual(same, lt == "Barcode", lt)
 
     def test_combined_never_runs_off_label(self):
+        """With far more allergens than any real product, the combined label fits at
+        the store's spacing (1.75) and below.  At the widest spacing (3.0) it may not:
+        it is then refused with a message (U-023) instead of cutting text off."""
         products = [p for p in helpers.fixture_products() if p["ingredients"]]
         for spacing in (1.0, 1.75, 3.0):
             for p in products:
                 with self.subTest(spacing=spacing, product=p["name"]):
-                    img = render(dict(p, **WORST_EXTRAS), "Combined", "2.25x3.00", dpi=203,
-                                 spacing=spacing)
+                    try:
+                        img = render(dict(p, **WORST_EXTRAS), "Combined", "2.25x3.00",
+                                     dpi=203, spacing=spacing)
+                    except lr.LabelTextDoesNotFit as e:
+                        self.assertGreater(spacing, 1.75)
+                        self.assertIn("Label spacing smaller", str(e))
+                        continue
                     self.assertLess(bottom_ink_row(img), img.height - 2)
 
+    def test_real_allergens_fit_at_every_spacing(self):
+        """Every real CONTAINS line fits every label at every spacing setting."""
+        for spacing in (1.0, 3.0):
+            for p in [x for x in helpers.fixture_products() if x["allergens"]]:
+                for lt, size in (("Ingredient", "2.25x1.25"), ("Combined", "2.25x3.00")):
+                    with self.subTest(spacing=spacing, product=p["name"], label=lt):
+                        img = render(p, lt, size, dpi=203, spacing=spacing)
+                        self.assertLess(bottom_ink_row(img), img.height - 2)
+
     def test_no_ingredient_text_dropped(self):
+        """Text that doesn't fit raises LabelTextDoesNotFit (U-023), so a render
+        that returns has every ingredient and the whole CONTAINS line."""
+        refused = []
+        for p in [x for x in helpers.fixture_products() if x["ingredients"]]:
+            for lt, size in (("Combined", "2.25x3.00"), ("Ingredient", "2.25x1.25")):
+                try:
+                    render(dict(p, **WORST_EXTRAS), lt, size, dpi=203)
+                except lr.LabelTextDoesNotFit:
+                    refused.append((p["name"], lt))
+        self.assertEqual(refused, [])
+
+    def test_real_allergens_fit_every_label_at_every_resolution(self):
+        """U-023: every product's real CONTAINS line, on every label that shows it,
+        on screen (150), at the store printers' 203 DPI and the 600 DPI fallback."""
+        products = [p for p in helpers.fixture_products() if p["allergens"]]
+        self.assertGreaterEqual(len(products), 40)
+        for p in products:
+            for lt, size in (("Ingredient", "2.25x1.25"), ("Ingredient", "2.25x3.00"),
+                             ("Combined", "2.25x3.00")):
+                for dpi in (150, 203, 600):
+                    with self.subTest(product=p["name"], label=lt, size=size, dpi=dpi):
+                        with_line = render(p, lt, size, dpi=dpi)
+                        without = render(dict(p, allergens=""), lt, size, dpi=dpi)
+                        self.assertNotEqual(with_line.tobytes(), without.tobytes())
+                        if lt == "Combined":
+                            self.assertLess(bottom_ink_row(with_line), with_line.height - 2)
+
+    def test_contains_line_same_size_as_ingredients(self):
+        """FDA: the CONTAINS statement is in the same type size as the ingredient list."""
+        p = next(x for x in helpers.fixture_products() if x["name"] == "LADOO")
+        seen = []
         orig = lr._draw_ingredients_block
-        truncated = []
 
         def spy(draw, ingredients, ing_fnt, prefix_fnt, y, w_px, content_w, margin, dpi,
                 max_y=None, extras=()):
-            lines = (len(lr._wrap_text("Ingredients : " + ingredients, ing_fnt, content_w, draw))
-                     if ingredients else 0)
-            lines += sum(len(lr._wrap_text(t, f, content_w, draw)) for t, f in extras)
-            _, lh = lr._text_size(draw, "Ay", ing_fnt)
-            end = orig(draw, ingredients, ing_fnt, prefix_fnt, y, w_px, content_w, margin, dpi,
-                       max_y=max_y, extras=extras)
-            if end - y < lines * (lh + 1):
-                truncated.append(ingredients[:30])
-            return end
+            seen.append((ing_fnt.size, [f.size for _, f in extras], [t for t, _ in extras]))
+            return orig(draw, ingredients, ing_fnt, prefix_fnt, y, w_px, content_w, margin, dpi,
+                        max_y=max_y, extras=extras)
 
         lr._draw_ingredients_block = spy
         try:
-            for p in [x for x in helpers.fixture_products() if x["ingredients"]]:
-                for lt, size in (("Combined", "2.25x3.00"), ("Ingredient", "2.25x1.25")):
-                    render(dict(p, **WORST_EXTRAS), lt, size, dpi=203)
+            for lt, size in (("Ingredient", "2.25x1.25"), ("Combined", "2.25x3.00")):
+                render(p, lt, size, dpi=203)
         finally:
             lr._draw_ingredients_block = orig
-        self.assertEqual(truncated, [])
+        for ing_size, extra_sizes, texts in seen:
+            self.assertEqual(texts, ["CONTAINS: MILK, ALMONDS, CASHEWS, WHEAT, SESAME"])
+            self.assertEqual(extra_sizes, [ing_size])
+
+    def test_text_that_cannot_fit_is_refused_not_cut(self):
+        p = next(x for x in helpers.fixture_products() if x["name"] == "GUJRATI DAL")
+        huge = dict(p, ingredients=", ".join(["Pigeon Peas Lentils, Tamarind, Jaggery"] * 40))
+        with self.assertRaises(lr.LabelTextDoesNotFit) as caught:
+            render(huge, "Ingredient", "2.25x1.25", dpi=203)
+        self.assertIn("Print Combined", str(caught.exception))
+        self.assertIsInstance(caught.exception, RuntimeError)   # shown as a print error
 
 
 class TestDates(unittest.TestCase):

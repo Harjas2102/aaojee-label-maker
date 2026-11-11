@@ -22,7 +22,26 @@ from typing import Any
 
 from PIL import Image, ImageDraw, ImageFont
 
+from allergens import contains_line
 from barcode_engine import draw_barcode, pad_barcode, QUIET_MODULES
+
+
+class LabelTextDoesNotFit(RuntimeError):
+    """The ingredient list with its CONTAINS / Net Wt lines can't fit on the
+    label even at the smallest font.  Text used to be cut off silently; a
+    label missing ingredients or allergens can't be sold (U-023), so the
+    label is refused instead and nothing is printed."""
+
+    def __init__(self, label_type: str = "", label_size: str = ""):
+        if label_type == "Ingredient" and label_size == "2.25x1.25":
+            fix = ("Use the 2.25\" × 3.00\" label: Print Combined, or change the label "
+                   "size to 2.25 x 3.00 in Settings → Settings….")
+        else:
+            fix = "Make the Label spacing smaller in Settings → Settings…."
+        super().__init__(
+            "The full ingredient list and CONTAINS line don't fit on this label, even in "
+            "the smallest print, so nothing was printed (text would have been cut off)."
+            f"\n\n{fix}")
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Constants
@@ -314,12 +333,14 @@ def _fit_font(draw, text: str, family: str, start_pt: int, stop_pt: int,
 
 def info_lines(product: dict) -> list[tuple[str, bool]]:
     """Lines printed after the ingredients, as (text, bold):
-    the allergen line (U-007) and the net weight (U-008).  Empty fields add
-    nothing, so labels for products without them are unchanged."""
+    the allergen line (U-007; "CONTAINS: MILK, CASHEWS" since U-023) and the
+    net weight (U-008).  Empty fields add nothing, so labels for products
+    without them are unchanged.  The CONTAINS line is printed in the same
+    type size as the ingredient list, as FDA requires."""
     lines = []
-    allergens = (product.get("allergens") or "").strip()
+    allergens = contains_line(product.get("allergens"))
     if allergens:
-        lines.append((f"Contains: {allergens}", True))
+        lines.append((allergens, True))
     net_weight = (product.get("net_weight") or "").strip()
     if net_weight:
         lines.append((f"Net Wt: {net_weight}", False))
@@ -434,6 +455,19 @@ def render_label(
         return px
 
     # ── Dispatch to layout functions ─────────────────────────────────────────
+    try:
+        return _render_layout(img, draw, product, label_type, pack_date, show_flags,
+                              font_settings, fs, w_px, h_px, margin, content_w,
+                              address_line, bestby_offset, dpi, gap, module_px)
+    except LabelTextDoesNotFit:
+        raise LabelTextDoesNotFit(label_type, label_size) from None
+
+
+def _render_layout(img, draw, product, label_type, pack_date, show_flags, font_settings, fs,
+                   w_px, h_px, margin, content_w, address_line, bestby_offset, dpi, gap,
+                   module_px) -> Image.Image:
+    """Draw *label_type* onto *img* (a new image if the combined label has to be
+    laid out a second time) and return it."""
     if label_type == "Combined":
         overflow, block_used, block_room = _layout_combined(
             draw, product, pack_date, show_flags, font_settings, fs, w_px, h_px, margin,
@@ -765,8 +799,10 @@ def _draw_ingredients_block(draw, ingredients, ing_fnt, prefix_fnt,
                              extras: list[tuple[str, Any]] = ()) -> int:
     """Draw the 'Ingredients : …' block.  'Ingredients' is underlined.
     *extras* are (text, font) info lines drawn centred underneath
-    ("Contains: …", "Net Wt: …").
-    Lines that would exceed *max_y* are silently clipped (not drawn).
+    ("CONTAINS: …", "Net Wt: …").
+    If any line would go past *max_y*, LabelTextDoesNotFit is raised: the
+    label must never print with part of the ingredients or allergens missing
+    (U-023; lines used to be clipped silently).
     Returns y after the block."""
 
     prefix  = "Ingredients : "
@@ -777,9 +813,9 @@ def _draw_ingredients_block(draw, ingredients, ing_fnt, prefix_fnt,
     _, lh   = _text_size(draw, "Ay", ing_fnt)
 
     for i, line in enumerate(lines):
-        # Stop drawing if we would exceed the allowed area
+        # Never leave part of the ingredient list off the label (U-023)
         if max_y is not None and y + lh > max_y:
-            break
+            raise LabelTextDoesNotFit()
         if i == 0:
             # On the first line, underline only the word "Ingredients"
             pw, _ = _text_size(draw, "Ingredients", prefix_fnt)
@@ -798,7 +834,7 @@ def _draw_ingredients_block(draw, ingredients, ing_fnt, prefix_fnt,
     for text, fnt in extras:
         for line in _wrap_text(text, fnt, content_w, draw):
             if max_y is not None and y + lh > max_y:
-                return y
+                raise LabelTextDoesNotFit()
             _draw_text_centred(draw, line, fnt, y, w_px)
             y += lh + 1
 

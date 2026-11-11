@@ -70,14 +70,21 @@ in LF, on every computer. Don't change that; a `.bat` with the wrong endings sil
 | File | Checks |
 |------|--------|
 | `tests/test_barcode.py` | All 1,000,000 six-digit barcodes encode exactly as the store's labels do (compared with a recorded fingerprint); the POS reference products; right-padding; every format a scanner can send |
-| `tests/test_labels.py` | Every product in every label type and size renders; barcodes decode back to the right number at 203 and 300 DPI; the Contains / Net Wt lines never run off the label or drop ingredient text; tiny font sizes don't crash |
+| `tests/test_labels.py` | Every product in every label type and size renders; barcodes decode back to the right number at 203 and 300 DPI; the CONTAINS / Net Wt lines never run off the label or drop ingredient text, and are the ingredients' type size; text that can't fit is refused (`LabelTextDoesNotFit`), never cut; tiny font sizes don't crash |
+| `tests/test_allergens.py` | U-023 allergen rules: standard names and the law's order, broad / non-allergen names refused, suggestions from ingredient words (coconut milk, cream of wheat, rice flour, refined oils…), the 68-product review in `data_changes/2026-11-11_U-023_allergens/` |
 | `tests/test_database.py` | Saving, searching, schema upgrade (with backup), Trash, print and price history, backup / export / restore, backup rotation |
 | `tests/test_modules.py` | Settings, importer, print queue, manager PIN, price rounding, categories |
 | `tests/test_gui.py` | The real window: both screens and the PIN, keyboard printing, scanning, unsaved-changes prompts, editing, duplicate, Trash, printing at printer DPI, print history, preview, price tools, sorting and filters |
 
 The tests use `tests/fixtures/products.json`, a copy of the product list taken on 2026-09-17, in
-temporary folders. **They never touch the live `products.db`.** Refresh the fixture only on
-purpose; the label check below compares against it.
+temporary folders. Its `allergens` were filled in from the U-023 review on 2026-11-11.
+**They never touch the live `products.db`.** Refresh the fixture only on purpose; the label
+check below compares against it.
+
+**Allergens (U-023).** Every product with ingredients must have its Allergens decided: the
+CONTAINS line is a legal requirement in New York from 2026-11-12. A new data change that adds
+ingredients must also set allergens, and `allergen_hints()` / `missing_allergens()` in
+`source/allergens.py` are the check to run.
 
 ### How to run them
 

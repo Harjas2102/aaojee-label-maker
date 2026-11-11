@@ -1,0 +1,506 @@
+[
+ {
+  "id": 139,
+  "name": "ALOO MATTAR",
+  "old_ingredients": "Potato, Peas, Ginger, Garlic, Fenugreek, Tomatoes, Cilantro Salt, Onions, Oil & Spices",
+  "new_ingredients": "Potato, Peas, Ginger, Garlic, Fenugreek, Tomatoes, Cilantro Salt, Onions, Canola Oil & Spices",
+  "old_allergens": "",
+  "new_allergens": "",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 217,
+  "name": "ALOO SABZI",
+  "old_ingredients": "Potatoes, Tomatoes, Cumin, Cilantro, Salt, Ginger, Chillis, Curry Leaves, Asafoetida, Oil & Spices",
+  "new_ingredients": "Potatoes, Tomatoes, Cumin, Cilantro, Salt, Ginger, Chillis, Curry Leaves, Asafoetida (Wheat Flour), Canola Oil & Spices",
+  "old_allergens": "Wheat",
+  "new_allergens": "Wheat",
+  "why": "oil is canola oil; hing contains wheat flour (shown in brackets) (owner, 2026-11-11)"
+ },
+ {
+  "id": 442,
+  "name": "ALSI PINNI",
+  "old_ingredients": "Flex Seed, Chickpea Flour, Clarified Butter, Almonds, Raisins, Cashews, Coconut Powder, Fennel Powder, Oil & Sugar",
+  "new_ingredients": "Flex Seed, Chickpea Flour, Clarified Butter, Almonds, Raisins, Cashews, Coconut Powder, Fennel Powder, Canola Oil & Sugar",
+  "old_allergens": "Milk, Almonds, Cashews",
+  "new_allergens": "Milk, Almonds, Cashews",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 122,
+  "name": "BAINGAN ALOO",
+  "old_ingredients": "Eggplant, Potatoes, Tomatoes, Ginger, Garlic, Cilantro, Salt, Oil & Spices",
+  "new_ingredients": "Eggplant, Potatoes, Tomatoes, Ginger, Garlic, Cilantro, Salt, Canola Oil & Spices",
+  "old_allergens": "",
+  "new_allergens": "",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 11,
+  "name": "BAINGAN BHARTHA",
+  "old_ingredients": "Eggplant, Green Peas, Tomatoes, Cilantro, Salt, Ginger, Onions, Oil & Spices",
+  "new_ingredients": "Eggplant, Green Peas, Tomatoes, Cilantro, Salt, Ginger, Onions, Canola Oil & Spices",
+  "old_allergens": "",
+  "new_allergens": "",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 255,
+  "name": "BESAN BURFI",
+  "old_ingredients": "chickpea flour, Clarified Butter, cardamom, almonds, Oil & Sugar",
+  "new_ingredients": "chickpea flour, Clarified Butter, cardamom, almonds, Canola Oil & Sugar",
+  "old_allergens": "Milk, Almonds",
+  "new_allergens": "Milk, Almonds",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 211,
+  "name": "BESAN PINNI",
+  "old_ingredients": "Chickpea Flour, Clarified Butter, Almonds, Raisins, Cashews, Coconut Powder, Fennel Powder, Oil & Sugar",
+  "new_ingredients": "Chickpea Flour, Clarified Butter, Almonds, Raisins, Cashews, Coconut Powder, Fennel Powder, Canola Oil & Sugar",
+  "old_allergens": "Milk, Almonds, Cashews",
+  "new_allergens": "Milk, Almonds, Cashews",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 121,
+  "name": "BHINDI ALOO",
+  "old_ingredients": "Okra, Potato, Tomato, Carrom seed, tumeric, onions, spieces, salt & oil",
+  "new_ingredients": "Okra, Potato, Tomato, Carrom seed, tumeric, onions, spieces, salt & canola oil",
+  "old_allergens": "",
+  "new_allergens": "",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 126,
+  "name": "BHINDI MASALA",
+  "old_ingredients": "Okra, Tomatoes, Carrom seed, Turmeric, Onions, Salt, Oil & Spices",
+  "new_ingredients": "Okra, Tomatoes, Carrom seed, Turmeric, Onions, Salt, Canola Oil & Spices",
+  "old_allergens": "",
+  "new_allergens": "",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 116,
+  "name": "CHANA MASALA",
+  "old_ingredients": "Chickpeas, Ginger, tamarind, Cumin, caromseed, Tomatoes, Cilantro, Salt, Oil & spices",
+  "new_ingredients": "Chickpeas, Ginger, tamarind, Cumin, caromseed, Tomatoes, Cilantro, Salt, Dry Fenugreek, Asafoetida (Wheat Flour), Canola Oil & spices",
+  "old_allergens": "",
+  "new_allergens": "Wheat",
+  "why": "oil is canola oil; added dry fenugreek and asafoetida (owner, 2026-11-11)"
+ },
+ {
+  "id": 105,
+  "name": "CHANNA DAL COOKED",
+  "old_ingredients": "Chickpea Lentils, Ginger Garlic, Cumin, Tomatoes, Cilantro, Salt, Oil & Spices",
+  "new_ingredients": "Chickpea Lentils, Ginger Garlic, Cumin, Tomatoes, Cilantro, Salt, Canola Oil & Spices",
+  "old_allergens": "",
+  "new_allergens": "",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 178,
+  "name": "FRUIT CUSTARD",
+  "old_ingredients": "Milk, Custard Powder, Assorted Fruits, Sugar, and Vanilla",
+  "new_ingredients": "Milk, Custard Powder, Assorted Fruits (Banana, Blueberry, Strawberry, Grape, Lychee, Mandarin Orange, Pineapple), Sugar, and Vanilla",
+  "old_allergens": "Milk",
+  "new_allergens": "Milk",
+  "why": "listed the fruits (owner, 2026-11-11)"
+ },
+ {
+  "id": 119,
+  "name": "GAJJAR HALWA",
+  "old_ingredients": "Carrots, Milk, Cashews, Pistachio, Clarified butter & Sugar",
+  "new_ingredients": "Carrots, Milk, Cashews, Pistachio, Clarified butter, Sugar & Green Cardamom",
+  "old_allergens": "Milk, Cashews, Pistachios",
+  "new_allergens": "Milk, Cashews, Pistachios",
+  "why": "added green cardamom (owner, 2026-11-11)"
+ },
+ {
+  "id": 106,
+  "name": "GOBHI ALOO",
+  "old_ingredients": "Cauliflower, Potato, Tomato, Ginger, Garlic, Cilantro, Salt, Turmeric, Oil & Spices",
+  "new_ingredients": "Cauliflower, Potato, Tomato, Ginger, Garlic, Cilantro, Salt, Turmeric, Canola Oil & Spices",
+  "old_allergens": "",
+  "new_allergens": "",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 433,
+  "name": "GOLGAPPA PANI",
+  "old_ingredients": "MINT, CILENTRO",
+  "new_ingredients": "MINT, CILANTRO, SPICES, TAMARIND, LEMON JUICE, GREEN CHILLIES",
+  "old_allergens": "",
+  "new_allergens": "",
+  "why": "spelling of cilantro; added spices, tamarind, lemon juice, green chillies (owner, 2026-11-11)"
+ },
+ {
+  "id": 201,
+  "name": "GUJARATI BATATA RINGER",
+  "old_ingredients": "Eggplant, Jaggery, Tamarind, Mustard Seeds, Cumin, Tomatoes, Cilantro, Salt, Ginger, Green Chillis, Curry Leaves, Asafoetida, Oil & Spices",
+  "new_ingredients": "Eggplant, Jaggery, Tamarind, Mustard Seeds, Cumin, Tomatoes, Cilantro, Salt, Ginger, Green Chillis, Curry Leaves, Asafoetida (Wheat Flour), Canola Oil & Spices",
+  "old_allergens": "Wheat",
+  "new_allergens": "Wheat",
+  "why": "oil is canola oil; hing contains wheat flour (shown in brackets) (owner, 2026-11-11)"
+ },
+ {
+  "id": 144,
+  "name": "GUJRATI DAL",
+  "old_ingredients": "Pigeon Peas Lentils, Tamarind, Jaggery, Mustard seeds, Tomatoes, Salt, Ginger, Lemon Juice, Green Chilli, Curry Leaves, Asafoetida, Oil & Spices",
+  "new_ingredients": "Pigeon Peas Lentils, Tamarind, Jaggery, Mustard seeds, Tomatoes, Salt, Ginger, Lemon Juice, Green Chilli, Curry Leaves, Asafoetida (Wheat Flour), Canola Oil & Spices",
+  "old_allergens": "Wheat",
+  "new_allergens": "Wheat",
+  "why": "oil is canola oil; hing contains wheat flour (shown in brackets) (owner, 2026-11-11)"
+ },
+ {
+  "id": 292,
+  "name": "GUJRATI KHICHDI",
+  "old_ingredients": "Rice, Split Pigeon Peas, Mustard Seeds, Turmeric, Mix Vegetable, Salt, Asafoetida, Whole Red Chilli, Curry Leaves, Oil & Spices",
+  "new_ingredients": "Rice, Split Pigeon Peas, Mustard Seeds, Turmeric, Mix Vegetable, Salt, Asafoetida (Wheat Flour), Whole Red Chilli, Curry Leaves, Canola Oil & Spices",
+  "old_allergens": "Wheat",
+  "new_allergens": "Wheat",
+  "why": "oil is canola oil; hing contains wheat flour (shown in brackets) (owner, 2026-11-11)"
+ },
+ {
+  "id": 162,
+  "name": "GULAB JAMUN",
+  "old_ingredients": "Sugar, Milk Solids, Oil, Cardamom, Paneer, Vinegar, Flour, Citric Acid, Saffron",
+  "new_ingredients": "Sugar, Milk Solids, Canola Oil, Cardamom, Paneer, Vinegar, Flour, Citric Acid, Saffron",
+  "old_allergens": "Milk, Wheat",
+  "new_allergens": "Milk, Wheat",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 118,
+  "name": "HAKKA NOODLES",
+  "old_ingredients": "Noodles, Carrots, Onions, Cabbage, Bell Pepper, Vinegar, Chilly Sauce, Soy Sauce, MSG, Salt & Oil",
+  "new_ingredients": "Egg Noodles, Carrots, Onions, Cabbage, Bell Pepper, Vinegar, Chilly Sauce, Soy Sauce, MSG, Salt & Canola Oil",
+  "old_allergens": "Eggs, Wheat, Soybeans",
+  "new_allergens": "Eggs, Wheat, Soybeans",
+  "why": "oil is canola oil; egg noodles (the reason for EGGS) (owner, 2026-11-11)"
+ },
+ {
+  "id": 156,
+  "name": "IDLI",
+  "old_ingredients": "Rice Flour, Lentils Flour, Salt, Fenugreek Powder, Sodium Bicarbonate & Oil",
+  "new_ingredients": "Rice Flour, Lentils Flour, Salt, Fenugreek Powder, Sodium Bicarbonate & Canola Oil",
+  "old_allergens": "",
+  "new_allergens": "",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 163,
+  "name": "KADAHI PANEER",
+  "old_ingredients": "Green Peppers, panir, Fenugreek, Tomatoes, Ginger, Onion, Garlic, Cilantro, Salt, Oil & Spices",
+  "new_ingredients": "Green Peppers, panir, Fenugreek, Tomatoes, Ginger, Onion, Garlic, Cilantro, Salt, Canola Oil & Spices",
+  "old_allergens": "Milk",
+  "new_allergens": "Milk",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 360,
+  "name": "KADHAI MUSHROOM",
+  "old_ingredients": "Green Peppers, Mushrooms, Fenugreek, Tomatoes, Ginger, Onion, Garlic, Cilantro, Salt, Oil & Spices",
+  "new_ingredients": "Green Peppers, Mushrooms, Fenugreek, Tomatoes, Ginger, Onion, Garlic, Cilantro, Salt, Canola Oil & Spices",
+  "old_allergens": "",
+  "new_allergens": "",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 152,
+  "name": "KADHI PAKORA",
+  "old_ingredients": "Yogurt, Chickpea Flour, Onions, Cumin, Mustard Seed, Fenugreek, Coriander, Seeded Chili, Curry leaves & Asafoetida, Oil & Spices",
+  "new_ingredients": "Yogurt, Chickpea Flour, Onions, Cumin, Mustard Seed, Fenugreek, Coriander, Seeded Chili, Curry leaves & Asafoetida (Wheat Flour), Canola Oil & Spices",
+  "old_allergens": "Milk, Wheat",
+  "new_allergens": "Milk, Wheat",
+  "why": "oil is canola oil; hing contains wheat flour (shown in brackets) (owner, 2026-11-11)"
+ },
+ {
+  "id": 115,
+  "name": "KALA CHANNA COOKED",
+  "old_ingredients": "Bengal Grams, Ginger, Green Chilli, Cumin, Dry Mango Powder, Tomatoes, Cilantro, Salt, Oil & Spices",
+  "new_ingredients": "Bengal Grams, Ginger, Green Chilli, Cumin, Dry Mango Powder, Tomatoes, Cilantro, Salt, Canola Oil & Spices",
+  "old_allergens": "",
+  "new_allergens": "",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 111,
+  "name": "KARELA ALOO",
+  "old_ingredients": "Bitter Gourd, Potatoes, Ginger, Garlic, Fenugreek, Tomatoes, Cilantro, Salt, Oil & Spices",
+  "new_ingredients": "Bitter Gourd, Potatoes, Ginger, Garlic, Fenugreek, Tomatoes, Cilantro, Salt, Canola Oil & Spices",
+  "old_allergens": "",
+  "new_allergens": "",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 158,
+  "name": "LEMON RICE",
+  "old_ingredients": "Basmati Rice, Cashews, Mustard Seeds, Lentils, Turmeric, Curry Leaves, Lemon Juice, Asafoetida, Salt, Oil & Spices",
+  "new_ingredients": "Basmati Rice, Cashews, Mustard Seeds, Lentils, Turmeric, Curry Leaves, Lemon Juice, Asafoetida (Wheat Flour), Salt, Canola Oil & Spices",
+  "old_allergens": "Cashews, Wheat",
+  "new_allergens": "Cashews, Wheat",
+  "why": "oil is canola oil; hing contains wheat flour (shown in brackets) (owner, 2026-11-11)"
+ },
+ {
+  "id": 441,
+  "name": "LOBIA RASMISSA",
+  "old_ingredients": "Black eye beans, ginger, Garlic, onions, spieces, salt tomatoes & oil",
+  "new_ingredients": "Black eye beans, ginger, Garlic, onions, spieces, salt tomatoes & canola oil",
+  "old_allergens": "",
+  "new_allergens": "",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 382,
+  "name": "MAKHANI DAL",
+  "old_ingredients": "Black Lentil, Kidney Beans, Ginger, Garlic, Fenugreek, Butter, Heavy Cream, Salt, Oil & Spices",
+  "new_ingredients": "Black Lentil, Kidney Beans, Ginger, Garlic, Fenugreek, Butter, Heavy Cream, Salt, Canola Oil & Spices",
+  "old_allergens": "Milk",
+  "new_allergens": "Milk",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 103,
+  "name": "MAKHANI PANEER",
+  "old_ingredients": "Paneer Cheese, Tomato, Ginger, Garlic, Fenugreek, Butter, Sugar, Onions, Heavy Cream, Salt, Oil & Spices",
+  "new_ingredients": "Paneer Cheese, Tomato, Ginger, Garlic, Fenugreek, Butter, Sugar, Onions, Heavy Cream, Salt, Canola Oil & Spices",
+  "old_allergens": "Milk",
+  "new_allergens": "Milk",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 243,
+  "name": "MAKHANI SAUCE",
+  "old_ingredients": "Tomato, Ginger, Garlic, Fenugreek, Butter, Sugar, Onions, Heavy Cream, Salt, Oil & Spices",
+  "new_ingredients": "Tomato, Ginger, Garlic, Fenugreek, Butter, Sugar, Onions, Heavy Cream, Salt, Canola Oil & Spices",
+  "old_allergens": "Milk",
+  "new_allergens": "Milk",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 10,
+  "name": "MALAI KOFTA",
+  "old_ingredients": "Cottage cheese, Tomatoes, Ginger, Garlic, Fenugreek, Butter, Heavy Cream, Salt, Onions, Potatoes, Oil & Spices",
+  "new_ingredients": "Cottage cheese, Tomatoes, Ginger, Garlic, Fenugreek, Butter, Heavy Cream, Salt, Onions, Potatoes, Canola Oil & Spices",
+  "old_allergens": "Milk",
+  "new_allergens": "Milk",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 128,
+  "name": "MATTAR PANEER",
+  "old_ingredients": "Cottage Cheese, Peas, Ginger, Cashew, Makhana, Garlic, Fenugreek, Tomatoes, Cilantro, Salt, Onions, Oil & Spices",
+  "new_ingredients": "Cottage Cheese, Peas, Ginger, Cashew, Makhana, Garlic, Fenugreek, Tomatoes, Cilantro, Salt, Onions, Canola Oil & Spices",
+  "old_allergens": "Milk, Cashews",
+  "new_allergens": "Milk, Cashews",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 123,
+  "name": "MIX VEG",
+  "old_ingredients": "Cauliflower, Potatoes, Eggplant, Carrot, Bell Pepper, Peas, Ginger, Garlic, Fenugreek, Tomatoes, Cilantro, Salt, Oil & Spices",
+  "new_ingredients": "Cauliflower, Potatoes, Eggplant, Carrot, Bell Pepper, Peas, Ginger, Garlic, Fenugreek, Tomatoes, Cilantro, Salt, Canola Oil & Spices",
+  "old_allergens": "",
+  "new_allergens": "",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 129,
+  "name": "MIX VEG MAKHANI",
+  "old_ingredients": "Cottage Cheese, Tomatoes, Ginger Garlic, Fenugreek, Butter, Heavy Cream, Mushroom, Cashew, Carrot, Peas, Bell Pepper, Makhana, Salt, Oil & Spices",
+  "new_ingredients": "Cottage Cheese, Tomatoes, Ginger Garlic, Fenugreek, Butter, Heavy Cream, Mushroom, Cashew, Carrot, Peas, Bell Pepper, Makhana, Salt, Canola Oil & Spices",
+  "old_allergens": "Milk, Cashews",
+  "new_allergens": "Milk, Cashews",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 49,
+  "name": "MOONG DAL",
+  "old_ingredients": "Moong Lentils, Ginger Garlic, Cumin, Tomatoes, Cilantro, Salt, Oil & Spices",
+  "new_ingredients": "Moong Lentils, Ginger Garlic, Cumin, Tomatoes, Cilantro, Salt, Canola Oil & Spices",
+  "old_allergens": "",
+  "new_allergens": "",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 444,
+  "name": "MORIYO",
+  "old_ingredients": "Moriyo (Samo), Potatoes, Curry Leaves, Cumin Seeds, Cilantro, Red Whole Chilli, Salt, Sugar, Cashews, Lemon Juice, Ginger, Green Chilli & Oil",
+  "new_ingredients": "Moriyo (Samo), Potatoes, Curry Leaves, Cumin Seeds, Cilantro, Red Whole Chilli, Salt, Sugar, Cashews, Lemon Juice, Ginger, Green Chilli & Canola Oil",
+  "old_allergens": "Cashews",
+  "new_allergens": "Cashews",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 173,
+  "name": "NAVRATAN KORMA",
+  "old_ingredients": "Mix Veggies, Potatoes, Onions, Ginger, Garlic, Cilantro, Heavy Cream, Tomatoes, Makhana, Oil & Spices",
+  "new_ingredients": "Mix Veggies, Potatoes, Onions, Ginger, Garlic, Cilantro, Heavy Cream, Tomatoes, Makhana, Canola Oil & Spices",
+  "old_allergens": "Milk",
+  "new_allergens": "Milk",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 131,
+  "name": "PALAK PANEER",
+  "old_ingredients": "Spinach, Cheese, Tomatoes, Ginger, Garlic, Fenugreek, Butter, Heavy Cream, Salt, Spinach, Oil & Spices",
+  "new_ingredients": "Spinach, Cheese, Tomatoes, Ginger, Garlic, Fenugreek, Butter, Heavy Cream, Salt, Spinach, Canola Oil & Spices",
+  "old_allergens": "Milk",
+  "new_allergens": "Milk",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 9,
+  "name": "PANEER BHURJI",
+  "old_ingredients": "Cottage Cheese, Peas, Tomatoes, Ginger, Garlic, Fenugreek, Cilantro, Salt, Onion, Oil & Spices",
+  "new_ingredients": "Cottage Cheese, Peas, Tomatoes, Ginger, Garlic, Fenugreek, Cilantro, Salt, Onion, Canola Oil & Spices",
+  "old_allergens": "Milk",
+  "new_allergens": "Milk",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 194,
+  "name": "PAV BHAJI",
+  "old_ingredients": "Cauliflower, Cabbage, Green Peas, Eggplant, Potatoes, Tomatoes, Cilantro, Salt, Oil & Spices",
+  "new_ingredients": "Cauliflower, Cabbage, Green Peas, Eggplant, Potatoes, Tomatoes, Butter, Cilantro, Salt, Canola Oil & Spices",
+  "old_allergens": "Milk",
+  "new_allergens": "Milk",
+  "why": "oil is canola oil; added butter (the reason for MILK) (owner, 2026-11-11)"
+ },
+ {
+  "id": 140,
+  "name": "PEAS PILAF",
+  "old_ingredients": "Rice, Peas, Cumin, Cilantro, Salt, Almonds, Oil & Spices",
+  "new_ingredients": "Rice, Peas, Cumin, Cilantro, Salt, Canola Oil & Spices",
+  "old_allergens": "Almonds",
+  "new_allergens": "",
+  "why": "oil is canola oil; no almonds (owner, 2026-11-11)"
+ },
+ {
+  "id": 108,
+  "name": "PLAIN PALAK",
+  "old_ingredients": "Spinach, Tomato, Ginger, Garlic, Fenugreek, Butter, heavy cream, Salt, Spinach, Oil & spices",
+  "new_ingredients": "Spinach, Tomato, Ginger, Garlic, Fenugreek, Butter, heavy cream, Salt, Spinach, Canola Oil & spices",
+  "old_allergens": "Milk",
+  "new_allergens": "Milk",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 372,
+  "name": "POTATO POHA",
+  "old_ingredients": "Peanuts, Onions, Mustard Seeds, Potatoes, Curry Leaves, Red Chilli, Rice Flakes, Tumeric, Salt & Oil, Cilantro",
+  "new_ingredients": "Peanuts, Onions, Mustard Seeds, Potatoes, Curry Leaves, Red Chilli, Rice Flakes, Tumeric, Salt & Canola Oil, Cilantro",
+  "old_allergens": "Peanuts",
+  "new_allergens": "Peanuts",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 114,
+  "name": "RAJMA",
+  "old_ingredients": "Kidney Bean, Tomatoes, Ginger, Garlic, Onions, Spices, Salt & Oil",
+  "new_ingredients": "Kidney Bean, Tomatoes, Ginger, Garlic, Onions, Spices, Salt & Canola Oil",
+  "old_allergens": "",
+  "new_allergens": "",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 133,
+  "name": "RICE PILAF",
+  "old_ingredients": "Rice, Cumin, Black Cardamom, Bay Leaves, Salt & Oil",
+  "new_ingredients": "Rice, Cumin, Black Cardamom, Bay Leaves, Salt & Canola Oil",
+  "old_allergens": "",
+  "new_allergens": "",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 110,
+  "name": "SAMBER",
+  "old_ingredients": "Pigeon Peas Lentils, Tamarind, Mustard, Cumin, Tomatoes, Cilantro, Salt, Asafoetida, Oil & Spices",
+  "new_ingredients": "Pigeon Peas Lentils, Tamarind, Mustard, Cumin, Tomatoes, Cilantro, Salt, Asafoetida (Wheat Flour), Canola Oil & Spices",
+  "old_allergens": "Wheat",
+  "new_allergens": "Wheat",
+  "why": "oil is canola oil; hing contains wheat flour (shown in brackets) (owner, 2026-11-11)"
+ },
+ {
+  "id": 104,
+  "name": "SARSO KA SAAG",
+  "old_ingredients": "Mustard Green, Tomato, Ginger, Garlic, Fenugreek, Butter, Heavy Cream, Salt, Spinach, Oil & Spices",
+  "new_ingredients": "Mustard Green, Tomato, Ginger, Garlic, Fenugreek, Butter, Heavy Cream, Salt, Spinach, Canola Oil & Spices",
+  "old_allergens": "Milk",
+  "new_allergens": "Milk",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 257,
+  "name": "SCHEZWAN FRIED RICE",
+  "old_ingredients": "Rice, Mix Veg, Spices, Ginger, Garlic, Tomatoes, MSG, Celery, Chilli Sauce, Soya sauce, Vinegar, Scallions, Oil & Salt",
+  "new_ingredients": "Rice, Mix Veg, Spices, Ginger, Garlic, Tomatoes, MSG, Celery, Chilli Sauce, Soya sauce, Vinegar, Scallions, Canola Oil & Salt",
+  "old_allergens": "Wheat, Soybeans",
+  "new_allergens": "Wheat, Soybeans",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 273,
+  "name": "SHAKKAR PARA",
+  "old_ingredients": "Enriched Flour, Sugar, Vegetable Oil & Cardamom Seeds",
+  "new_ingredients": "Enriched Flour, Sugar, Canola Oil & Cardamom Seeds",
+  "old_allergens": "Wheat",
+  "new_allergens": "Wheat",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 319,
+  "name": "SOOJI HALWA",
+  "old_ingredients": "Almonds, Raisins, Saffron, Cardamom, Sugar, Cream of Wheat",
+  "new_ingredients": "Almonds, Raisins, Saffron, Cardamom, Clarified Butter, Sugar, Cream of Wheat",
+  "old_allergens": "Milk, Almonds, Wheat",
+  "new_allergens": "Milk, Almonds, Wheat",
+  "why": "added clarified butter / ghee (the reason for MILK) (owner, 2026-11-11)"
+ },
+ {
+  "id": 248,
+  "name": "SOYA PILAU",
+  "old_ingredients": "Soya Chunks, Rice, Cumin, Bay Leaf, Cinnamon, Cardamom, Cloves, Salt & Veg Oil,paneer",
+  "new_ingredients": "Soya Chunks, Rice, Cumin, Bay Leaf, Cinnamon, Cardamom, Cloves, Salt & Canola Oil,paneer",
+  "old_allergens": "Milk, Soybeans",
+  "new_allergens": "Milk, Soybeans",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 155,
+  "name": "TADKA DAL",
+  "old_ingredients": "Mixed Lentils, Ginger, Garlic, Cumin, Tomatoes, Cilantro, Salt, Mustard Seed, Curry Leaves, Oil & Spices",
+  "new_ingredients": "Mixed Lentils, Ginger, Garlic, Cumin, Tomatoes, Cilantro, Salt, Mustard Seed, Curry Leaves, Canola Oil & Spices",
+  "old_allergens": "",
+  "new_allergens": "",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 446,
+  "name": "URAD CHANA DAL",
+  "old_ingredients": "Split Matpe Beans, Chickpea Lentils, Ginger, Garlic, Cumin, Tomatoes, Cilantro, Salt, Oil & Spices",
+  "new_ingredients": "Split Matpe Beans, Chickpea Lentils, Ginger, Garlic, Cumin, Tomatoes, Cilantro, Salt, Canola Oil & Spices",
+  "old_allergens": "",
+  "new_allergens": "",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ },
+ {
+  "id": 280,
+  "name": "VEG PILAF",
+  "old_ingredients": "Basmati Rice, Green Beans, Carrots, Corn, Green Peas, Cumin, Black Cardamom, Bay Leaves, Mushroom, Cashews, Salt, Oil & Spices",
+  "new_ingredients": "Basmati Rice, Green Beans, Carrots, Corn, Green Peas, Cumin, Black Cardamom, Bay Leaves, Mushroom, Salt, Canola Oil & Spices",
+  "old_allergens": "Cashews",
+  "new_allergens": "",
+  "why": "oil is canola oil; no cashews (owner, 2026-11-11)"
+ },
+ {
+  "id": 311,
+  "name": "VEG SINDHI BIRYANI",
+  "old_ingredients": "Rice, Green Beans, Carrots, Corn, Green Peas, Spices, Ginger, Tomatoes, Onions, Extract of Pandanus tectorius, Cilantro, Oil, Salt & Saffron",
+  "new_ingredients": "Rice, Green Beans, Carrots, Corn, Green Peas, Spices, Ginger, Tomatoes, Onions, Extract of Pandanus tectorius, Cilantro, Canola Oil, Salt & Saffron",
+  "old_allergens": "",
+  "new_allergens": "",
+  "why": "oil is canola oil (owner, 2026-11-11)"
+ }
+]

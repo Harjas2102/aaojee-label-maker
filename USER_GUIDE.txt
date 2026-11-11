@@ -80,7 +80,11 @@ PRINTING LABELS — WITH THE MOUSE
   The program will not print, and tells you why, if:
     • the Print Date is not a real date, or
     • the Barcode # is not valid (the label would otherwise
-      print with no barcode).
+      print with no barcode), or
+    • the ingredients and CONTAINS line don't fit on the label
+      (use the 2.25" x 3.00" / Combined label).
+  Before printing ingredient or combined labels it asks first if
+  the CONTAINS (allergen) line looks incomplete — see ALLERGENS.
 
 PRINT QUEUE (printing many products at once)
   Use this for the morning batch instead of printing one product
@@ -132,10 +136,13 @@ ADDING A NEW PRODUCT
                       (parentheses).  Type it WITHOUT parentheses.
        Ingredients  — comma-separated list.  Leave blank for
                       packaged goods that have no ingredient list.
-       Allergens    — e.g. "Milk, Tree Nuts".  Click Pick… to tick
-                      them from the list of major allergens.
-                      Prints as a bold "Contains: …" line on
-                      ingredient and combined labels.
+       Allergens    — REQUIRED BY LAW for anything with an
+                      ingredient list (see "ALLERGENS" below).
+                      e.g. "Milk, Cashews".  Click Pick… to tick
+                      them.  Prints as a bold
+                      "CONTAINS: MILK, CASHEWS" line right under
+                      the ingredients.  Leave it empty only if the
+                      food has none of the 9 major allergens.
        Size         — e.g. "2 LB", "8 OZ", "6 PCS".
        Price ($)    — a number, e.g.  4.99  (no commas).
        Net Wt       — e.g. "16 OZ".  Prints as "Net Wt: 16 OZ" on
@@ -155,9 +162,75 @@ ADDING A NEW PRODUCT
                       None:    no date line (for dry goods).
        Notes        — internal notes, never printed.
   3. Click Save (or press Ctrl+S).  "✓ Saved." appears when done.
-     If the name is missing, the price is not a number, or the
-     barcode is not valid, a red message explains what to fix and
-     nothing is saved.
+     If the name is missing, the price is not a number, the
+     barcode is not valid, or the Allergens have a word that isn't
+     allowed (see ALLERGENS), a red message explains what to fix
+     and nothing is saved.
+     If the ingredients mention an allergen that isn't in
+     Allergens (e.g. "paneer" but no Milk), the program asks:
+     Yes = add it, No = save as it is, Cancel = go back.
+
+ALLERGENS — THE "CONTAINS:" LINE  (New York law from Nov 12, 2026)
+  New York Agriculture and Markets Law § 199-g: every food made
+  and packed in the store before it is sold must be labeled with
+  every MAJOR FOOD ALLERGEN it contains.  The store does this
+  with a "CONTAINS:" line printed right under the ingredients:
+        CONTAINS: MILK, ALMONDS, CASHEWS
+  The line must name EVERY major allergen in the food — one left
+  out is a violation, even if it is in the ingredient list.
+  Ingredient labels and Combined labels carry it; a barcode label
+  alone does not, so packages that need it must get the
+  ingredient (or combined) label too.
+
+  The 9 major food allergens:
+    Milk  Eggs  Fish  Crustacean shellfish  Tree nuts
+    Peanuts  Wheat  Soybeans  Sesame
+  • Tree nuts, fish and shellfish must be NAMED BY KIND:
+      Almonds, Cashews, Pistachios, Walnuts, Pecans, Hazelnuts,
+      Brazil Nuts, Macadamia Nuts, Pine Nuts; Cod, Salmon…;
+      Shrimp, Crab, Lobster…  Never just "Tree Nuts" or "Nuts".
+  • Hidden allergens count:
+      ghee, butter, cream, paneer, yogurt, khoya → Milk
+      flour/maida/atta, sooji/semolina, noodles → Wheat
+      hing (asafoetida) — ours has wheat flour → Wheat
+      soy sauce → Soybeans and Wheat
+  • NOT major allergens — never put them on the line:
+      coconut, makhana, nutmeg, mustard, poppy seeds, chickpeas,
+      sulfites.  ("May contain …" warnings on a supplier's
+      package are about traces, and don't go on the line either.)
+  • Milk from goats or other animals, or eggs from ducks etc.:
+    write the animal, e.g. "Goat Milk".
+  • Peanut or sesame (til) OIL counts unless the supplier
+    confirms it is "highly refined" (refined, bleached,
+    deodorized).  Cold-pressed / unrefined oil always counts.
+  • If something goes into the food, it goes in the ingredient
+    list too — every allergen on the CONTAINS line should have
+    its reason in the ingredients (e.g. "Clarified Butter" in
+    Sooji Halwa, "Egg Noodles" in Hakka Noodles).
+  • How we write things: oil is "Canola Oil"; hing is
+    "Asafoetida (Wheat Flour)".  Something bought ready-made
+    (sauces, masala mixes, paneer) has its own ingredients in
+    brackets after it, copied from its package.
+
+  What the program does to help:
+  • Pick… shows tick boxes for the 9, with each tree nut by
+    name, and suggests allergens it finds in the ingredients
+    ("Tick these").
+  • A red "⚠ Allergen check" line appears under Allergens (and
+    on the Print Labels card) when the ingredients mention an
+    allergen that isn't on the CONTAINS line.
+  • Saving refuses "Tree Nuts", "Coconut", "None", etc.
+  • Printing an Ingredients or Combined label (or the Print
+    Queue) for a product whose CONTAINS line looks incomplete
+    asks first — the answer that stops printing is the default.
+    Fix the product instead of printing it.
+  • A label is never printed with part of the ingredients or
+    the CONTAINS line cut off.  If it can't fit, nothing prints
+    and a message says to use the 2.25" x 3.00" label.
+  The program's suggestions come only from the words in the
+  ingredient list.  The person entering the product is still
+  responsible for checking every ingredient (and the labels of
+  bought-in sauces, spice mixes and oils).
 
 EDITING A PRODUCT
   Click it in the list, change the fields, click Save.
@@ -214,7 +287,8 @@ SETTINGS  (Settings menu → Settings…)
   • Business address line — printed at the bottom of barcode and
     combined labels.
   • Default printer.
-  • Label spacing — space between lines on the label.
+  • Label spacing — space between lines on the label (at most
+    2.5; above that the longest ingredient lists don't fit).
   • Side margin — space at the left and right edges, in inches.
   • Label size for Barcode and Ingredient labels (2.25x1.25 or
     2.25x3.00).  Combined labels always use 2.25x3.00.
