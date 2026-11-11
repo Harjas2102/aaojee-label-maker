@@ -48,7 +48,7 @@ here.
 | U-023 | 2026-11-11 | **Allergen law (NY AML § 199-g)**: CONTAINS line on every product with ingredients | **Live**: data in the store database 2026-11-11 13:40; code in the `.exe` installed 2026-11-11 14:42 (GitHub build of `f5a2119`) | Data: `apply_allergens.py --undo`; code: `git revert` (not advised: the law requires the line) |
 | U-024 | 2026-11-11 | Owner's ingredient corrections (canola oil, hing with wheat shown, butter / ghee / egg noodles named, recipe fixes) | Data: **Live** (store database, 2026-11-11) | `apply_ingredient_fixes.py --undo` |
 | U-025 | 2026-11-11 | Sauces / pani puri masala written out from their packages; Golgappa water; Sooji Halwa order; label spacing capped at 2.5 | **Live**: data 2026-11-11; spacing cap in the `.exe` installed 2026-11-11 14:42 | `apply_bought_in_ingredients.py --undo` |
-| U-026 | 2026-11-11 | Barcode label: the date no longer runs into the barcode ("Best By :" over the date) | Done, not yet built | `git revert` the U-026 commit |
+| U-026 | 2026-11-11 | Barcode label: the date no longer runs into the barcode ("Best By :" over the date) | **Live**: `.exe` installed 2026-11-11 15:11 (GitHub build of `401bd8b`) | `git revert` the U-026 commit |
 
 "Not yet built" means the source is changed but `AaojeeLabels.exe` hasn't been rebuilt with it.
 Update the status to **Live** once the new build is in use at the store.
@@ -1350,7 +1350,9 @@ barcode label without a date.
   242).
 - All barcodes still decode (`test_native_dpi_decodes`). Full suite 105/105.
 
-**After installing:** Test Print one barcode label and scan it at the register.
+**Installed** 2026-11-11 15:11. The GitHub build of `401bd8b` was checked, then installed. The
+previous `.exe` was kept as `AaojeeLabels_before_U-026.exe`. The window opens and closes
+normally. **Still to do:** Test Print one barcode label and scan it at the register.
 
 ---
 
