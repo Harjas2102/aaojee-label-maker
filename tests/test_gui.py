@@ -286,6 +286,7 @@ class TestPrinting(GuiTestCase):
         self.assertEqual(self.h.printed[-1], ((457, 254), "1", "2.25x1.25", 2))
         app.settings.set("print_at_printer_dpi", False)
         app._printer_dpi_cache.clear()
+        self.h.answers[:] = [True]                     # U-027: yes, the 3-inch roll is in
         app._print_label_type("Combined")
         self.assertEqual(self.h.printed[-1][:3], ((1350, 1800), "RGB", "2.25x3.00"))
 
@@ -523,8 +524,10 @@ class TestAllergens(GuiTestCase):
         app._print_label_type("Barcode")              # no CONTAINS line: no question
         self.assertEqual(len(self.h.printed), 2)
         app._allergens_var.set("Milk")
-        app._print_label_type("Combined")             # complete: no question
+        self.h.answers[:] = [True]                    # only the roll question (U-027)
+        app._print_label_type("Combined")             # allergens complete: no question
         self.assertEqual(len(self.h.printed), 3)
+        self.assertEqual(len(self.h.answers), 0)
 
     def test_queue_asks_when_contains_line_looks_incomplete(self):
         app = self.app
@@ -564,6 +567,78 @@ class TestAllergens(GuiTestCase):
         picker._other_var.set("")
         picker._ok()
         self.assertEqual(app._allergens_var.get(), "Milk, Cashews")
+
+
+# ── U-027: main label follows the label roll in the printer ───────────────────
+
+class TestSmallRoll(GuiTestCase):
+    """The store today: the 2.25 x 1.25 roll, Barcode as the main label."""
+
+    def test_combined_on_small_roll_asks_first(self):
+        app = self.app
+        self.h.open_barcode(GUJRATI_DAL)
+        self.assertEqual(app._main_label(), "Barcode")
+        self.h.answers[:] = [False]
+        app._print_label_type("Combined")
+        self.assertEqual(self.h.printed, [])
+        self.assertIn("2.25 × 1.25 roll", self.h.last_message())
+        self.h.answers[:] = [True]
+        app._print_label_type("Combined")
+        self.assertEqual(self.h.printed[-1][2], "2.25x3.00")
+
+    def test_switching_the_roll_in_settings(self):
+        import app_window
+        app = self.app
+        self.assertIn("Enter", app._barcode_btn.cget("text"))
+        dialog = app_window.SettingsDialog(self.h.root, app.settings, [], app._on_settings_saved)
+        dialog._size_var.set(app_window.ROLL_CHOICES["2.25x3.00"])
+        dialog._save()
+        self.assertEqual(app.settings.default_label_size, "2.25x3.00")
+        self.assertEqual(app._main_label(), "Combined")
+        self.assertIn("Enter", app._combined_btn.cget("text"))
+        self.assertNotIn("Enter", app._barcode_btn.cget("text"))
+        dialog = app_window.SettingsDialog(self.h.root, app.settings, [], app._on_settings_saved)
+        self.assertEqual(dialog._size_var.get(), app_window.ROLL_CHOICES["2.25x3.00"])
+        dialog._size_var.set(app_window.ROLL_CHOICES["2.25x1.25"])
+        dialog._save()
+        self.assertEqual(app._main_label(), "Barcode")
+        self.assertIn("Enter", app._barcode_btn.cget("text"))
+
+
+class TestThreeInchRoll(GuiTestCase):
+    """After the switch: the 2.25 x 3.00 roll, Combined as the main label."""
+    settings_overrides = {"default_label_size": "2.25x3.00"}
+
+    def test_enter_prints_combined_with_no_roll_question(self):
+        app = self.app
+        self.assertEqual(app._main_label(), "Combined")
+        buttons = [w for w in app._barcode_btn.master.pack_slaves()
+                   if w in (app._combined_btn, app._barcode_btn)]
+        self.assertEqual(buttons, [app._combined_btn, app._barcode_btn])   # Combined first
+        app._search_var.set("gujrati")
+        self.h.key(app._search_entry, "<Return>", 400)
+        app._qty_var.set("2")
+        self.h.key(app._qty_entry, "<Return>")
+        self.assertEqual(self.h.printed[-1], ((457, 609), "1", "2.25x3.00", 2))
+        self.assertEqual(app.db.get_print_history()[0]["label_type"], "Combined")
+        self.h.key(app._search_entry, "<F5>")                 # barcode label: 3 inches too
+        self.assertEqual(self.h.printed[-1][2], "2.25x3.00")
+        self.assertEqual(app.db.get_print_history()[0]["label_type"], "Barcode")
+
+    def test_queue_and_test_print_use_the_big_roll(self):
+        app = self.app
+        self.h.open_barcode(GUJRATI_DAL)
+        app._on_add_to_queue()
+        self.assertEqual(app.print_queue.items[-1]["label"], "Combined")
+        app._on_test_print()
+        self.assertEqual(self.h.printed[-1][2], "2.25x3.00")
+        app._open_print_queue()
+        self.h.pump()
+        self.assertIn("Combined", app._queue_window._label_values())
+        self.h.answers[:] = [True]                            # "Print N labels?" only
+        app._queue_window._print_all()
+        self.assertEqual(self.h.printed[-1][2], "2.25x3.00")
+        self.assertEqual(len(self.h.answers), 0)
 
 
 if __name__ == "__main__":

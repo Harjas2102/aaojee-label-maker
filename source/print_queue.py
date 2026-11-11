@@ -30,8 +30,11 @@ LABEL_CHOICES: dict[str, list[str]] = {
 MAX_QTY = 999
 
 
-def default_choice(product: dict) -> str:
-    """Cooked food (has ingredients) gets both labels; everything else a barcode."""
+def default_choice(product: dict, main_label: str = "Barcode") -> str:
+    """Cooked food (has ingredients) gets both labels; everything else a barcode.
+    With the 3-inch roll in the printer (U-027) every product gets a Combined label."""
+    if main_label == "Combined":
+        return "Combined"
     return "Barcode + Ingredients" if (product.get("ingredients") or "").strip() else "Barcode"
 
 
@@ -175,7 +178,8 @@ class PrintQueueWindow(tk.Toplevel):
 
     def _label_values(self) -> list[str]:
         values = ["Barcode", "Ingredients", "Barcode + Ingredients"]
-        if self.app.settings.get("show_combined_button", False):
+        if (self.app.settings.get("show_combined_button", False)
+                or self.app._main_label() == "Combined"):
             values.append("Combined")
         return values
 

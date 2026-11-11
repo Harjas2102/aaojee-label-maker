@@ -49,6 +49,7 @@ here.
 | U-024 | 2026-11-11 | Owner's ingredient corrections (canola oil, hing with wheat shown, butter / ghee / egg noodles named, recipe fixes) | Data: **Live** (store database, 2026-11-11) | `apply_ingredient_fixes.py --undo` |
 | U-025 | 2026-11-11 | Sauces / pani puri masala written out from their packages; Golgappa water; Sooji Halwa order; label spacing capped at 2.5 | **Live**: data 2026-11-11; spacing cap in the `.exe` installed 2026-11-11 14:42 | `apply_bought_in_ingredients.py --undo` |
 | U-026 | 2026-11-11 | Barcode label: the date no longer runs into the barcode ("Best By :" over the date) | **Live**: `.exe` installed 2026-11-11 15:11 (GitHub build of `401bd8b`) | `git revert` the U-026 commit |
+| U-027 | 2026-11-11 | Main label follows the label roll (3-inch roll → Enter / queue print Combined) | Done, not yet built | Settings → Label roll → 2.25 × 1.25 |
 
 "Not yet built" means the source is changed but `AaojeeLabels.exe` hasn't been rebuilt with it.
 Update the status to **Live** once the new build is in use at the store.
@@ -1353,6 +1354,55 @@ barcode label without a date.
 **Installed** 2026-11-11 15:11. The GitHub build of `401bd8b` was checked, then installed. The
 previous `.exe` was kept as `AaojeeLabels_before_U-026.exe`. The window opens and closes
 normally. **Still to do:** Test Print one barcode label and scan it at the register.
+
+---
+
+### U-027 — Main label follows the label roll in the printer
+
+**Why.** The owner is ordering 2.25" × 3.00" thermal transfer labels (BCW 2113300, ribbon
+in the printer) and will mainly print combined labels. Until now, Enter always printed
+barcode labels and the Print Queue suggested "Barcode + Ingredients". Barcode and
+Ingredient labels and Test Print were sized for the 1.25" roll.
+
+**What it does.** The Settings "Label size" box is now **"Label roll in the printer"**. It
+stores the same setting (`default_label_size`) and offers:
+- **2.25 × 1.25 roll (main label: Barcode):** everything works as before. This is the
+  store's current setting, so installing the build changes nothing.
+- **2.25 × 3.00 roll (main label: Combined):**
+  - **Enter** in Quantity prints combined labels; F5 / F6 / F7 still print barcode /
+    ingredients / combined;
+  - the **Print Combined Label** button is shown first and says "Enter / F7";
+  - **+ Add to Print Queue** adds products as **Combined**, and Combined is always
+    offered in the queue window;
+  - Barcode and Ingredient labels, and **Test Print**, print 3 inches tall.
+- **Safety:** printing a combined label (single or queue) while the 1.25" roll is set
+  asks first. It used to spread across about three small labels. The store printed 3
+  such labels on 2026-09-26.
+
+**Switch day** (`USER_GUIDE.txt`, "SWITCHING TO THE 3-INCH ROLL"):
+1. Load the roll.
+2. Set the TSC driver label height to 3.00" (same width and offset).
+3. Calibrate.
+4. Set Settings → Label roll → 2.25 × 3.00.
+5. Test Print and scan.
+
+The program does not change the driver's label size itself.
+
+**Files.**
+- `source/app_window.py`: `THREE_INCH_ROLL`, `ROLL_CHOICES`, `_main_label()`,
+  `_apply_combined_visibility()` (order and button text), `_confirm_roll_for_combined()`,
+  the Enter binding, `_on_test_print()`, `_on_add_to_queue()`, `print_queue_items()`, the
+  Settings dialog and the keyboard help.
+- `source/print_queue.py`: `default_choice(product, main_label)` and `_label_values()`.
+
+**Tested.**
+- 4 new window tests (`TestSmallRoll`, `TestThreeInchRoll`). They cover: the roll
+  question; switching in Settings (both ways); with the 3-inch roll, Enter prints a
+  457×609-dot combined label with no roll question, F5 prints a 3-inch barcode label, and
+  the queue default and Test Print use 3 inches.
+- Two existing tests now answer the new roll question.
+- Full suite 109/109.
+- All 4,457 label renders are identical (no label drawing changed).
 
 ---
 

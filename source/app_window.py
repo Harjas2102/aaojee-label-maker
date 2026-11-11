@@ -66,6 +66,11 @@ import importer as mdb_importer
 # ──────────────────────────────────────────────────────────────────────────────
 
 LABEL_SIZES = ["2.25x3.00", "2.25x1.25"]
+# U-027: the label roll in the printer decides the main label.  With the 2.25 x 3.00
+# roll, Enter and the Print Queue use Combined labels and every label is 3 inches tall.
+THREE_INCH_ROLL = "2.25x3.00"
+ROLL_CHOICES = {"2.25x1.25": "2.25 × 1.25 roll  (main label: Barcode)",
+                THREE_INCH_ROLL: "2.25 × 3.00 roll  (main label: Combined)"}
 # U-025: above this the longest ingredient lists (e.g. GUJRATI DAL) no longer fit the
 # combined label.  The owner set the limit at 2.5 (the store uses 1.75).
 MAX_LABEL_SPACING = 2.5
@@ -570,9 +575,10 @@ class AaojeeApp:
                                    width=5, justify=tk.CENTER, relief=tk.SOLID, bd=1)
         self._qty_entry.pack(side=tk.LEFT, padx=6, ipady=2)
         tk.Button(qty_frame, text="+", command=self._qty_plus, **step).pack(side=tk.LEFT)
-        # U-017: Enter prints the barcode label, Shift+Enter the ingredients label
+        # U-017: Enter prints the main label (U-027: Barcode, or Combined with the
+        # 3-inch roll), Shift+Enter the ingredients label
         for seq in ("<Return>", "<KP_Enter>"):
-            self._qty_entry.bind(seq, lambda _e: self._print_key("Barcode"))
+            self._qty_entry.bind(seq, lambda _e: self._print_key(self._main_label()))
         self._qty_entry.bind("<Shift-Return>", lambda _e: self._print_key("Ingredient"))
         self._qty_entry.bind("<Escape>", self._focus_search)
         self._qty_entry.bind("<FocusIn>", lambda _e: self._qty_entry.select_range(0, tk.END))
@@ -794,15 +800,26 @@ class AaojeeApp:
         return (max(PREVIEW_MIN_W, min(PREVIEW_LIMIT_W, box_w - 30)),
                 max(200, box_h - 12))
 
+    def _main_label(self) -> str:
+        """U-027: the label Enter prints and the Print Queue suggests: Combined when
+        the 2.25 x 3.00 roll is in the printer (Settings → Label roll), else Barcode."""
+        return "Combined" if self.settings.default_label_size == THREE_INCH_ROLL else "Barcode"
+
     def _apply_combined_visibility(self):
-        """Show or hide the Combined PRINT button per the Settings toggle.
-        The Combined preview radio is always available regardless."""
-        show = bool(self.settings.get("show_combined_button", False))
-        if show:
-            if not self._combined_btn.winfo_manager():
-                self._combined_btn.pack(fill=tk.X, pady=3, after=self._ingredient_btn)
-        else:
-            self._combined_btn.pack_forget()
+        """Show or hide the Combined PRINT button per the Settings toggle, and put
+        "Enter" on the main label's button.  With the 3-inch roll (U-027) the
+        Combined button is always shown, first.  The Combined preview radio is
+        always available regardless."""
+        combined_main = self._main_label() == "Combined"
+        self._barcode_btn.config(text="  Print Barcode          "
+                                      + ("F5" if combined_main else "Enter / F5"))
+        self._combined_btn.config(text="  Print Combined Label   "
+                                       + ("Enter / F7" if combined_main else "F7"))
+        self._combined_btn.pack_forget()
+        if combined_main:
+            self._combined_btn.pack(fill=tk.X, pady=3, before=self._barcode_btn)
+        elif self.settings.get("show_combined_button", False):
+            self._combined_btn.pack(fill=tk.X, pady=3, after=self._ingredient_btn)
 
     # ── Keyboard flow (U-017) ─────────────────────────────────────────────────
 
@@ -842,7 +859,8 @@ class AaojeeApp:
             "  Type a name, or scan a label   find the product\n"
             "  Up / Down                      move through the list\n"
             "  Enter (in Search)              pick the first product, go to Quantity\n"
-            "  Enter (in Quantity)            print barcode labels\n"
+            "  Enter (in Quantity)            print the main label: barcode, or combined\n"
+            "                                 when the 2.25 x 3.00 roll is in the printer\n"
             "  Shift+Enter (in Quantity)      print ingredient labels\n"
             "  F5 / F6 / F7                   print barcode / ingredients / combined\n"
             "  F8                             add to the print queue\n"
@@ -1349,6 +1367,20 @@ class AaojeeApp:
             return False
         return True
 
+    def _confirm_roll_for_combined(self, title: str, parent=None) -> bool:
+        """U-027: a combined label is 2.25 x 3.00.  If Settings says the 1.25-inch roll
+        is in the printer, ask first - it would print across about three small labels."""
+        if self._main_label() == "Combined":
+            return True
+        kw = {"parent": parent} if parent is not None else {}
+        return messagebox.askyesno(
+            title,
+            "A combined label is 2.25 × 3.00, but Settings says the 2.25 × 1.25 roll is "
+            "in the printer, so it would print across several small labels.\n\n"
+            "If the 3-inch roll is loaded, change \"Label roll in the printer\" in "
+            "Settings → Settings….\n\nPrint anyway?",
+            icon="warning", default=messagebox.NO, **kw)
+
     def _confirm_allergen_label(self, products: list[dict], title: str, parent=None) -> bool:
         """U-023, before printing ingredient / combined labels: warn when a
         CONTAINS line looks wrong or incomplete.  Returns True to go ahead."""
@@ -1707,6 +1739,9 @@ class AaojeeApp:
                                         flags["date"], flags["barcode"]):
             return
 
+        if label_type == "Combined" and not self._confirm_roll_for_combined("Print"):
+            return
+
         # U-023: ingredient / combined labels carry the CONTAINS line
         if label_type in ("Ingredient", "Combined") and not self._confirm_allergen_label(
                 [self._collect_form_data()], "Print"):
@@ -1734,7 +1769,8 @@ class AaojeeApp:
             messagebox.showerror("Print Error", f"Unexpected error: {e}")
 
     def _on_test_print(self):
-        """Print a single barcode-only label on 2.25×1.25 stock for POS verification."""
+        """Print a single barcode-only label, on the roll in the printer, for POS
+        verification."""
         if not self._name_var.get().strip():
             messagebox.showwarning("Test Print", "No product loaded.")
             return
@@ -1749,7 +1785,8 @@ class AaojeeApp:
                   "date": True, "address": True}
         try:
             self._print_product(self._collect_form_data(), "Barcode", all_on, printer, 1,
-                                label_size="2.25x1.25", source="Test Print")
+                                label_size=self._resolve_label_size("Barcode"),
+                                source="Test Print")
             messagebox.showinfo("Test Print",
                                 "Test label sent to printer.\n"
                                 "Scan it at the POS to verify it reads correctly.")
@@ -1846,7 +1883,7 @@ class AaojeeApp:
             qty = max(1, int(self._qty_var.get()))
         except ValueError:
             qty = 1
-        choice = default_choice(product)
+        choice = default_choice(product, self._main_label())
         item = self.print_queue.add(product["id"], choice, qty)
         self._status_var.set(
             f"✓ Added {product['name']} ({choice}) — now {item['qty']} in the print queue.")
@@ -1906,6 +1943,10 @@ class AaojeeApp:
                     "These products have an invalid Barcode # and would print "
                     "without a barcode:\n\n" + "\n".join(bad), parent=window)
                 return []
+
+        if (any("Combined" in types for _, _, types, _ in jobs)
+                and not self._confirm_roll_for_combined("Print Queue", parent=window)):
+            return []
 
         # U-023: same allergen check as single printing
         if not self._confirm_allergen_label(
@@ -2293,15 +2334,19 @@ class SettingsDialog(tk.Toplevel):
         printer_combo.grid(row=1, column=1, **pad, sticky=tk.EW)
         _block_mousewheel(printer_combo)
 
-        # Default label size — global (combined is always 2.25x3.00)
-        lbl(2, "Label size:")
-        self._size_var = tk.StringVar(value=settings.default_label_size)
-        size_combo = ttk.Combobox(f, textvariable=self._size_var, values=LABEL_SIZES,
-                                  state="readonly", width=18)
+        # Label roll in the printer (U-027).  It sets the size of Barcode and
+        # Ingredient labels and the main label; Combined labels are always 2.25x3.00.
+        lbl(2, "Label roll in the printer:")
+        self._roll_by_text = {text: size for size, text in ROLL_CHOICES.items()}
+        self._size_var = tk.StringVar(value=ROLL_CHOICES.get(settings.default_label_size,
+                                                             ROLL_CHOICES["2.25x1.25"]))
+        size_combo = ttk.Combobox(f, textvariable=self._size_var,
+                                  values=list(ROLL_CHOICES.values()), state="readonly", width=38)
         size_combo.grid(row=2, column=1, **pad, sticky=tk.W)
         _block_mousewheel(size_combo)
-        ttk.Label(f, text="Applies to Barcode & Ingredient labels.  "
-                          "Combined labels always print at 2.25×3.00.",
+        ttk.Label(f, text="With the 2.25 × 3.00 roll, Enter and the Print Queue print Combined "
+                          "labels, and every label prints 3 inches tall.\nAlso set the label "
+                          "size in the printer's Windows settings to match, then calibrate it.",
                   foreground="gray").grid(row=3, column=1, sticky=tk.W, padx=10)
 
         # Best-By date offset — editable, with + / − buttons
@@ -2400,7 +2445,7 @@ class SettingsDialog(tk.Toplevel):
         s = self._settings
         s.address_line       = self._addr_var.get().strip()
         s.default_printer    = self._printer_var.get()
-        s.default_label_size = self._size_var.get()
+        s.default_label_size = self._roll_by_text.get(self._size_var.get(), "2.25x1.25")
         try:
             s.set("bestby_offset_days", max(0, min(365, int(self._offset_var.get()))))
         except ValueError:

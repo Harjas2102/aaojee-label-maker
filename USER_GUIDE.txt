@@ -39,8 +39,10 @@ PRINTING LABELS — WITH THE KEYBOARD (fastest)
      cursor jumps to Quantity.  (Use the Up / Down arrow keys first
      to pick a different product in the list.)
   3. Type the quantity, e.g.  30
-  4. Press Enter to print barcode labels,
-     or Shift+Enter to print ingredient labels.
+  4. Press Enter to print the main label — barcode labels on the
+     2.25 x 1.25 roll, combined labels on the 2.25 x 3.00 roll
+     (see "SWITCHING TO THE 3-INCH ROLL") — or Shift+Enter to
+     print ingredient labels.
   The cursor goes back to the search box, ready for the next one.
   Other keys on the Print Labels screen:
     F5 = Print Barcode   F6 = Print Ingredients
@@ -67,8 +69,28 @@ PRINTING LABELS — WITH THE MOUSE
        Print Barcode         — the barcode / price label
        Print Ingredients     — the ingredients label
        Print Combined Label  — both on one tall 2.25" x 3.00"
-                               label (only shown if turned on
-                               in Settings)
+                               label (shown first, with Enter,
+                               when the 3-inch roll is set in
+                               Settings; otherwise only if
+                               turned on in Settings)
+     The button that says "Enter" is the main label.
+
+SWITCHING TO THE 3-INCH ROLL (combined labels)
+  1. Close the program.  Load the 2.25" x 3.00" roll (thermal
+     transfer labels — keep the ribbon in).
+  2. Windows: Printers → TSC TTP-244CE → Printing preferences.
+     Change the label ("AAOJEE Label") height from 1.25 to 3.00
+     inches.  Keep the width and the horizontal offset.
+  3. Calibrate the printer so it finds the gaps between the taller
+     labels (TSC driver tools or the TSC Diagnostic Tool).
+  4. Open the program: Settings → Settings… → "Label roll in the
+     printer" → 2.25 × 3.00 roll → Save.
+  Now Enter prints combined labels, the Print Queue adds products
+  as Combined, and Barcode / Ingredient labels and Test Print are
+  3 inches tall too.  Do a Test Print and scan it at the register.
+  Going back to the 1.25" roll: the same steps the other way.
+  If someone prints a combined label while Settings says the small
+  roll is in, the program asks first (it would waste stickers).
 
   The preview on the right shows what will print, as large as the
   screen allows.  Choose Barcode / Ingredients / Combined / All
@@ -290,8 +312,11 @@ SETTINGS  (Settings menu → Settings…)
   • Label spacing — space between lines on the label (at most
     2.5; above that the longest ingredient lists don't fit).
   • Side margin — space at the left and right edges, in inches.
-  • Label size for Barcode and Ingredient labels (2.25x1.25 or
-    2.25x3.00).  Combined labels always use 2.25x3.00.
+  • Label roll in the printer — 2.25 × 1.25 (main label: Barcode)
+    or 2.25 × 3.00 (main label: Combined).  It sets the size of
+    Barcode and Ingredient labels and what Enter prints.  Combined
+    labels are always 2.25 × 3.00.  See "SWITCHING TO THE 3-INCH
+    ROLL".
   • Best-By date offset — days added for Best By (default 10).
   • Which elements show on labels by default.
   • Show the "Print Combined Label" button.
