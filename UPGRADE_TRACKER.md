@@ -50,7 +50,7 @@ here.
 | U-025 | 2026-11-11 | Sauces / pani puri masala written out from their packages; Golgappa water; Sooji Halwa order; label spacing capped at 2.5 | **Live**: data 2026-11-11; spacing cap in the `.exe` installed 2026-11-11 14:42 | `apply_bought_in_ingredients.py --undo` |
 | U-026 | 2026-11-11 | Barcode label: the date no longer runs into the barcode ("Best By :" over the date) | **Live**: `.exe` installed 2026-11-11 15:11 (GitHub build of `401bd8b`) | `git revert` the U-026 commit |
 | U-027 | 2026-11-11 | Main label follows the label roll (3-inch roll → Enter / queue print Combined) | **Live**: `.exe` installed 2026-11-11 16:26 (GitHub build of `3443477`); the store's Settings were on the 2.25 × 3.00 roll by 2026-11-17 | Settings → Label roll → 2.25 × 1.25 |
-| U-028 | 2026-11-17 | Sideways label for 16 oz containers: 3.00 wide × 2.25 tall on the same 3-inch roll | Done, not yet built | Settings → Label roll → 2.25 × 3.00 roll, upright |
+| U-028 | 2026-11-17 | Sideways label for 16 oz containers: 3.00 wide × 2.25 tall on the same 3-inch roll | **Installed**: `.exe` installed 2026-11-17 (GitHub build of `59306f7`); Settings still on "upright", sideways not yet printed or scanned | Settings → Label roll → 2.25 × 3.00 roll, upright |
 
 "Not yet built" means the source is changed but `AaojeeLabels.exe` hasn't been rebuilt with it.
 Update the status to **Live** once the new build is in use at the store.
@@ -1493,6 +1493,13 @@ size as a small label), so the commit carries `[label change]`.
 - **Not yet done:** nothing has been printed on the TSC printer with this layout.
 
 **Turn off.** Settings → Label roll → "2.25 × 3.00 roll, upright".
+
+**Installed** 2026-11-17, after the owner approved the proof sheet. GitHub run 44138712781
+of `59306f7` (all tests and the build passed) was downloaded and installed. The previous
+`.exe` was kept as `AaojeeLabels_before_U-028.exe`. The window opens and closes normally,
+and the products and print history are unchanged. Settings were left on "2.25 × 3.00 roll,
+upright". **Still to do at the store:** choose the sideways roll in Settings, Test Print,
+print one combined label, and scan both at the register.
 
 ---
 
