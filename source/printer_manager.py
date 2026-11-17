@@ -74,6 +74,28 @@ def get_printer_dpi(printer_name: str) -> tuple[int, int] | None:
         return None
 
 
+DEFAULT_STOCK_WIDTH_IN = 2.25     # the store's rolls, if the driver can't be asked
+
+
+def fit_to_stock(image: Image.Image, label_width_in: float, label_height_in: float,
+                 stock_width_in: float | None) -> tuple[Image.Image, float, float]:
+    """U-028: turn a label that is wider than the roll a quarter turn.
+
+    The 3.00" wide x 2.25" tall label is printed on the 2.25" x 3.00" sticker,
+    which feeds through the printer narrow edge first.  If the label is wider
+    than the stock but fits it sideways, the picture is turned clockwise (its
+    left edge comes out of the printer first) and the width and height swap.
+    A label that fits the stock as it is - e.g. a real 3.00"-wide roll - is
+    returned unchanged.  *stock_width_in* None (the driver couldn't be read)
+    counts as the 2.25" roll.
+
+    Returns (image, width_in, height_in) to print."""
+    stock = (stock_width_in or DEFAULT_STOCK_WIDTH_IN) + 0.06       # a little tolerance
+    if label_width_in <= stock or label_height_in > stock:
+        return image, label_width_in, label_height_in               # fits, or can't be helped
+    return image.rotate(-90, expand=True), label_height_in, label_width_in   # clockwise
+
+
 def to_monochrome(image: Image.Image) -> Image.Image:
     """Convert to pure black/white (no grey).  Thermal label printers can only
     print solid dots; sending grey makes the driver dither text and bar edges."""
@@ -96,6 +118,7 @@ def print_label(
     The image is stretched to the label size in printer dots.  When it was
     rendered at the printer's own DPI (see get_printer_dpi) its size already
     matches, so every pixel lands on exactly one printer dot.
+    A label wider than the roll is turned a quarter turn first (fit_to_stock).
     Raises RuntimeError if printing is unavailable or the print job fails.
     """
     if not _WINDOWS:
@@ -120,6 +143,15 @@ def print_label(
             # Printer DPI
             printer_dpi_x = hdc.GetDeviceCaps(88)   # LOGPIXELSX
             printer_dpi_y = hdc.GetDeviceCaps(90)   # LOGPIXELSY
+
+            # U-028: a label wider than the roll is printed sideways.  The stock
+            # width is the driver's page width (PHYSICALWIDTH, in dots).
+            try:
+                stock_w_in = hdc.GetDeviceCaps(110) / printer_dpi_x
+            except Exception:
+                stock_w_in = None
+            image, label_width_in, label_height_in = fit_to_stock(
+                image, label_width_in, label_height_in, stock_w_in or None)
 
             # Physical size in printer pixels
             dest_w = round(label_width_in  * printer_dpi_x)
@@ -161,7 +193,7 @@ def print_label(
 def print_labels(
     image: Image.Image,
     printer_name: str,
-    label_size: str,           # "2.25x3.00" | "2.25x1.25"
+    label_size: str,           # "2.25x3.00" | "2.25x1.25" | "3.00x2.25" (printed sideways)
     copies: int = 1,
 ) -> None:
     """Parse *label_size*, then call print_label()."""

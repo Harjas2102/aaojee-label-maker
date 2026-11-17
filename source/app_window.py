@@ -69,8 +69,14 @@ LABEL_SIZES = ["2.25x3.00", "2.25x1.25"]
 # U-027: the label roll in the printer decides the main label.  With the 2.25 x 3.00
 # roll, Enter and the Print Queue use Combined labels and every label is 3 inches tall.
 THREE_INCH_ROLL = "2.25x3.00"
+# U-028: the same 3-inch sticker printed sideways, 3.00 wide x 2.25 tall, for the
+# side of a 16 oz container.  Every label is then laid out and printed that way.
+WIDE_LABEL = "3.00x2.25"
+COMBINED_ROLLS = (THREE_INCH_ROLL, WIDE_LABEL)
 ROLL_CHOICES = {"2.25x1.25": "2.25 × 1.25 roll  (main label: Barcode)",
-                THREE_INCH_ROLL: "2.25 × 3.00 roll  (main label: Combined)"}
+                THREE_INCH_ROLL: "2.25 × 3.00 roll, upright  (main label: Combined)",
+                WIDE_LABEL: "2.25 × 3.00 roll, sideways: 3.00 wide × 2.25 tall  "
+                            "(main label: Combined)"}
 # U-025: above this the longest ingredient lists (e.g. GUJRATI DAL) no longer fit the
 # combined label.  The owner set the limit at 2.5 (the store uses 1.75).
 MAX_LABEL_SPACING = 2.5
@@ -802,8 +808,9 @@ class AaojeeApp:
 
     def _main_label(self) -> str:
         """U-027: the label Enter prints and the Print Queue suggests: Combined when
-        the 2.25 x 3.00 roll is in the printer (Settings → Label roll), else Barcode."""
-        return "Combined" if self.settings.default_label_size == THREE_INCH_ROLL else "Barcode"
+        the 2.25 x 3.00 roll is in the printer (Settings → Label roll; upright, or
+        sideways since U-028), else Barcode."""
+        return "Combined" if self.settings.default_label_size in COMBINED_ROLLS else "Barcode"
 
     def _apply_combined_visibility(self):
         """Show or hide the Combined PRINT button per the Settings toggle, and put
@@ -1375,7 +1382,7 @@ class AaojeeApp:
         kw = {"parent": parent} if parent is not None else {}
         return messagebox.askyesno(
             title,
-            "A combined label is 2.25 × 3.00, but Settings says the 2.25 × 1.25 roll is "
+            "A combined label needs the 2.25 × 3.00 sticker, but Settings says the 2.25 × 1.25 roll is "
             "in the printer, so it would print across several small labels.\n\n"
             "If the 3-inch roll is loaded, change \"Label roll in the printer\" in "
             "Settings → Settings….\n\nPrint anyway?",
@@ -1654,11 +1661,13 @@ class AaojeeApp:
             return 1.0
 
     def _resolve_label_size(self, label_type: str) -> str:
-        """Combined labels are always 2.25x3.00.  Barcode/Ingredient labels use
-        the global default label size set in Settings."""
+        """Barcode/Ingredient labels use the label roll set in Settings.  Combined
+        labels are always on the 3-inch sticker: 3.00 wide x 2.25 tall when the roll
+        is set to sideways (U-028), otherwise 2.25x3.00."""
+        setting = self.settings.default_label_size or "2.25x1.25"
         if label_type == "Combined":
-            return "2.25x3.00"
-        return self.settings.default_label_size or "2.25x1.25"
+            return WIDE_LABEL if setting == WIDE_LABEL else THREE_INCH_ROLL
+        return setting
 
     def _resolve_printer(self, title: str) -> str | None:
         printer = self.settings.default_printer or get_default_printer()
@@ -2335,18 +2344,22 @@ class SettingsDialog(tk.Toplevel):
         _block_mousewheel(printer_combo)
 
         # Label roll in the printer (U-027).  It sets the size of Barcode and
-        # Ingredient labels and the main label; Combined labels are always 2.25x3.00.
+        # Ingredient labels and the main label; Combined labels are always on the
+        # 3-inch sticker, upright or sideways (U-028).
         lbl(2, "Label roll in the printer:")
         self._roll_by_text = {text: size for size, text in ROLL_CHOICES.items()}
         self._size_var = tk.StringVar(value=ROLL_CHOICES.get(settings.default_label_size,
                                                              ROLL_CHOICES["2.25x1.25"]))
         size_combo = ttk.Combobox(f, textvariable=self._size_var,
-                                  values=list(ROLL_CHOICES.values()), state="readonly", width=38)
+                                  values=list(ROLL_CHOICES.values()), state="readonly", width=62)
         size_combo.grid(row=2, column=1, **pad, sticky=tk.W)
         _block_mousewheel(size_combo)
         ttk.Label(f, text="With the 2.25 × 3.00 roll, Enter and the Print Queue print Combined "
-                          "labels, and every label prints 3 inches tall.\nAlso set the label "
-                          "size in the printer's Windows settings to match, then calibrate it.",
+                          "labels, and every label uses the whole 3-inch sticker.\n"
+                          "Sideways (3.00 wide × 2.25 tall) fits the side of a 16 oz container; "
+                          "it is the same roll, with no printer change.\nWhen changing "
+                          "between the 1.25 and 3.00 rolls, also set the label size in the "
+                          "printer's Windows settings, then calibrate it.",
                   foreground="gray").grid(row=3, column=1, sticky=tk.W, padx=10)
 
         # Best-By date offset — editable, with + / − buttons

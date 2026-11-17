@@ -31,7 +31,9 @@ DIFF_DIR = os.path.join(ROOT, "tools", "label_diffs")
 MAX_PICTURES = 12
 
 VARIANTS = [("Barcode", "2.25x1.25"), ("Barcode", "2.25x3.00"), ("Ingredient", "2.25x1.25"),
-            ("Ingredient", "2.25x3.00"), ("Combined", "2.25x3.00")]
+            ("Ingredient", "2.25x3.00"), ("Combined", "2.25x3.00"),
+            # U-028: the 3-inch sticker on its side
+            ("Barcode", "3.00x2.25"), ("Ingredient", "3.00x2.25"), ("Combined", "3.00x2.25")]
 EXTRAS = {"allergens": "Milk, Cashews", "net_weight": "16 OZ"}
 
 
@@ -46,6 +48,7 @@ def _jobs():
                 yield f"{p['id']}|{lt}|{size}|{dpi}", p, lt, size, dpi
         if p["ingredients"]:
             yield f"{p['id']}|Combined+extras|2.25x3.00|203", dict(p, **EXTRAS), "Combined", "2.25x3.00", 203
+            yield f"{p['id']}|Combined+extras|3.00x2.25|203", dict(p, **EXTRAS), "Combined", "3.00x2.25", 203
 
 
 def _worker(source_dir: str, out_path: str, image_keys: list[str] | None, image_dir: str | None):

@@ -41,8 +41,9 @@ PRINTING LABELS — WITH THE KEYBOARD (fastest)
   3. Type the quantity, e.g.  30
   4. Press Enter to print the main label — barcode labels on the
      2.25 x 1.25 roll, combined labels on the 2.25 x 3.00 roll
-     (see "SWITCHING TO THE 3-INCH ROLL") — or Shift+Enter to
-     print ingredient labels.
+     (upright or sideways; see "SWITCHING TO THE 3-INCH ROLL" and
+     "SIDEWAYS LABELS") — or Shift+Enter to print ingredient
+     labels.
   The cursor goes back to the search box, ready for the next one.
   Other keys on the Print Labels screen:
     F5 = Print Barcode   F6 = Print Ingredients
@@ -68,8 +69,9 @@ PRINTING LABELS — WITH THE MOUSE
   5. Click:
        Print Barcode         — the barcode / price label
        Print Ingredients     — the ingredients label
-       Print Combined Label  — both on one tall 2.25" x 3.00"
-                               label (shown first, with Enter,
+       Print Combined Label  — both on one 2.25" x 3.00" sticker,
+                               upright or sideways (see SIDEWAYS
+                               LABELS) (shown first, with Enter,
                                when the 3-inch roll is set in
                                Settings; otherwise only if
                                turned on in Settings)
@@ -91,6 +93,27 @@ SWITCHING TO THE 3-INCH ROLL (combined labels)
   Going back to the 1.25" roll: the same steps the other way.
   If someone prints a combined label while Settings says the small
   roll is in, the program asks first (it would waste stickers).
+
+SIDEWAYS LABELS FOR 16 OZ CONTAINERS (3.00 wide x 2.25 tall)
+  The upright 2.25" x 3.00" label is too tall for the side of a
+  16 oz container.  The same sticker can be printed sideways, so
+  it is 3.00" wide and 2.25" tall when it is on the container:
+    Settings → Settings… → "Label roll in the printer" →
+    "2.25 × 3.00 roll, sideways: 3.00 wide × 2.25 tall" → Save.
+  Nothing changes on the printer: same roll, same Windows label
+  size, no calibration.  The stickers come out of the printer
+  turned a quarter turn (the left edge of the label first).
+  On the sideways label:
+    • the name (and subtitle) are across the top;
+    • the ingredients and CONTAINS line use the full 3 inches,
+      in the largest print that fits (the size set in Fonts for
+      every product today);
+    • along the bottom: price, date and address on the left, the
+      barcode on the right.
+  Barcode and Ingredient labels and Test Print are sideways too.
+  To go back to upright labels, choose "2.25 × 3.00 roll, upright".
+  After switching, do a Test Print and one combined label, and
+  scan both at the register.
 
   The preview on the right shows what will print, as large as the
   screen allows.  Choose Barcode / Ingredients / Combined / All
@@ -312,11 +335,13 @@ SETTINGS  (Settings menu → Settings…)
   • Label spacing — space between lines on the label (at most
     2.5; above that the longest ingredient lists don't fit).
   • Side margin — space at the left and right edges, in inches.
-  • Label roll in the printer — 2.25 × 1.25 (main label: Barcode)
-    or 2.25 × 3.00 (main label: Combined).  It sets the size of
-    Barcode and Ingredient labels and what Enter prints.  Combined
-    labels are always 2.25 × 3.00.  See "SWITCHING TO THE 3-INCH
-    ROLL".
+  • Label roll in the printer — 2.25 × 1.25 (main label: Barcode),
+    2.25 × 3.00 upright, or 2.25 × 3.00 sideways (3.00 wide ×
+    2.25 tall, for 16 oz containers); main label Combined for both
+    3-inch choices.  It sets the size of Barcode and Ingredient
+    labels and what Enter prints.  Combined labels are always on
+    the 3-inch sticker.  See "SWITCHING TO THE 3-INCH ROLL" and
+    "SIDEWAYS LABELS FOR 16 OZ CONTAINERS".
   • Best-By date offset — days added for Best By (default 10).
   • Which elements show on labels by default.
   • Show the "Print Combined Label" button.

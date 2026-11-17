@@ -49,7 +49,8 @@ here.
 | U-024 | 2026-11-11 | Owner's ingredient corrections (canola oil, hing with wheat shown, butter / ghee / egg noodles named, recipe fixes) | Data: **Live** (store database, 2026-11-11) | `apply_ingredient_fixes.py --undo` |
 | U-025 | 2026-11-11 | Sauces / pani puri masala written out from their packages; Golgappa water; Sooji Halwa order; label spacing capped at 2.5 | **Live**: data 2026-11-11; spacing cap in the `.exe` installed 2026-11-11 14:42 | `apply_bought_in_ingredients.py --undo` |
 | U-026 | 2026-11-11 | Barcode label: the date no longer runs into the barcode ("Best By :" over the date) | **Live**: `.exe` installed 2026-11-11 15:11 (GitHub build of `401bd8b`) | `git revert` the U-026 commit |
-| U-027 | 2026-11-11 | Main label follows the label roll (3-inch roll → Enter / queue print Combined) | **Live**: `.exe` installed 2026-11-11 16:26 (GitHub build of `3443477`); the store is still set to the 1.25" roll | Settings → Label roll → 2.25 × 1.25 |
+| U-027 | 2026-11-11 | Main label follows the label roll (3-inch roll → Enter / queue print Combined) | **Live**: `.exe` installed 2026-11-11 16:26 (GitHub build of `3443477`); the store's Settings were on the 2.25 × 3.00 roll by 2026-11-17 | Settings → Label roll → 2.25 × 1.25 |
+| U-028 | 2026-11-17 | Sideways label for 16 oz containers: 3.00 wide × 2.25 tall on the same 3-inch roll | Done, not yet built | Settings → Label roll → 2.25 × 3.00 roll, upright |
 
 "Not yet built" means the source is changed but `AaojeeLabels.exe` hasn't been rebuilt with it.
 Update the status to **Live** once the new build is in use at the store.
@@ -1409,6 +1410,89 @@ The program does not change the driver's label size itself.
 same commit was built by a manual run (43102222216: tests and build passed). The previous
 `.exe` was kept as `AaojeeLabels_before_U-027.exe`. With the store's 1.25" roll setting, the
 window looks and works as before.
+
+---
+
+### U-028 — Sideways label for 16 oz containers (3.00 wide × 2.25 tall)
+
+**Why (owner, 2026-11-17).** The new 2.25" × 3.00" combined labels print well, but upright
+they are too tall for the side of a 16 oz food container. The label has to be 3.00" wide and
+2.25" tall, and still carry the ingredients, CONTAINS line, barcode, price, date and address.
+
+**What it does.** A third choice in Settings → "Label roll in the printer":
+**"2.25 × 3.00 roll, sideways: 3.00 wide × 2.25 tall"** (`default_label_size` =
+`"3.00x2.25"`). It is the **same sticker and the same roll**. The label is laid out 3.00 wide
+and the print path turns the picture a quarter turn, so nothing changes in the Windows
+driver and no calibration is needed. Combined stays the main label (Enter, queue).
+Barcode and Ingredient labels and Test Print are sideways too. The two existing choices
+work exactly as before (the 3-inch one is now worded "upright").
+
+**The layout** (`_layout_combined_wide()` in `label_renderer.py`):
+- **Top:** name, then the subtitle, centred, shrunk to fit one line each as before.
+- **Bottom edge:** the barcode on the right; beside it, on the left, the price, the date
+  and the address stacked. On the upright label these are stacked above and below the
+  barcode and take about 1.2" of height; side by side they take about 0.6".
+- **Middle:** the ingredients, CONTAINS and Net Wt lines get all the height in between,
+  on lines 2.9" long (2.15" upright), in the largest type from the Fonts setting down to
+  6 pt, centred in the free space.
+- A product without ingredients gets the name and the price / barcode row centred on the
+  label.
+- Barcode: same module width as the upright combined label (3 dots at 203 DPI), bars
+  0.40" to 0.55" tall (0.46" with the store's fonts; 0.50" upright), full quiet zones.
+- Text is never cut off: if it can't fit at 6 pt the label is refused
+  (`LabelTextDoesNotFit`, U-023).
+
+**Result on the store's database (2026-11-17, 68 products with ingredients, store
+settings, 203 DPI).** Sideways, all 68 print their ingredients at the full 10 pt. Upright,
+59 do; 9 are shrunk (HAKKA NOODLES to 7 pt, GOLGAPPA PANI to 8 pt, seven others to 9 pt).
+The longest list with nine allergens, a net weight and a long subtitle added still fits,
+at 7 pt.
+
+**Printing sideways** (`fit_to_stock()` in `printer_manager.py`, called by `print_label()`).
+The stock width is read from the driver (page width; 2.45" with the liner at the store).
+A label wider than the stock that fits it turned is rotated clockwise, so the left edge of
+the label leaves the printer first; 609 × 457 dots become 457 × 609, still one pixel per
+printer dot. A label that fits as it is isn't turned, so a real 3.00"-wide roll would print
+straight, and the 2.25 × 1.25 and upright labels are never turned. If the driver can't
+be read, the 2.25" roll is assumed.
+
+**Known and accepted.** Turned, the barcode's bars run across the direction the label
+feeds ("ladder"), not along it as on the upright label. Bars this size (3 dots, 0.015")
+normally print and scan fine that way, but it has to be checked on the real printer:
+**Test Print and scan at the register before using it for sale.** If scans are unreliable,
+lower the print speed in the TSC driver, or switch back to upright.
+
+**Files.**
+- `source/label_renderer.py`: `WIDE_LABEL`, `label_inches()`, `_layout_combined_wide()`,
+  `_ink()`, `_draw_ink()`; `render_label()` takes the size from `label_inches()`.
+- `source/printer_manager.py`: `fit_to_stock()`, `DEFAULT_STOCK_WIDTH_IN`; `print_label()`.
+- `source/app_window.py`: `WIDE_LABEL`, `COMBINED_ROLLS`, `ROLL_CHOICES`, `_main_label()`,
+  `_resolve_label_size()`, the Settings dialog text.
+- `tools/compare_labels.py`: the three sideways labels are now part of the "labels
+  unchanged" check (7,158 renders, up from 4,457).
+- `USER_GUIDE.txt`: "SIDEWAYS LABELS FOR 16 OZ CONTAINERS".
+
+**Labels.** No existing label changed: all 4,457 earlier renders are identical. The check
+reports only the 2,701 new `3.00x2.25` renders as different (the earlier code drew that
+size as a small label), so the commit carries `[label change]`.
+
+**Tested.**
+- New `TestWideCombinedLabel`: for every fixture product with ingredients and a barcode, at
+  150, 203 and 600 DPI with the widest date, the ingredient text ends above the footer, the
+  price / date / address end before the barcode's quiet zone, and nothing is drawn off the
+  label; ingredients are never smaller than on the upright label; every show/hide mix
+  renders; text that can't fit is refused.
+- New `TestPrintedSideways`: the wide label is turned for the 2.25" roll and not for a
+  3"-wide one; upright and 1.25" labels are never turned. (The first version turned the
+  1.25" label when the driver couldn't be read; this test caught it.)
+- The sideways sizes were added to the existing render, barcode-decode (decoded from the
+  turned print image), CONTAINS-line and barcode-label-date tests.
+- New window tests `TestSidewaysLabel`: Enter, F5, F6 and Test Print send 609 × 457
+  labels of size `3.00x2.25`; the preview is wide; the Settings choice saves and reloads.
+- Full suite 118/118 (109 before, 9 new).
+- **Not yet done:** nothing has been printed on the TSC printer with this layout.
+
+**Turn off.** Settings → Label roll → "2.25 × 3.00 roll, upright".
 
 ---
 

@@ -641,5 +641,60 @@ class TestThreeInchRoll(GuiTestCase):
         self.assertEqual(len(self.h.answers), 0)
 
 
+# ── U-028: the 3-inch sticker printed sideways (3.00 wide x 2.25 tall) ────────
+
+class TestSidewaysLabel(GuiTestCase):
+    """Label roll set to "sideways": Combined is still the main label, and every
+    label is laid out 3.00 wide x 2.25 tall."""
+    settings_overrides = {"default_label_size": "3.00x2.25"}
+
+    def test_every_label_is_three_wide(self):
+        app = self.app
+        self.assertEqual(app._main_label(), "Combined")
+        self.assertIn("Enter", app._combined_btn.cget("text"))
+        app._search_var.set("gujrati")
+        self.h.key(app._search_entry, "<Return>", 400)
+        app._qty_var.set("2")
+        self.h.key(app._qty_entry, "<Return>")                # no roll question
+        self.assertEqual(self.h.printed[-1], ((609, 457), "1", "3.00x2.25", 2))
+        history = app.db.get_print_history()[0]
+        self.assertEqual((history["label_type"], history["label_size"]),
+                         ("Combined", "3.00x2.25"))
+        self.h.key(app._search_entry, "<F5>")                 # barcode label
+        self.assertEqual(self.h.printed[-1][:3], ((609, 457), "1", "3.00x2.25"))
+        self.h.key(app._search_entry, "<F6>")                 # ingredient label
+        self.assertEqual(self.h.printed[-1][:3], ((609, 457), "1", "3.00x2.25"))
+        app._on_test_print()
+        self.assertEqual(self.h.printed[-1][:3], ((609, 457), "1", "3.00x2.25"))
+        app._on_add_to_queue()
+        self.assertEqual(app.print_queue.items[-1]["label"], "Combined")
+        self.assertEqual(len(self.h.printed), 4)
+
+    def test_preview_is_wide(self):
+        app = self.app
+        self.h.open_barcode(GUJRATI_DAL)
+        app._preview_type_var.set("Combined")
+        app._update_preview()
+        self.h.pump()
+        canvas = app._preview_tiles["Combined"]["canvas"]
+        self.assertGreater(int(canvas.cget("width")), int(canvas.cget("height")))
+
+    def test_switching_in_settings(self):
+        import app_window
+        app = self.app
+        dialog = app_window.SettingsDialog(self.h.root, app.settings, [], app._on_settings_saved)
+        self.assertEqual(dialog._size_var.get(), app_window.ROLL_CHOICES["3.00x2.25"])
+        dialog._size_var.set(app_window.ROLL_CHOICES["2.25x3.00"])
+        dialog._save()
+        self.assertEqual(app._resolve_label_size("Combined"), "2.25x3.00")
+        self.assertEqual(app._main_label(), "Combined")
+        dialog = app_window.SettingsDialog(self.h.root, app.settings, [], app._on_settings_saved)
+        dialog._size_var.set(app_window.ROLL_CHOICES["3.00x2.25"])
+        dialog._save()
+        self.assertEqual(app.settings.default_label_size, "3.00x2.25")
+        self.assertEqual(app._resolve_label_size("Combined"), "3.00x2.25")
+        self.assertEqual(app._resolve_label_size("Barcode"), "3.00x2.25")
+
+
 if __name__ == "__main__":
     unittest.main()

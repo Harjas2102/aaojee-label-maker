@@ -2,9 +2,9 @@
 label_renderer.py — Pillow-based label image renderer for Aaojee Label Maker.
 
 Produces PIL Image objects for:
-  • Combined label      2.25" × 3.00"
-  • Ingredient-only     2.25" × 1.25"  (also 3.00")
-  • Barcode-only        2.25" × 1.25"  (also 3.00")
+  • Combined label      2.25" × 3.00", or 3.00" wide × 2.25" tall (U-028)
+  • Ingredient-only     2.25" × 1.25"  (also the two sizes above)
+  • Barcode-only        2.25" × 1.25"  (also the two sizes above)
 
 All text is centred.  Auto-shrink ensures the ingredient list always fits the
 label even on the small stock.  Underline for subtitle is drawn manually (Pillow
@@ -47,9 +47,24 @@ class LabelTextDoesNotFit(RuntimeError):
 # Constants
 # ──────────────────────────────────────────────────────────────────────────────
 
-LABEL_W_IN   = 2.25          # all labels share the same width
+LABEL_W_IN   = 2.25          # width of the two upright labels
 LABEL_H_TALL = 3.00          # combined / tall variant
 LABEL_H_SMALL = 1.25         # small stock
+
+# U-028: the 3-inch sticker turned on its side, 3.00" wide x 2.25" tall, so it fits
+# the side of a 16 oz food container.  It is the same sticker as "2.25x3.00";
+# the print path turns the picture a quarter turn for the 2.25"-wide roll.
+WIDE_LABEL = "3.00x2.25"
+_LABEL_INCHES = {
+    "2.25x3.00": (LABEL_W_IN, LABEL_H_TALL),
+    WIDE_LABEL:  (LABEL_H_TALL, LABEL_W_IN),
+}
+
+
+def label_inches(label_size: str) -> tuple[float, float]:
+    """(width, height) in inches of *label_size*; anything unknown is the small
+    2.25" x 1.25" label, as before."""
+    return _LABEL_INCHES.get(label_size, (LABEL_W_IN, LABEL_H_SMALL))
 
 BESTBY_OFFSET = 10           # default; can be overridden via settings
 
@@ -403,7 +418,7 @@ def format_date_line(date_mode: str, pack_date: date, bestby_offset: int = 10) -
 def render_label(
     product: dict,
     label_type: str,         # "Combined" | "Ingredient" | "Barcode"
-    label_size: str,         # "2.25x3.00" | "2.25x1.25"
+    label_size: str,         # "2.25x3.00" | "2.25x1.25" | "3.00x2.25" (WIDE_LABEL)
     pack_date: date,
     show_flags: dict,        # keys: barcode, price, dollar_sign, date, address
     font_settings: dict,     # keyed by element name, each a dict with family/size/bold
@@ -425,8 +440,8 @@ def render_label(
     gap_scale = max(0.25, min(4.0, float(gap_scale)))  # clamp to sane range
 
     # ── Canvas dimensions ────────────────────────────────────────────────────
-    w_px = round(LABEL_W_IN * dpi)
-    h_in = LABEL_H_TALL if label_size == "2.25x3.00" else LABEL_H_SMALL
+    w_in, h_in = label_inches(label_size)
+    w_px = round(w_in * dpi)
     h_px = round(h_in * dpi)
 
     img  = Image.new("RGB", (w_px, h_px), "white")
@@ -468,7 +483,10 @@ def _render_layout(img, draw, product, label_type, pack_date, show_flags, font_s
                    module_px) -> Image.Image:
     """Draw *label_type* onto *img* (a new image if the combined label has to be
     laid out a second time) and return it."""
-    if label_type == "Combined":
+    if label_type == "Combined" and w_px > h_px:
+        _layout_combined_wide(draw, product, pack_date, show_flags, fs, w_px, h_px, margin,
+                              content_w, address_line, bestby_offset, dpi, gap, module_px)
+    elif label_type == "Combined":
         overflow, block_used, block_room = _layout_combined(
             draw, product, pack_date, show_flags, font_settings, fs, w_px, h_px, margin,
             content_w, address_line, bestby_offset, dpi, gap, module_px)
@@ -618,6 +636,206 @@ def _layout_combined(draw, product, pack_date, show_flags, font_settings, fs,
         _draw_text_centred(draw, address_line, addr_fnt, addr_y, w_px)
         return max(0, y - (h_px - margin - ah)), block_used, block_room
     return max(0, y - (h_px - margin)), block_used, block_room
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Layout: Combined, wide (3.00" × 2.25") — U-028
+# ──────────────────────────────────────────────────────────────────────────────
+
+WIDE_BAR_H_IN     = 0.40     # shortest barcode bars on the wide combined label
+WIDE_BAR_H_MAX_IN = 0.55     # bars grow to the height of the price/date/address stack
+WIDE_MIN_INGREDIENTS_PT = 6  # same floor as the other labels
+
+
+def _ink(draw, text: str, font) -> tuple[int, int, int, int]:
+    """Ink box (left, top, right, bottom) of *text* drawn at (0, 0)."""
+    return draw.textbbox((0, 0), text, font=font)
+
+
+def _draw_ink(draw, text: str, font, x: int, y: int) -> tuple[int, int]:
+    """Draw *text* with the top-left corner of its ink exactly at (x, y).
+    Returns the ink's (width, height)."""
+    l, t, r, b = _ink(draw, text, font)
+    draw.text((x - l, y - t), text, font=font, fill="black")
+    return r - l, b - t
+
+
+def _layout_combined_wide(draw, product, pack_date, show_flags, fs, w_px, h_px, margin,
+                          content_w, address_line, bestby_offset, dpi, gap,
+                          module_px=lambda px: px) -> None:
+    """The combined label on its side: 3.00" wide, 2.25" tall.
+
+        +------------------------------------------------+
+        |                 PRODUCT NAME                   |  header
+        |                  (SUBTITLE)                    |
+        |  Ingredients : ... full width, the largest     |  middle: gets every dot the
+        |  type that fits, centred in the free space ... |  header and footer don't need
+        |            CONTAINS: MILK, WHEAT               |
+        |       $4.49                 || ||| | || ||| |  |  footer, on the bottom edge:
+        |  Best By : 11/27/2026       || ||| | || ||| |  |  price / date / address beside
+        |  Aaojee, Middletown, NY ...   0 315000 6       |  the barcode
+        +------------------------------------------------+
+
+    Putting the price, date and address beside the barcode, not above and below
+    it, is what makes room: the footer is only as tall as the barcode, and the
+    ingredient lines are 2.9" long instead of 2.15".
+
+    Nothing is ever cut off: if the ingredients and CONTAINS line can't fit even
+    at 6 pt, LabelTextDoesNotFit is raised (U-023).
+    """
+    left   = (w_px - content_w) // 2
+    top    = margin
+    bottom = h_px - margin
+
+    name        = (product.get("name") or "").upper()
+    subtitle    = (product.get("subtitle") or "").upper()
+    ingredients = product.get("ingredients") or ""
+    extras      = info_lines(product)
+    size_str    = (product.get("size") or "").upper()
+    price       = product.get("price")
+    barcode_raw = product.get("barcode_number") or ""
+    date_mode   = product.get("date_mode") or "Packed"
+    has_middle  = bool(ingredients or extras)
+
+    # ── Header: what goes in it (drawn later, once its place is known) ────────
+    header: list[tuple[str, Any, bool]] = []          # (text, font, underline)
+    if name:
+        spec = fs("name")
+        header.append((name, _fit_font(draw, name, spec["family"], spec["size"], 6,
+                                       content_w, dpi, bold=spec.get("bold", True)), False))
+    if subtitle:
+        spec = fs("subtitle")
+        text = f"({subtitle})"
+        header.append((text, _fit_font(draw, text, spec["family"], spec["size"], 6, content_w,
+                                       dpi, bold=spec.get("bold", True), italic=True), True))
+    if size_str and not ingredients:
+        spec = fs("subtitle")
+        header.append((size_str, _fit_font(draw, size_str, spec["family"], spec["size"], 6,
+                                           content_w, dpi, bold=False), False))
+    header_gap  = gap(0.03)
+    underline_h = max(2, round(0.012 * dpi))          # room for the subtitle's underline
+
+    def header_height() -> int:
+        h = 0
+        for i, (text, fnt, underline) in enumerate(header):
+            _, t, _, b = _ink(draw, text, fnt)
+            h += (b - t) + (underline_h if underline else 0) + (header_gap if i else 0)
+        return h
+
+    def draw_header(y: int) -> int:
+        for i, (text, fnt, underline) in enumerate(header):
+            if i:
+                y += header_gap
+            l, t, r, b = _ink(draw, text, fnt)
+            x = (w_px - (r - l)) // 2
+            _draw_ink(draw, text, fnt, x, y)
+            y += b - t
+            if underline:
+                draw.line([(x, y + 1), (x + (r - l), y + 1)], fill="black", width=1)
+                y += underline_h
+        return y
+
+    # ── Footer: barcode on the right, price / date / address beside it ────────
+    data6 = None
+    if show_flags.get("barcode", True) and barcode_raw:
+        try:
+            data6 = pad_barcode(barcode_raw)
+        except Exception:
+            data6 = None                              # as on the other labels: no barcode
+    bc_w = digits_h = mod_w = 0
+    bc_fnt = None
+    if data6:
+        spec     = fs("barcode_digits")
+        bc_fnt   = load_font(spec["family"], spec["size"], bold=spec.get("bold", False), dpi=dpi)
+        mod_w    = module_px(max(2, round(0.013 * dpi)))
+        bc_w     = (51 + 2 * QUIET_MODULES) * mod_w
+        digits_h = 2 + _ink(draw, "0123456789", bc_fnt)[3]    # draw_barcode: text 2 px below
+    gutter  = max(4, round(0.06 * dpi)) if data6 else 0
+    stack_w = max(1, content_w - bc_w - gutter)
+
+    stack: list[tuple[str, Any]] = []
+    if show_flags.get("price", True) and price is not None:
+        spec   = fs("price")
+        dollar = "$" if show_flags.get("dollar_sign", True) else ""
+        text   = f"{dollar}{price:.2f}"
+        stack.append((text, _fit_font(draw, text, spec["family"], spec["size"], 8, stack_w, dpi,
+                                      bold=spec.get("bold", True))))
+    if show_flags.get("date", True):
+        text = format_date_line(date_mode, pack_date, bestby_offset)
+        if text:
+            spec = fs("date")
+            stack.append((text, _fit_font(draw, text, spec["family"], spec["size"], 4, stack_w,
+                                          dpi, bold=spec.get("bold", False))))
+    if show_flags.get("address", True) and address_line:
+        spec = fs("address")
+        stack.append((address_line, _fit_font(draw, address_line, spec["family"], spec["size"],
+                                              4, stack_w, dpi, bold=spec.get("bold", False))))
+    stack_gap  = gap(0.02)
+    stack_inks = [_ink(draw, text, fnt) for text, fnt in stack]
+    stack_ink  = sum(b - t for _, t, _, b in stack_inks)
+    stack_h    = stack_ink + stack_gap * max(0, len(stack) - 1)
+
+    bar_h = 0
+    if data6:
+        # Bars as tall as the stack beside them, between the shortest and tallest allowed
+        bar_h = max(round(WIDE_BAR_H_IN * dpi),
+                    min(round(WIDE_BAR_H_MAX_IN * dpi), stack_h - digits_h))
+    footer_h = max(stack_h, bar_h + digits_h)
+
+    def draw_footer(y: int) -> None:
+        if data6:
+            draw_barcode(draw, left + content_w - bc_w, y + footer_h - (bar_h + digits_h),
+                         data6, mod_w, bar_h, bc_fnt)
+        if not stack:
+            return
+        # Spread the stack over the footer's height: the price level with the top
+        # of the bars, the last line level with the digits.
+        spare = footer_h - stack_ink
+        step  = spare // (len(stack) - 1) if len(stack) > 1 else 0
+        sy    = y + (spare // 2 if len(stack) == 1 else 0)
+        for (text, fnt), (l, t, r, b) in zip(stack, stack_inks):
+            _draw_ink(draw, text, fnt, left + (stack_w - (r - l)) // 2, sy)
+            sy += (b - t) + step
+
+    # ── No ingredients: header and footer together, centred on the label ──────
+    if not has_middle:
+        between = gap(0.10) if header and footer_h else 0
+        y = top + max(0, (bottom - top - header_height() - between - footer_h) // 2)
+        y = draw_header(y)
+        draw_footer(y + between)
+        return
+
+    # ── Middle: the ingredients get all the height that is left ───────────────
+    header_bottom = draw_header(top)
+    footer_top    = bottom - footer_h
+    draw_footer(footer_top)
+
+    pad      = gap(0.03)                              # clear space above and below the block
+    room_top = header_bottom + (pad if header else 0)
+    room_bot = footer_top - (pad if footer_h else 0)
+
+    spec = fs("ingredients")
+    family, bold = spec.get("family", "Arial"), spec.get("bold", False)
+    full_text = "Ingredients : " + ingredients if ingredients else ""
+    start_pt  = max(WIDE_MIN_INGREDIENTS_PT, spec.get("size", 10))
+    for pt in range(start_pt, WIDE_MIN_INGREDIENTS_PT - 1, -1):
+        fnt       = load_font(family, pt, bold, dpi=dpi)
+        extra_fns = _info_fonts(extras, family, pt, bold, dpi)
+        n_lines   = len(_wrap_text(full_text, fnt, content_w, draw))
+        n_lines  += sum(len(_wrap_text(text, xfnt, content_w, draw)) for text, xfnt in extra_fns)
+        _, lh     = _text_size(draw, "Ay", fnt)
+        block_h   = n_lines * (lh + 1)
+        if block_h <= room_bot - room_top:
+            break
+    else:
+        raise LabelTextDoesNotFit()
+
+    # _draw_ingredients_block puts each line's ink the font's top bearing below y,
+    # so start that much higher: the ink then begins exactly at block_top.
+    bearing   = _ink(draw, "Ay", fnt)[1]
+    block_top = room_top + (room_bot - room_top - block_h) // 2
+    _draw_ingredients_block(draw, ingredients, fnt, fnt, block_top - bearing, w_px, content_w,
+                            margin, dpi, max_y=room_bot - bearing + 1, extras=extra_fns)
 
 
 # ──────────────────────────────────────────────────────────────────────────────

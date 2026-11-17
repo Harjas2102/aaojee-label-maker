@@ -22,8 +22,11 @@ DEFAULTS: dict[str, Any] = {
 
     # Label defaults
     "default_label_type":    "Combined",          # Combined | Ingredient | Barcode
-    "default_label_size":    "2.25x1.25",         # global size for barcode & ingredient
-                                                  # labels (combined is always 2.25x3.00)
+    "default_label_size":    "2.25x1.25",         # the label roll: "2.25x1.25", "2.25x3.00",
+                                                  # or "3.00x2.25" (3-inch sticker printed
+                                                  # sideways, U-028).  Size of barcode &
+                                                  # ingredient labels; combined is always
+                                                  # on the 3-inch sticker.
 
     # Show the "Print Combined Label" button on the main screen.
     # Hidden by default so staff aren't confused during the transition.
